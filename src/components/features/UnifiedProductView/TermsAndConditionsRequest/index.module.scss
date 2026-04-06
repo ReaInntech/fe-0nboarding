@@ -1,0 +1,98 @@
+@reference "tailwindcss";
+
+.terms-request {
+    @apply bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden;
+
+    &__header {
+        @apply px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/30;
+    }
+
+    &__title-box {
+        @apply text-lg font-bold flex items-center gap-2;
+    }
+
+    &__content {
+        @apply p-6;
+    }
+
+    &__info {
+        @apply mb-4;
+    }
+
+    &__doc-title {
+        @apply font-bold text-slate-900 dark:text-slate-100 text-lg;
+    }
+
+    &__reader {
+        @apply bg-slate-50 dark:bg-slate-950/50 rounded-lg p-5 border border-slate-200 dark:border-slate-800 h-64 overflow-y-auto mb-6;
+    }
+
+    &__prose {
+        @apply text-slate-700 dark:text-slate-300 font-serif leading-relaxed text-sm;
+        white-space: pre-line;
+    }
+
+    &__accepted-view {
+        @apply bg-emerald-50 dark:bg-emerald-500/10 rounded-lg p-5 border border-emerald-100 dark:border-emerald-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4;
+    }
+
+    &__accepted-info {
+        @apply flex items-center gap-3;
+    }
+
+    &__accepted-title {
+        @apply font-bold text-emerald-700 dark:text-emerald-400;
+    }
+
+    &__accepted-subtext {
+        @apply text-xs text-emerald-600/70 dark:text-emerald-500/70 mt-0.5;
+    }
+
+    &__accepted-date {
+        @apply text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-white/50 dark:bg-emerald-500/10 px-3 py-1.5 rounded-md self-start sm:self-auto;
+    }
+
+    &__checkboxes-list {
+        @apply space-y-3;
+    }
+
+    &__checkbox-label {
+        @apply flex items-start gap-3 cursor-pointer;
+        
+        &:hover .terms-request__checkbox-custom {
+            @apply border-emerald-400;
+        }
+        
+        &:hover .terms-request__checkbox-text {
+            @apply text-slate-900 dark:text-white;
+        }
+    }
+
+    &__checkbox-input-box {
+        @apply relative flex items-start pt-0.5;
+    }
+
+    &__checkbox-custom {
+        @apply size-5 rounded border flex items-center justify-center transition-all bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600;
+
+        &--checked {
+            @apply bg-emerald-500 border-emerald-500;
+        }
+    }
+
+    &__checkbox-text {
+        @apply text-sm font-medium text-slate-700 dark:text-slate-300 leading-snug transition-colors;
+    }
+
+    &__footer {
+        @apply pt-2 flex justify-end;
+    }
+
+    &__accept-btn {
+        @apply bg-emerald-600 hover:bg-emerald-700 text-white;
+        
+        &:disabled {
+            @apply opacity-50 cursor-not-allowed bg-slate-400 hover:bg-slate-400;
+        }
+    }
+}

@@ -38,4 +38,20 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+# next-env.d.ts
 next-env.d.ts
+
+# storybook
+/storybook-static
+.storybook-static
+
+# logs and reports
+*.log
+sb_build*.log
+tsc_output.log
+eslint_out.json
+analysis_results.md
+implementation_plan.md
+task.md
+walkthrough.md
+!src/**/stories/*.stories.tsx

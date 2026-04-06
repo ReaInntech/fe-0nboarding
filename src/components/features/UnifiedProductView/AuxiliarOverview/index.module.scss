@@ -1,0 +1,33 @@
+@reference "tailwindcss";
+
+.auxiliar-overview {
+    @apply grid grid-cols-1 sm:grid-cols-2 gap-4;
+
+    &__card {
+        @apply p-4;
+    }
+
+    &__title {
+        @apply text-xs font-bold text-slate-500 uppercase mb-3;
+    }
+
+    &__badges {
+        @apply flex flex-wrap gap-2;
+    }
+
+    &__health-box {
+        @apply flex items-center justify-between w-full;
+    }
+
+    &__health-info {
+        @apply flex flex-col;
+    }
+
+    &__health-label {
+        @apply text-sm font-bold;
+    }
+
+    &__health-icon {
+        @apply text-3xl;
+    }
+}

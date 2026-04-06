@@ -1,0 +1,31 @@
+@reference "tailwindcss";
+
+.finance-kpi-card {
+    &__header {
+        @apply flex justify-between items-start mb-4;
+    }
+
+    &__icon {
+        @apply size-10 rounded-lg flex items-center justify-center;
+    }
+
+    &__icon-inner {
+        @apply text-xl;
+    }
+
+    &__badge {
+        @apply flex items-center gap-1 bg-emerald-500/10 text-emerald-500 border-none;
+    }
+
+    &__badge-icon {
+        @apply text-xs;
+    }
+
+    &__label {
+        @apply text-sm font-semibold uppercase tracking-wider text-slate-400;
+    }
+
+    &__value {
+        @apply text-3xl font-bold text-white mt-1;
+    }
+}

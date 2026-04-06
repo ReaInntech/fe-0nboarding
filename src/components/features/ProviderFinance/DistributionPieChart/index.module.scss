@@ -1,0 +1,50 @@
+@reference "tailwindcss";
+
+.distribution-pie-chart {
+    @apply flex flex-col xl:flex-row items-center justify-center gap-6 xl:gap-8 w-full p-4;
+
+    &__donut-wrapper {
+        @apply relative size-48 lg:size-56 drop-shadow-2xl flex-shrink-0;
+    }
+
+    &__donut-bg {
+        @apply absolute inset-0 rounded-full;
+        transform: rotate(-90deg);
+    }
+
+    &__donut-hole {
+        @apply absolute inset-[18%] bg-[#0f1523] rounded-full flex items-center justify-center flex-col shadow-inner;
+    }
+
+    &__donut-label {
+        @apply text-slate-400 text-xs uppercase tracking-widest font-bold;
+    }
+
+    &__donut-value {
+        @apply text-white text-xl font-bold;
+    }
+
+    &__legend {
+        @apply flex flex-col gap-3 w-full max-w-[220px];
+    }
+
+    &__legend-item {
+        @apply flex justify-between items-center bg-slate-800/20 p-2 rounded-lg border border-slate-700/50;
+    }
+
+    &__legend-left {
+        @apply flex items-center gap-2;
+    }
+
+    &__legend-dot {
+        @apply size-3 rounded-full shadow-sm;
+    }
+
+    &__legend-text {
+        @apply text-xs text-slate-300 font-medium truncate max-w-[100px];
+    }
+
+    &__legend-val {
+        @apply text-xs font-bold text-white;
+    }
+}

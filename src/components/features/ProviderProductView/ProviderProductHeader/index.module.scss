@@ -1,0 +1,223 @@
+@reference "tailwindcss";
+
+.provider-header {
+    @apply flex flex-col;
+
+    &__row {
+        @apply flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-slate-800/70;
+    }
+
+    &__info {
+        @apply flex items-center gap-6;
+    }
+
+    &__icon-box {
+        @apply size-20 rounded-xl flex items-center justify-center border border-slate-700/50 shrink-0 transition-colors duration-300;
+    }
+
+    &__details {
+        @apply flex flex-col;
+    }
+
+    &__title-box {
+        @apply flex items-center gap-3;
+    }
+
+    &__title {
+        @apply text-3xl font-bold tracking-tight text-white;
+    }
+
+    &__meta {
+        @apply flex flex-col mt-1 gap-0.5;
+    }
+
+    &__id {
+        @apply text-slate-400 text-sm font-medium;
+        
+        span {
+            @apply font-mono text-xs;
+        }
+    }
+
+    &__client {
+        @apply text-[#1978e5] text-sm font-bold flex items-center gap-1;
+
+        span {
+            @apply text-slate-500 font-normal ml-1;
+        }
+    }
+
+    &__actions {
+        @apply flex gap-3;
+    }
+
+    &__edit-btn {
+        @apply flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all;
+
+        &--active {
+            @apply bg-[#1978e5]/20 text-[#1978e5] border border-[#1978e5]/40;
+        }
+
+        &--idle {
+            @apply bg-[#1978e5] hover:bg-[#1978e5]/90 text-white shadow-lg shadow-[#1978e5]/20;
+        }
+    }
+
+    /* Edit Panel */
+    &__panel {
+        @apply mt-6 rounded-xl border border-[#1978e5]/20 bg-slate-900/70 overflow-hidden;
+    }
+
+    &__panel-header {
+        @apply px-6 py-4 border-b border-slate-800 flex items-center gap-2;
+        
+        span {
+            @apply text-sm font-bold text-slate-200;
+        }
+    }
+
+    &__panel-grid {
+        @apply p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6;
+    }
+
+    &__field {
+        @apply flex flex-col gap-1.5;
+
+        &--span-2 {
+            @apply md:col-span-2;
+        }
+    }
+
+    &__label {
+        @apply text-xs font-bold text-slate-500 uppercase tracking-wider;
+    }
+
+    &__input-wrapper {
+        @apply relative;
+
+        .prefix {
+            @apply absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm;
+        }
+    }
+
+    &__input {
+        @apply w-full px-3 py-2.5 bg-slate-800/60 border border-slate-700 text-slate-100 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1978e5] focus:border-[#1978e5] transition-colors;
+
+        &--with-prefix {
+            @apply pl-7;
+        }
+    }
+
+    &__select {
+        @apply w-full px-3 py-2.5 bg-slate-800/60 border border-slate-700 text-slate-100 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1978e5] focus:border-[#1978e5] transition-colors appearance-none cursor-pointer;
+    }
+
+    &__textarea {
+        @apply w-full px-3 py-2.5 bg-slate-800/60 border border-slate-700 text-slate-100 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1978e5] focus:border-[#1978e5] transition-colors resize-none;
+    }
+
+    &__status-list {
+        @apply flex flex-col gap-2;
+    }
+
+    &__status-btn {
+        @apply flex items-center gap-3 px-3 py-2.5 rounded-lg border text-sm font-medium transition-all;
+
+        &--idle {
+            @apply border-slate-700/50 bg-slate-800/20 text-slate-500 hover:border-slate-600;
+        }
+
+        .check-icon {
+            @apply ml-auto text-sm;
+        }
+    }
+
+    &__color-grid {
+        @apply grid grid-cols-5 gap-2;
+    }
+
+    &__color-btn {
+        @apply aspect-square rounded-lg border-2 transition-all border-transparent hover:scale-105;
+
+        &--active {
+            @apply border-white scale-110 shadow-lg;
+        }
+    }
+
+    &__preview {
+        @apply mt-3 flex items-center gap-3 p-3 rounded-lg border border-slate-700/50;
+    }
+
+    &__preview-icon {
+        @apply size-10 rounded-lg flex items-center justify-center;
+    }
+
+    &__preview-info {
+        p:first-child {
+            @apply text-xs font-bold text-slate-300;
+        }
+        p:last-child {
+            @apply text-xs font-mono;
+        }
+    }
+
+    &__panel-footer {
+        @apply px-6 py-4 border-t border-slate-800 flex justify-end gap-3;
+    }
+
+    &__save-btn {
+        @apply bg-[#1978e5] hover:bg-[#1978e5]/90 text-white shadow-lg shadow-[#1978e5]/20 flex items-center;
+    }
+}
+
+.icon-dropdown {
+    @apply relative;
+
+    &__trigger {
+        @apply flex items-center gap-3 w-full px-3 py-2.5 bg-slate-800/60 border border-slate-700 rounded-lg hover:border-slate-600 transition-colors focus:outline-none focus:ring-1 focus:ring-[#1978e5];
+    }
+
+    &__trigger-icon {
+        @apply flex items-center justify-center rounded shrink-0;
+    }
+
+    &__trigger-text {
+        @apply flex-1 text-left text-sm text-slate-300;
+    }
+
+    &__trigger-arrow {
+        @apply text-slate-500 text-base;
+    }
+
+    &__menu {
+        @apply absolute z-50 mt-1 w-full max-h-52 overflow-y-auto bg-[#0f1523] border border-slate-700 rounded-lg shadow-xl;
+    }
+
+    &__item {
+        @apply flex items-center gap-3 w-full px-3 py-2 hover:bg-slate-800 transition-colors;
+
+        &--active {
+            @apply bg-[#1978e5]/10;
+        }
+    }
+
+    &__item-icon-box {
+        @apply flex items-center justify-center rounded shrink-0;
+    }
+
+    &__item-text {
+        @apply text-sm;
+        
+        &--active {
+            @apply text-white font-semibold;
+        }
+        
+        &--idle {
+            @apply text-slate-400;
+        }
+    }
+
+    &__item-check {
+        @apply ml-auto text-[#1978e5] text-sm;
+    }
+}

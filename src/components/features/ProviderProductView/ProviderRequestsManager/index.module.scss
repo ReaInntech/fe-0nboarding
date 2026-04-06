@@ -1,0 +1,87 @@
+@reference "tailwindcss";
+
+.requests-manager {
+    &__header {
+        @apply flex items-center justify-between mb-6;
+    }
+
+    &__title {
+        @apply text-lg font-bold flex items-center gap-2 text-white;
+    }
+
+    &__table-container {
+        @apply overflow-x-auto;
+    }
+
+    &__table {
+        @apply w-full text-left border-collapse;
+    }
+
+    &__th {
+        @apply py-3 px-2 text-[10px] uppercase font-bold text-slate-500 tracking-widest border-b border-slate-800;
+
+        &--right {
+            @apply text-right;
+        }
+    }
+
+    &__tr {
+        @apply border-b border-slate-800/50 transition-colors;
+        
+        &:hover {
+            @apply bg-slate-800/20;
+        }
+
+        &:last-child {
+            @apply border-none;
+        }
+    }
+
+    &__td {
+        @apply py-4 px-2;
+
+        &--right {
+            @apply text-right;
+        }
+
+        &--date {
+            @apply text-xs text-slate-400 font-medium;
+        }
+    }
+
+    &__request-info {
+        @apply flex flex-col;
+    }
+
+    &__subject {
+        @apply text-sm font-bold text-slate-200;
+    }
+
+    &__meta {
+        @apply flex items-center gap-2 mt-1;
+    }
+
+    &__id {
+        @apply text-[10px] text-slate-500 font-mono;
+    }
+
+    &__separator {
+        @apply text-[10px] text-slate-500;
+    }
+
+    &__priority {
+        @apply text-[10px] font-bold uppercase;
+        
+        &--high { @apply text-red-500; }
+        &--medium { @apply text-amber-500; }
+        &--low { @apply text-emerald-500; }
+    }
+
+    &__empty {
+        @apply py-12 text-center text-slate-500 italic text-sm;
+    }
+
+    &__review-btn {
+        @apply text-[#1978e5] hover:bg-[#1978e5]/10;
+    }
+}

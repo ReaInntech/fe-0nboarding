@@ -1,0 +1,89 @@
+@reference "tailwindcss";
+
+.legal-documents {
+    @apply bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden;
+
+    &__header {
+        @apply px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/30;
+    }
+
+    &__title {
+        @apply text-lg font-bold flex items-center gap-2;
+    }
+
+    &__list {
+        @apply divide-y divide-slate-200 dark:divide-slate-800;
+    }
+
+    &__item {
+        @apply p-6 flex flex-col gap-4 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors;
+    }
+
+    &__item-main {
+        @apply flex flex-col justify-between gap-4;
+    }
+
+    &__item-top {
+        @apply flex items-start gap-4 flex-1;
+    }
+
+    &__icon-container {
+        @apply p-2 bg-slate-100 dark:bg-slate-800 rounded-lg shrink-0;
+    }
+
+    &__icon {
+        @apply text-slate-600 dark:text-slate-400 text-xl;
+    }
+
+    &__item-info {
+        @apply flex-1 min-w-0;
+    }
+
+    &__name-row {
+        @apply flex items-center gap-2 flex-wrap mb-1;
+    }
+
+    &__name {
+        @apply font-bold text-slate-800 dark:text-white text-sm;
+    }
+
+    &__badge-group {
+        @apply flex gap-1.5;
+    }
+
+    &__badge {
+        @apply px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase;
+
+        &--format {
+            @apply bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300;
+        }
+
+        &--step {
+            @apply bg-[#1978e5]/10 text-[#1978e5];
+        }
+    }
+
+    &__description {
+        @apply text-xs text-slate-500 dark:text-slate-400 line-clamp-2;
+    }
+
+    &__footer {
+        @apply flex flex-row items-center justify-between gap-4 shrink-0 mt-2 border-t border-slate-100 dark:border-slate-800 pt-2;
+    }
+
+    &__meta {
+        @apply flex flex-col text-left;
+    }
+
+    &__meta-item {
+        @apply flex items-center gap-1.5 text-[10px] text-slate-500 whitespace-nowrap;
+
+        &--approved {
+            @apply text-emerald-600 dark:text-emerald-500 font-medium mt-0.5;
+        }
+    }
+
+    &__action {
+        @apply p-2 text-[#1978e5] hover:bg-[#1978e5]/10 rounded-full shrink-0;
+    }
+}

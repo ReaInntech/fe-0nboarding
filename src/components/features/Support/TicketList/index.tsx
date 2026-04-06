@@ -139,7 +139,7 @@ export default function TicketList({
                                         </span>
                                     </div>
                                 </div>
-                                <Badge variant={status.variant} className={styles['ticket-list__status-badge']}>
+                                <Badge variant={(ticket.priority === 'High' ? 'warning' : 'default') as "default" | "warning" | "success" | "primary"} className={styles['ticket-list__priority-badge']}>
                                     {status.label}
                                 </Badge>
                             </button>

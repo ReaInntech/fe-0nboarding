@@ -1,0 +1,63 @@
+@reference "tailwindcss";
+
+.service-details {
+    &__title {
+        @apply text-lg font-bold mb-6 flex items-center gap-2;
+    }
+
+    &__progress-section {
+        @apply mb-8 p-4 rounded-xl bg-[#1978e5]/5 dark:bg-[#1978e5]/10 border border-[#1978e5]/10;
+    }
+
+    &__progress-header {
+        @apply flex justify-between items-end mb-3;
+    }
+
+    &__progress-label-box {
+        @apply flex flex-col;
+    }
+
+    &__progress-label {
+        @apply text-[10px] font-bold uppercase tracking-wider text-[#1978e5]/70;
+    }
+
+    &__progress-amount-row {
+        @apply flex items-baseline gap-1.5 mt-0.5;
+    }
+
+    &__progress-paid {
+        @apply text-lg font-black text-slate-800 dark:text-white;
+    }
+
+    &__progress-total {
+        @apply text-xs font-bold text-slate-400;
+    }
+
+    &__progress-bar-bg {
+        @apply w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden shadow-inner;
+    }
+
+    &__progress-bar-fill {
+        @apply h-full transition-all duration-1000 ease-out relative;
+    }
+
+    &__fields-list {
+        @apply space-y-4;
+    }
+
+    &__field-item {
+        @apply flex items-center justify-between p-3 rounded-lg bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700;
+    }
+
+    &__field-info {
+        @apply flex items-center gap-3;
+    }
+
+    &__field-label {
+        @apply text-sm font-medium text-slate-500;
+    }
+
+    &__field-value {
+        @apply text-sm font-bold;
+    }
+}

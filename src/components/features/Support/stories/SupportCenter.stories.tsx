@@ -74,6 +74,7 @@ export const VehicleRepairSupport = {
                 avgResponse: '< 2 hrs',
             }}
             ticketListProps={{
+                title: 'Repair Tickets',
                 tickets: [
                     {
                         id: 'TK-SRV-001',

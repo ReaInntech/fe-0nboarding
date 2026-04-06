@@ -1,0 +1,203 @@
+@reference "tailwindcss";
+
+.payment-request {
+    @apply bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden;
+
+    &__header {
+        @apply px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/30;
+    }
+
+    &__title-box {
+        @apply text-lg font-bold flex items-center gap-2;
+    }
+
+    &__content {
+        @apply p-6;
+        
+        &--paid { @apply bg-emerald-500/5; }
+        &--processing { @apply bg-[#1978e5]/5; }
+        &--pending { @apply bg-slate-50/50 dark:bg-slate-900/50; }
+    }
+
+    &__layout {
+        @apply flex flex-col md:flex-row gap-8;
+    }
+
+    &__details {
+        @apply flex-1;
+    }
+
+    &__details-top {
+        @apply flex items-start gap-4;
+    }
+
+    &__icon-box {
+        @apply p-2 rounded;
+        &--paid { @apply bg-emerald-500/10 text-emerald-500; }
+        &--processing { @apply bg-[#1978e5]/10 text-[#1978e5]; }
+        &--pending { @apply bg-slate-200 dark:bg-slate-800 text-slate-500; }
+    }
+
+    &__info-body {
+        @apply flex-1;
+    }
+
+    &__info-title {
+        @apply font-bold text-sm text-slate-900 dark:text-slate-100;
+    }
+
+    &__info-meta {
+        @apply text-xs text-slate-500 mt-1;
+    }
+
+    &__status-row {
+        @apply flex items-center gap-4 mt-2 mb-4;
+    }
+
+    &__status-indicator {
+        @apply flex items-center gap-1 text-xs font-bold;
+        &--paid { @apply text-emerald-600 dark:text-emerald-500; }
+        &--processing { @apply text-[#1978e5]; }
+        &--pending { @apply text-amber-600 dark:text-amber-500; }
+    }
+
+    &__due-date {
+        @apply text-xs text-slate-400 ml-2;
+    }
+
+    &__invoice-table {
+        @apply mt-4 text-xs text-slate-500 space-y-1 bg-white dark:bg-slate-950/50 p-4 rounded-lg border border-slate-200 dark:border-slate-800;
+    }
+
+    &__invoice-row {
+        @apply flex justify-between;
+    }
+
+    &__invoice-item-amount {
+        @apply font-semibold text-slate-700 dark:text-slate-300;
+    }
+
+    &__invoice-total-row {
+        @apply flex justify-between pt-3 border-t border-slate-200 dark:border-slate-700 mt-3;
+    }
+
+    &__invoice-total-label {
+        @apply font-bold text-slate-900 dark:text-slate-100;
+    }
+
+    &__invoice-total-value {
+        @apply font-bold text-lg text-[#1978e5];
+    }
+
+    &__actions {
+        @apply mt-4;
+    }
+
+    &__sidebar {
+        @apply md:w-80 flex-shrink-0 flex flex-col gap-4 border-t md:border-t-0 md:border-l border-slate-200 dark:border-slate-800 pt-6 md:pt-0 md:pl-8;
+    }
+
+    &__sidebar-section {
+        @apply space-y-4;
+    }
+
+    &__bank-title {
+        @apply text-xs font-bold uppercase tracking-wider text-slate-500 mb-3;
+    }
+
+    &__bank-card {
+        @apply bg-white dark:bg-slate-950/50 p-4 rounded-lg border border-slate-200 dark:border-slate-800 space-y-3;
+    }
+
+    &__bank-field {
+        @apply flex flex-col;
+    }
+
+    &__bank-label {
+        @apply text-[10px] uppercase font-bold text-slate-400;
+    }
+
+    &__bank-value {
+        @apply text-sm font-semibold text-slate-900 dark:text-slate-100;
+    }
+
+    &__bank-mono {
+        @apply text-sm font-mono text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded;
+    }
+
+    &__bank-copy-row {
+        @apply flex items-center justify-between;
+    }
+
+    &__instruction-box {
+        @apply mt-2 text-xs text-slate-500 p-2 bg-amber-50 dark:bg-amber-500/10 rounded border border-amber-100 dark:border-amber-500/20;
+    }
+
+    &__upload-dropzone {
+        @apply border-2 border-dashed border-[#1978e5]/30 rounded-xl p-6 flex flex-col items-center justify-center text-center bg-[#1978e5]/5 hover:bg-[#1978e5]/10 hover:border-[#1978e5]/50 transition-all cursor-pointer;
+    }
+
+    &__upload-icon-box {
+        @apply size-10 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center mb-3 transition-colors text-[#1978e5] shadow-sm;
+        
+        .payment-request__upload-dropzone:hover & {
+            @apply bg-[#1978e5] text-white;
+        }
+    }
+
+    &__upload-text {
+        @apply text-sm font-bold text-slate-900 dark:text-slate-100;
+    }
+
+    &__upload-subtext {
+        @apply text-[10px] text-slate-500 mt-1;
+    }
+
+    &__uploaded-card {
+        @apply flex items-center gap-3 p-4 rounded-xl bg-[#1978e5]/5 border border-[#1978e5]/20;
+    }
+
+    &__uploaded-icon-box {
+        @apply size-8 rounded-full bg-[#1978e5]/20 flex items-center justify-center;
+    }
+
+    &__uploaded-title {
+        @apply text-xs font-bold text-slate-900 dark:text-slate-100;
+    }
+
+    &__uploaded-subtext {
+        @apply text-[10px] text-slate-500 mt-0.5;
+    }
+
+    &__uploaded-date {
+        @apply text-[9px] text-slate-400;
+    }
+
+    &__paid-info {
+        @apply p-4 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20;
+    }
+
+    &__paid-header {
+        @apply flex items-center gap-2 mb-3;
+    }
+
+    &__paid-title {
+        @apply font-bold text-emerald-700 dark:text-emerald-400;
+    }
+
+    &__paid-meta-row {
+        @apply flex justify-between items-center text-xs mb-2 pb-2 border-b border-emerald-200 dark:border-emerald-500/20;
+    }
+
+    &__paid-date-label {
+        @apply text-emerald-600/70 dark:text-emerald-500/70;
+    }
+
+    &__paid-date-value {
+        @apply font-bold text-emerald-700 dark:text-emerald-400;
+    }
+
+    &__paid-description {
+        @apply text-xs text-emerald-600/80 dark:text-emerald-500/80 leading-snug;
+    }
+}

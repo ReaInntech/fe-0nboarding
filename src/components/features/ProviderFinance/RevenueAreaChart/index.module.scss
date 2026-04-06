@@ -1,0 +1,17 @@
+@reference "tailwindcss";
+
+.revenue-area-chart {
+    @apply w-full h-full relative;
+
+    &__svg {
+        @apply w-full h-full absolute inset-0;
+    }
+
+    &__x-axis {
+        @apply absolute left-0 right-0 bottom-[-24px] flex justify-between text-xs text-slate-400 px-2 font-medium;
+    }
+
+    &__x-label {
+        @apply absolute -translate-x-1/2;
+    }
+}

@@ -1,0 +1,196 @@
+@reference "tailwindcss";
+
+.onboarding-manager {
+    &__header {
+        @apply flex items-center justify-between mb-8;
+    }
+
+    &__title {
+        @apply text-lg font-bold flex items-center gap-2 text-white;
+    }
+
+    &__steps-list {
+        @apply space-y-4;
+    }
+
+    &__step {
+        @apply flex flex-col rounded-xl border transition-all overflow-hidden bg-slate-800/20 border-slate-800;
+        
+        &:hover {
+            @apply border-slate-700;
+        }
+
+        &--expanded {
+            @apply bg-slate-800/40 border-[#1978e5]/40 shadow-lg shadow-[#1978e5]/5;
+        }
+    }
+
+    &__step-header {
+        @apply flex items-center gap-4 p-4 cursor-pointer select-none;
+    }
+
+    &__drag-handle {
+        @apply text-slate-600 transition-colors;
+        
+        .onboarding-manager__step--expanded & {
+            @apply text-[#1978e5];
+        }
+        
+        .onboarding-manager__step-header:hover & {
+            @apply text-slate-400;
+        }
+    }
+
+    &__step-icon-box {
+        @apply size-10 rounded-lg flex items-center justify-center shrink-0 transition-colors bg-slate-800 text-slate-500;
+        
+        .onboarding-manager__step--expanded & {
+            @apply bg-[#1978e5]/20 text-[#1978e5];
+        }
+    }
+
+    &__step-info {
+        @apply flex-1;
+    }
+
+    &__step-name {
+        @apply font-bold text-sm transition-colors text-slate-300;
+        
+        .onboarding-manager__step--expanded & {
+            @apply text-white;
+        }
+    }
+
+    &__step-desc {
+        @apply text-xs text-slate-500 line-clamp-1 mt-0.5;
+    }
+
+    &__step-meta {
+        @apply flex items-center gap-3;
+    }
+
+    &__step-type-badge {
+        @apply flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider;
+    }
+
+    &__step-index {
+        @apply text-xs text-slate-600 font-mono;
+    }
+
+    &__accordion-icon {
+        @apply transition-transform duration-300 text-slate-500;
+        
+        .onboarding-manager__step--expanded & {
+            @apply rotate-180 text-[#1978e5];
+        }
+    }
+
+    &__step-body {
+        @apply px-14 pb-6;
+        animation: slideDown 200ms ease-out;
+    }
+
+    &__config-grid {
+        @apply grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-800/50;
+    }
+
+    &__field {
+        @apply flex flex-col gap-1.5;
+    }
+
+    &__label {
+        @apply text-[9px] font-black text-slate-500 uppercase tracking-widest;
+        
+        &--secondary {
+            @apply text-[10px] font-bold tracking-[0.1em];
+        }
+    }
+
+    &__input {
+        @apply w-full bg-slate-950/50 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-300 focus:outline-none focus:ring-1 focus:ring-[#1978e5] transition-all;
+    }
+
+    &__textarea {
+        @apply w-full bg-slate-900/50 border border-slate-700/50 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#1978e5] transition-all resize-none;
+    }
+
+    &__icon-field {
+        @apply flex gap-2;
+    }
+
+    &__icon-preview {
+        @apply size-9 rounded-lg bg-slate-900 flex items-center justify-center border border-slate-700/50 text-slate-400;
+    }
+
+    &__type-grid {
+        @apply grid grid-cols-2 gap-2;
+    }
+
+    &__type-btn {
+        @apply flex items-center justify-center gap-2 px-3 py-2 rounded-lg border text-xs font-semibold transition-all;
+
+        &--idle {
+            @apply bg-slate-900/50 border-slate-700/50 text-slate-500 hover:border-slate-600;
+        }
+        
+        &--active {
+            @apply border-[#1978e5]/30 shadow-inner;
+        }
+    }
+
+    &__requests-section {
+        @apply mt-8 pt-6 border-t border-slate-800/50;
+    }
+
+    &__requests-header {
+        @apply flex items-center justify-between mb-4;
+        
+        h4 {
+            @apply text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em] flex items-center gap-2;
+        }
+    }
+
+    &__requests-grid {
+        @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+    }
+
+    &__add-requests-box {
+        @apply flex flex-col gap-3;
+    }
+
+    &__add-row {
+        @apply grid grid-cols-2 gap-3;
+    }
+
+    &__add-card {
+        @apply p-3 border border-dashed border-slate-700 rounded-xl flex flex-col items-center justify-center gap-2 transition-colors cursor-pointer;
+
+        &:hover {
+            @apply bg-slate-800/20;
+        }
+
+        &--payment:hover { @apply bg-[#1978e5]/5 border-[#1978e5]/40; }
+        &--document:hover { @apply bg-amber-400/5 border-amber-400/40; }
+        &--terms:hover { @apply bg-emerald-400/5 border-emerald-400/40; }
+        &--form:hover { @apply bg-violet-400/5 border-violet-400/40; }
+    }
+
+    &__add-card-icon {
+        @apply size-7 rounded-full bg-slate-800 flex items-center justify-center text-slate-600 transition-colors;
+        
+        .onboarding-manager__add-card--payment:hover & { @apply text-[#1978e5]; }
+        .onboarding-manager__add-card--document:hover & { @apply text-amber-400; }
+        .onboarding-manager__add-card--terms:hover & { @apply text-emerald-400; }
+        .onboarding-manager__add-card--form:hover & { @apply text-violet-400; }
+    }
+
+    &__add-card-label {
+        @apply text-[9px] font-bold text-slate-600 uppercase transition-colors;
+        
+        .onboarding-manager__add-card:hover & { @apply text-slate-400; }
+    }
+
+    &__footer {
+        @apply mt-6 pt-5 border-t border-slate-800 flex justify-center;
+    }
+}

@@ -1,0 +1,61 @@
+@reference "tailwindcss";
+
+.payment-history {
+    @apply bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden;
+
+    &__header {
+        @apply px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/30;
+    }
+
+    &__title-box {
+        @apply text-lg font-bold flex items-center gap-2;
+    }
+
+    &__download-all {
+        @apply text-[#1978e5] text-sm font-bold hover:underline transition-colors bg-transparent border-none p-0 cursor-pointer;
+    }
+
+    &__table-container {
+        @apply overflow-x-auto;
+    }
+
+    &__table {
+        @apply w-full text-left border-collapse;
+    }
+
+    &__th {
+        @apply px-6 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50 dark:bg-slate-800/50;
+        
+        &--right { @apply text-right; }
+        &--center { @apply text-center; }
+    }
+
+    &__tr {
+        @apply hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors divide-y divide-slate-200 dark:divide-slate-800;
+    }
+
+    &__td {
+        @apply px-6 py-4 text-sm whitespace-nowrap;
+
+        &--date { @apply text-slate-600 dark:text-slate-300; }
+        &--desc { @apply font-medium text-slate-900 dark:text-slate-100; }
+        &--amount { @apply font-bold text-right text-slate-900 dark:text-slate-100; }
+        &--center { @apply text-center; }
+    }
+
+    &__status-badge {
+        @apply text-[10px] uppercase font-bold px-2 py-1;
+    }
+
+    &__download-btn {
+        @apply text-slate-400 hover:text-[#1978e5] transition-colors bg-transparent border-none p-0 cursor-pointer;
+    }
+
+    &__footer {
+        @apply p-4 bg-slate-50 dark:bg-slate-800/30 border-t border-slate-200 dark:border-slate-800 flex justify-center;
+    }
+
+    &__load-more {
+        @apply text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-[#1978e5] dark:hover:text-[#1978e5] transition-colors flex items-center gap-2 bg-transparent border-none cursor-pointer;
+    }
+}

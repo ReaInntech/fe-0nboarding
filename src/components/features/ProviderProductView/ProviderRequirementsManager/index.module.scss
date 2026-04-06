@@ -1,0 +1,71 @@
+@reference "tailwindcss";
+
+.requirements-manager {
+    &__header {
+        @apply flex items-center justify-between mb-6;
+    }
+
+    &__title {
+        @apply text-lg font-bold flex items-center gap-2 text-white;
+    }
+
+    &__add-btn {
+        @apply text-[#1978e5] text-xs;
+    }
+
+    &__list {
+        @apply space-y-3;
+    }
+
+    &__item {
+        @apply flex items-center justify-between p-4 bg-slate-800/30 border border-slate-700/50 rounded-lg transition-all;
+        
+        &:hover {
+            @apply border-slate-600;
+        }
+    }
+
+    &__item-left {
+        @apply flex items-center gap-4;
+    }
+
+    &__drag-handle {
+        @apply p-2 rounded bg-slate-800 text-slate-500 transition-colors;
+        
+        .requirements-manager__item:hover & {
+            @apply text-[#1978e5];
+        }
+    }
+
+    &__label {
+        @apply block text-xs font-bold text-slate-500 uppercase tracking-widest leading-none mb-1;
+        
+        &--required {
+            @apply text-red-500;
+        }
+    }
+
+    &__value {
+        @apply text-sm font-semibold text-slate-200;
+    }
+
+    &__actions {
+        @apply flex items-center gap-2 transition-opacity;
+        
+        .requirements-manager__item:not(:hover) & {
+            @apply opacity-0;
+        }
+    }
+
+    &__info-box {
+        @apply mt-6 p-4 rounded-lg bg-blue-500/5 border border-blue-500/20;
+    }
+
+    &__info-text {
+        @apply text-xs text-blue-400/80 leading-relaxed;
+        
+        strong {
+            @apply text-blue-300;
+        }
+    }
+}

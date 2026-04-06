@@ -1,0 +1,53 @@
+@reference "tailwindcss";
+
+.provider-finance {
+    @apply pt-[64px] min-h-screen bg-[#0f1523] text-slate-200 font-sans pb-20;
+
+    &__main {
+        @apply max-w-7xl mx-auto px-4 md:px-8 pt-28 space-y-20;
+    }
+
+    &__kpis-grid {
+        @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6;
+    }
+
+    &__charts-grid {
+        @apply grid grid-cols-1 lg:grid-cols-2 gap-8;
+    }
+
+    &__chart-card {
+        @apply overflow-hidden flex flex-col;
+    }
+
+    &__chart-header {
+        @apply flex justify-between items-center;
+
+        &--mb8 {
+            @apply mb-8;
+        }
+
+        &--mb6 {
+            @apply mb-6;
+        }
+    }
+
+    &__chart-title {
+        @apply font-bold text-lg text-slate-100;
+    }
+
+    &__chart-badge {
+        @apply text-xs text-slate-400 font-medium bg-slate-800 px-3 py-1 rounded-full;
+    }
+
+    &__chart-body {
+        @apply flex-1;
+
+        &--min-height {
+            @apply min-h-[300px] mb-6;
+        }
+
+        &--center {
+            @apply flex items-center justify-center;
+        }
+    }
+}

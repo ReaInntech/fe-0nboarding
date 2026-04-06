@@ -1,0 +1,69 @@
+@reference "tailwindcss";
+
+.contracting-progress {
+    @apply mb-8;
+
+    &__card {
+        @apply p-6;
+    }
+
+    &__header {
+        @apply flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6;
+    }
+
+    &__title {
+        @apply text-sm font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2;
+    }
+
+    &__icon {
+        @apply text-lg text-[#1978e5];
+    }
+
+    &__steps-container {
+        @apply relative flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0;
+    }
+
+    &__line-bg {
+        @apply absolute top-1/2 left-0 w-full h-0.5 bg-slate-200 dark:bg-slate-800 -translate-y-1/2 hidden md:block;
+    }
+
+    &__line-progress {
+        @apply absolute top-1/2 left-0 h-0.5 bg-[#1978e5] -translate-y-1/2 hidden md:block transition-all duration-700;
+    }
+
+    &__step {
+        @apply relative flex flex-col items-center gap-2 z-10 w-full md:w-auto bg-[#f5f6f8] dark:bg-[#0f1523] md:bg-transparent py-2 md:py-0;
+    }
+
+    &__step-circle {
+        @apply size-10 rounded-full flex items-center justify-center border-4 border-[#f5f6f8] dark:border-[#0f1523] transition-all duration-300;
+        
+        &--completed, &--active {
+            @apply bg-[#1978e5] text-white shadow-lg shadow-[#1978e5]/20;
+        }
+
+        &--pending {
+            @apply bg-slate-200 dark:bg-slate-800 text-slate-400;
+        }
+    }
+
+    &__step-icon {
+        @apply text-lg;
+    }
+
+    &__step-label {
+        @apply text-xs font-bold transition-colors duration-300;
+
+        &--active {
+            @apply text-[#1978e5];
+        }
+
+        &--completed {
+            @apply text-slate-900 dark:text-slate-100;
+        }
+
+        &--pending {
+            @apply text-slate-500;
+        }
+    }
+}

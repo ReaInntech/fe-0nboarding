@@ -1,0 +1,38 @@
+@reference "tailwindcss";
+
+.provider-view {
+    @apply pt-[64px] bg-[#020617] font-sans text-slate-300 min-h-screen antialiased flex flex-col w-full overflow-x-hidden relative;
+
+    // Premium background effect
+    &::before {
+        content: '';
+        @apply absolute top-0 left-0 w-full h-[500px] pointer-events-none;
+        background: radial-gradient(circle at 50% -20%, rgba(25, 120, 229, 0.15) 0%, transparent 70%);
+        z-index: 0;
+    }
+
+    &__main {
+        @apply max-w-7xl mx-auto w-full px-6 pt-12 pb-20 flex flex-col gap-10 flex-1 relative z-10;
+    }
+
+    &__header-section {
+        @apply pb-10 border-b border-white/[0.03];
+    }
+
+    &__activity-log {
+        @apply bg-[#0f1523]/40 border border-slate-800/60 rounded-2xl p-12 text-center transition-all;
+        backdrop-filter: blur(8px);
+        
+        h4 {
+            @apply text-slate-200 font-bold mb-3 uppercase tracking-[0.2em] text-xs;
+        }
+
+        p {
+            @apply text-slate-500 text-sm max-w-md mx-auto leading-relaxed;
+        }
+
+        &:hover {
+            @apply border-slate-700/60 bg-[#0f1523]/60;
+        }
+    }
+}

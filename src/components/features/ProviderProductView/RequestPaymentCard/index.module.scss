@@ -1,0 +1,223 @@
+@reference "tailwindcss";
+
+.payment-card {
+    @apply p-5 bg-[#0f1523]/60 border border-slate-800 rounded-xl transition-all duration-300;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 20px -10px rgba(0, 0, 0, 0.5);
+
+    &:hover {
+        @apply border-[#1978e5]/40 shadow-lg shadow-[#1978e5]/5;
+        transform: translateY(-2px);
+    }
+
+    &__header {
+        @apply flex items-center justify-between mb-5 pb-3 border-b border-white/[0.03];
+    }
+
+    &__title-box {
+        @apply flex items-center gap-3;
+    }
+
+    &__icon-wrapper {
+        @apply size-8 rounded-lg bg-[#1978e5]/10 text-[#1978e5] flex items-center justify-center;
+        box-shadow: inset 0 0 10px rgba(25, 120, 229, 0.05);
+    }
+
+    &__title {
+        @apply text-xs font-bold text-slate-100 uppercase tracking-widest;
+    }
+
+    &__actions {
+        @apply flex items-center gap-1.5 transition-opacity;
+        
+        button {
+            @apply p-1.5 rounded-md text-slate-500 hover:text-white hover:bg-white/5 transition-all;
+        }
+
+        .delete-btn {
+            @apply hover:text-red-400 hover:bg-red-400/5;
+        }
+    }
+
+    &__body {
+        @apply space-y-5;
+    }
+
+    &__upload-zone {
+        @apply text-center border border-dashed border-slate-800 rounded-xl p-5 hover:bg-[#1978e5]/[0.02] hover:border-[#1978e5]/30 transition-all cursor-pointer;
+
+        &:hover &-icon {
+            @apply text-[#1978e5] border-[#1978e5]/20 scale-110;
+        }
+
+        &:hover &-text {
+            @apply text-slate-200;
+        }
+    }
+
+    &__upload-zone-icon {
+        @apply size-10 rounded-full bg-slate-950/50 border border-slate-800 flex items-center justify-center mx-auto mb-3 text-slate-600 transition-all duration-300;
+    }
+
+    &__upload-zone-text {
+        @apply text-[10px] font-bold text-slate-400 transition-colors uppercase tracking-wider;
+    }
+
+    &__upload-zone-subtext {
+        @apply text-[10px] text-slate-500 mt-1.5;
+    }
+
+    &__field-group {
+        @apply flex flex-col gap-2;
+
+        &--row {
+            @apply grid grid-cols-2 gap-4;
+        }
+    }
+
+    &__label {
+        @apply text-[9px] font-black uppercase tracking-[0.15em] text-[#1978e5]/80;
+    }
+
+    &__input {
+        @apply w-full bg-slate-950/40 border border-slate-800/80 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#1978e5]/50 focus:border-[#1978e5]/50 transition-all placeholder:text-slate-700;
+
+        &--readonly {
+            @apply opacity-50 cursor-not-allowed grayscale bg-slate-900/50;
+        }
+
+        &--with-prefix {
+            @apply pl-7;
+        }
+    }
+
+    &__textarea {
+        @apply w-full bg-slate-950/40 border border-slate-800/80 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#1978e5]/50 focus:border-[#1978e5]/50 transition-all resize-none placeholder:text-slate-700;
+    }
+
+    &__input-wrapper {
+        @apply relative;
+
+        .prefix {
+            @apply absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs font-mono;
+        }
+    }
+
+    &__options-row {
+        @apply pt-3 border-t border-white/[0.03] flex items-center gap-5;
+    }
+
+    &__option-label {
+        @apply flex items-center gap-2.5 cursor-pointer select-none transition-all;
+        
+        &:hover span {
+            @apply text-slate-300;
+        }
+    }
+
+    &__checkbox-custom {
+        @apply size-3.5 rounded border flex items-center justify-center transition-all;
+
+        &--checked {
+            @apply bg-[#1978e5] border-[#1978e5] shadow-lg shadow-[#1978e5]/20;
+        }
+
+        &--idle {
+            @apply border-slate-700 bg-slate-950/60;
+        }
+    }
+
+    &__option-text {
+        @apply text-[9px] font-black uppercase tracking-widest transition-colors;
+
+        &--active {
+            @apply text-slate-100;
+        }
+
+        &--idle {
+            @apply text-slate-600;
+        }
+    }
+
+    &__amount-header {
+        @apply flex items-center justify-between;
+    }
+
+    &__sync-badge {
+        @apply flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 shadow-inner shadow-emerald-500/5;
+        
+        span {
+            @apply text-[8px] font-bold text-emerald-400/90 uppercase tracking-widest;
+        }
+    }
+
+    &__itemized-area {
+        @apply space-y-4 p-4 bg-slate-950/40 border border-slate-800/60 rounded-xl transition-all duration-300;
+        animation: fadeInSlide 300ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    &__itemized-header {
+        @apply flex items-center justify-between;
+        
+        span {
+            @apply text-[9px] font-black text-slate-500 uppercase tracking-[0.2em];
+        }
+    }
+
+    &__add-item-btn {
+        @apply text-[10px] flex items-center gap-1.5 font-bold text-[#1978e5] hover:text-[#1978e5]/80 transition-all px-2 py-1 rounded-md hover:bg-[#1978e5]/10;
+    }
+
+    &__items-list {
+        @apply space-y-3 max-h-[150px] overflow-y-auto pr-1;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(25, 120, 229, 0.2) transparent;
+        
+        &::-webkit-scrollbar {
+            width: 4px;
+        }
+        &::-webkit-scrollbar-thumb {
+            background: rgba(25, 120, 229, 0.2);
+            border-radius: 10px;
+        }
+    }
+
+    &__item-row {
+        @apply flex items-center gap-3 transition-all p-1 hover:bg-white/[0.02] rounded-lg;
+    }
+
+    &__item-desc {
+        @apply flex-1 bg-slate-950/40 border border-slate-800/60 rounded-lg px-3 py-1.5 text-[11px] text-slate-300 focus:outline-none focus:border-[#1978e5]/50 transition-all placeholder:text-slate-700;
+    }
+
+    &__item-price-wrapper {
+        @apply relative w-24;
+        
+        .prefix {
+            @apply absolute left-2 top-1/2 -translate-y-1/2 text-slate-600 text-[10px] font-mono;
+        }
+    }
+
+    &__item-price {
+        @apply w-full bg-slate-950/40 border border-slate-800/60 rounded-lg pl-5 pr-2 py-1.5 text-[11px] text-slate-100 transition-all font-mono focus:outline-none focus:border-[#1978e5]/50;
+    }
+
+    &__item-remove {
+        @apply p-1.5 rounded-md text-slate-600 hover:text-red-400 hover:bg-red-400/10 transition-all opacity-0;
+        
+        .payment-card__item-row:hover & {
+            @apply opacity-100;
+        }
+    }
+}
+
+@keyframes fadeInSlide {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

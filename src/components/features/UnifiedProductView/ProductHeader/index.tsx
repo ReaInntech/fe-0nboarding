@@ -55,7 +55,7 @@ export default function ProductHeader({
                 <div className={styles['product-header__details']}>
                     <div className={styles['product-header__title-row']}>
                         <h1 className={styles['product-header__title']}>{title}</h1>
-                        <Badge variant={badgeVariant}>{badgeText}</Badge>
+                        <Badge variant={badgeVariant as "default" | "warning" | "success" | "primary"}>{badgeText}</Badge>
                     </div>
                     <p className={styles['product-header__id']}>ID: {productId}</p>
                     <div className={styles['product-header__meta-list']}>
@@ -73,13 +73,14 @@ export default function ProductHeader({
                     action.type === 'dropdown' ? (
                         <DropdownButton
                             key={idx}
-                            variant={action.variant as any}
-                            label={<><Icon name={action.icon as string} className={styles['product-header__action-icon']} /> {action.label}</>}
+                            variant={(action.variant || 'secondary') as any}
                             options={action.options || []}
                             dropdownAlign="right"
-                        />
+                        >
+                            <><Icon name={action.icon as string} className={styles['product-header__action-icon']} /> {action.label}</>
+                        </DropdownButton>
                     ) : (
-                        <Button key={idx} variant={action.variant as any}>
+                        <Button key={idx} variant={(action.variant || 'primary') as any}>
                             <Icon name={action.icon as string} className={styles['product-header__action-icon']} /> {action.label}
                         </Button>
                     )

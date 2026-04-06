@@ -2,7 +2,7 @@ import React from 'react';
 import Dashboard from '../Dashboard';
 
 export default {
-    title: 'Client/Components/Organisms/Dashboard/Dashboard',
+    title: 'Features/Dashboard',
     component: Dashboard,
     parameters: {
         layout: 'fullscreen',

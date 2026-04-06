@@ -19,7 +19,7 @@ const defaultTransactions = [
 ];
 
 export default {
-    title: 'Provider/Components/Organisms/ProviderFinance',
+    title: 'Features/ProviderFinance',
     component: ProviderFinance,
     parameters: {
         layout: 'fullscreen',

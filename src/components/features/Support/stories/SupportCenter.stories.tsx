@@ -2,7 +2,7 @@ import React from 'react';
 import SupportCenter from '../SupportCenter';
 
 export default {
-    title: 'Client/Components/Organisms/Support/SupportCenter',
+    title: 'Features/SupportCenter',
     component: SupportCenter,
     parameters: {
         layout: 'fullscreen',
@@ -11,7 +11,7 @@ export default {
 
 export const FullPage = {
     render: () => (
-        <SupportCenter 
+        <SupportCenter
             headerProps={{
                 title: 'Enterprise Cloud Suite',
                 productId: 'PROD-992834-QX',

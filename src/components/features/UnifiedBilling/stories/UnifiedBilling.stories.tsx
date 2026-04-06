@@ -4,7 +4,7 @@ import { Transaction } from '../TransactionHistory';
 import { PaymentMethod } from '../PaymentMethodsContainer';
 
 export default {
-    title: 'Client/Components/Organisms/UnifiedBilling/UnifiedBilling',
+    title: 'Features/UnifiedBilling',
     component: UnifiedBilling,
     parameters: {
         layout: 'fullscreen',

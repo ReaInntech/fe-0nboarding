@@ -3,7 +3,7 @@ import ProviderDashboard from '../ProviderDashboard';
 import { SubscriptionData } from '../SubscriptionRow';
 
 export default {
-    title: 'Provider/Components/Organisms/ProviderDashboard/ProviderDashboard',
+    title: 'Features/ProviderDashboard',
     component: ProviderDashboard,
     parameters: {
         layout: 'fullscreen',

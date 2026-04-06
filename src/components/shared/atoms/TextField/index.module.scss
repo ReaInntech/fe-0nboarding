@@ -1,0 +1,33 @@
+@reference "tailwindcss";
+
+.field {
+    @apply flex flex-col gap-1;
+
+    &__label {
+        @apply block text-sm font-medium text-gray-700 dark:text-gray-300;
+    }
+
+    &__input-container {
+        @apply relative;
+    }
+
+    &__input {
+        @apply w-full px-4 py-2 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white;
+
+        &--with-action {
+            @apply pr-10;
+        }
+
+        &--error {
+            @apply border-red-500;
+        }
+    }
+
+    &__action {
+        @apply absolute inset-y-0 right-0 flex items-center pr-3;
+    }
+
+    &__error {
+        @apply text-xs text-red-500 mt-1;
+    }
+}

@@ -1,0 +1,14 @@
+@reference "tailwindcss";
+
+.icon {
+    @apply inline-flex items-center justify-center;
+
+    &__svg {
+        width: 1em;
+        height: 1em;
+    }
+
+    &--large {
+        @apply text-2xl;
+    }
+}

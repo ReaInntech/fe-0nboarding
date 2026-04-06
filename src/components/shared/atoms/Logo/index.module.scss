@@ -1,0 +1,25 @@
+@reference "tailwindcss";
+
+.logo {
+    @apply flex items-center h-8;
+
+    &__icon-container {
+        @apply flex items-center justify-center shrink-0 h-full aspect-square;
+    }
+
+    &__svg {
+        @apply h-[90%] w-auto;
+    }
+
+    &__text {
+        @apply font-extrabold tracking-tight text-xl leading-none pt-0.5;
+
+        &--light {
+            @apply text-slate-900;
+        }
+
+        &--dark {
+            @apply text-white;
+        }
+    }
+}

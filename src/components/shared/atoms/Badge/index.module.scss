@@ -1,0 +1,21 @@
+@reference "tailwindcss";
+
+.badge {
+    @apply px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider;
+
+    &--default {
+        @apply bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700;
+    }
+
+    &--success {
+        @apply bg-emerald-500/10 text-emerald-500 border border-emerald-500/20;
+    }
+
+    &--warning {
+        @apply bg-amber-500/10 text-amber-500 border border-amber-500/20;
+    }
+
+    &--primary {
+        @apply bg-[#1978e5]/10 text-[#1978e5] border border-[#1978e5]/20;
+    }
+}

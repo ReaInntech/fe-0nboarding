@@ -1,0 +1,9 @@
+@reference "tailwindcss";
+
+.avatar {
+    @apply bg-slate-200 dark:bg-slate-800 flex items-center justify-center rounded-full overflow-hidden border border-slate-300 dark:border-slate-700 flex-shrink-0;
+
+    &__image {
+        @apply w-full h-full object-cover;
+    }
+}

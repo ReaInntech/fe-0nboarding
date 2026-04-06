@@ -1,0 +1,9 @@
+@reference "tailwindcss";
+
+.card {
+    @apply bg-slate-300/20 dark:bg-slate-300/20 rounded-xl border border-slate-300/50 dark:border-slate-300/50 p-6;
+
+    &--no-padding {
+        @apply p-0;
+    }
+}

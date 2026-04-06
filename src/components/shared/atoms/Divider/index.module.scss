@@ -1,0 +1,21 @@
+@reference "tailwindcss";
+
+.divider {
+    @apply relative;
+
+    &__line-container {
+        @apply absolute inset-0 flex items-center;
+    }
+
+    &__line {
+        @apply w-full border-t border-gray-300 dark:border-gray-600;
+    }
+
+    &__content {
+        @apply relative flex justify-center text-sm;
+    }
+
+    &__text {
+        @apply px-2 text-gray-500 bg-white dark:bg-gray-800 dark:text-gray-400;
+    }
+}

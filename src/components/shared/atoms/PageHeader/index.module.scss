@@ -1,0 +1,53 @@
+@reference "tailwindcss";
+
+.page-header {
+    @apply text-left space-y-6;
+
+    &--centered {
+        @apply text-center;
+    }
+
+    &__content {
+        @apply space-y-2;
+    }
+
+    &__badge {
+        @apply inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1978e5]/10 border border-[#1978e5]/20 text-[#1978e5];
+
+        &--centered {
+            @apply mx-auto;
+        }
+    }
+
+    &__badge-icon {
+        @apply text-sm;
+    }
+
+    &__badge-text {
+        @apply text-[10px] font-bold uppercase tracking-widest leading-none;
+    }
+
+    &__title {
+        @apply font-black text-white tracking-tight text-3xl md:text-4xl;
+
+        &--centered {
+            @apply text-4xl md:text-5xl;
+        }
+    }
+
+    &__subtitle {
+        @apply text-slate-400 text-base font-medium leading-relaxed;
+
+        &--centered {
+            @apply max-w-2xl mx-auto text-lg;
+        }
+    }
+
+    &__actions {
+        @apply flex gap-4 justify-start;
+
+        &--centered {
+            @apply justify-center;
+        }
+    }
+}

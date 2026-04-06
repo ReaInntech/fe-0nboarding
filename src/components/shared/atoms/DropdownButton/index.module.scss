@@ -1,0 +1,65 @@
+@reference "tailwindcss";
+
+.dropdown {
+    @apply relative inline-block;
+
+    &__button {
+        @apply transition-all flex items-center justify-center gap-2 font-bold cursor-pointer;
+
+        &--primary {
+            @apply px-4 py-2 rounded-lg bg-[#1978e5] text-white text-sm hover:opacity-90 shadow-lg shadow-[#1978e5]/20;
+        }
+
+        &--secondary {
+            @apply px-4 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-sm border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white;
+        }
+
+        &--outline {
+            @apply px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white;
+        }
+    }
+
+    &__icon {
+        @apply text-base transition-transform duration-200;
+
+        &--open {
+            @apply rotate-180;
+        }
+    }
+
+    &__menu {
+        @apply absolute mt-2 min-w-[180px] bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xl shadow-black/10 dark:shadow-black/30 py-2 px-1 z-50 flex flex-col;
+
+        &--left {
+            @apply left-0;
+        }
+
+        &--right {
+            @apply right-0;
+        }
+    }
+
+    &__divider {
+        @apply my-2 border-t border-slate-200 dark:border-slate-700;
+    }
+
+    &__item {
+        @apply w-full flex items-center justify-center px-3 py-3 text-sm font-medium rounded-lg transition-colors text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer;
+
+        &--with-icon {
+            @apply gap-3 justify-start;
+        }
+
+        &--danger {
+            @apply text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10;
+        }
+    }
+
+    &__item-icon {
+        @apply text-lg text-slate-400 dark:text-slate-500;
+
+        &--danger {
+            @apply text-red-500 dark:text-red-400;
+        }
+    }
+}

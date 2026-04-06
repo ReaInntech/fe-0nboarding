@@ -19,6 +19,9 @@ export interface ProductData {
 
 export interface UserProfile {
     photoUrl?: string;
+    name?: string;
+    role?: string;
+    avatar?: string;
     clientType?: string;
 }
 

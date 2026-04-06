@@ -25,16 +25,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
     const statusClass = styles[`product-card__status--${product.status}`];
 
     return (
-        <div className={styles['product-card']} onClick={() => onClick?.(product)}>
+        <div 
+            className={styles['product-card']} 
+            onClick={() => onClick?.(product)}
+            style={{ 
+                '--icon-color': product.iconColor,
+                '--icon-bg': `${product.iconColor}15`
+            } as React.CSSProperties}
+        >
             <div className={styles['product-card__header']}>
-                <div
-                    className={styles['product-card__icon-box']}
-                    style={{ 
-                        backgroundColor: `${product.iconColor}15`, 
-                        color: product.iconColor,
-                        borderColor: `${product.iconColor}30`
-                    }}
-                >
+                <div className={styles['product-card__icon-box']}>
                     <Icon name={product.icon} className="text-2xl" />
                 </div>
                 <span className={`${styles['product-card__status']} ${statusClass}`}>
@@ -52,17 +52,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
             </div>
 
             <div className={styles['product-card__stats']}>
-                <div>
+                <div className={styles['product-card__stat-item']}>
                     <span className={styles['product-card__label']}>Price</span>
                     <span className={styles['product-card__value']}>
                         ${product.price.toLocaleString()} 
                         <span className={styles['product-card__period']}>/{product.period === 'month' ? 'mo' : product.period}</span>
                     </span>
                 </div>
-                <div className="text-right">
+                <div className={styles['product-card__stat-item']}>
                     <span className={styles['product-card__label']}>Total Sold</span>
                     <div className={styles['product-card__sold']}>
-                        <Icon name="trending_up" className="text-[#1978e5]" />
+                        <Icon name="trending_up" className="text-[#1978e5] text-sm" />
                         <span>{product.sold}</span>
                     </div>
                 </div>

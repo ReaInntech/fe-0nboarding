@@ -5,9 +5,16 @@ import ProviderTopNavigation from '../../../shared/molecule/ProviderTopNavigatio
 import ProductCard, { Product } from '../ProductCard';
 import styles from './index.module.scss';
 
+export interface UserProfile {
+    photoUrl?: string;
+    name?: string;
+    role?: string;
+    clientType?: string;
+}
+
 interface ProviderProductsProps {
     initialProducts: Product[];
-    userProfile?: any;
+    userProfile?: UserProfile;
 }
 
 const ProviderProducts: React.FC<ProviderProductsProps> = ({ initialProducts, userProfile }) => {
@@ -34,12 +41,12 @@ const ProviderProducts: React.FC<ProviderProductsProps> = ({ initialProducts, us
 
             <main className={styles['provider-products__main']}>
                 <PageHeader
-                    title={<>Products & <span className="text-[#1978e5]">Services</span></>}
+                    title={<>Products & <span className="text-blue-500">Services</span></>}
                     subtitle="Manage your organization's catalog and offerings from a single centralized dashboard."
                     badge={{ text: "Catalog Management", icon: "inventory_2" }}
                     centered={true}
                     actions={
-                        <button className="bg-[#1978e5] hover:bg-[#1978e5]/90 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-xl shadow-blue-500/20 flex items-center gap-2 border-none cursor-pointer">
+                        <button className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-2xl shadow-blue-500/20 flex items-center gap-2.5 border-none cursor-pointer">
                             <Icon name="add" className="text-xl" />
                             Create New Product
                         </button>
@@ -49,11 +56,11 @@ const ProviderProducts: React.FC<ProviderProductsProps> = ({ initialProducts, us
                 <section className={styles['provider-products__filters-bar']}>
                     <div className={styles['provider-products__search-wrapper']}>
                         <div className={styles['provider-products__search-icon']}>
-                            <Icon name="search" className="text-xl" />
+                            <Icon name="search" />
                         </div>
                         <input
                             type="text"
-                            placeholder="Search by name or code..."
+                            placeholder="Search by name or product code..."
                             className={styles['provider-products__search-input']}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -61,7 +68,7 @@ const ProviderProducts: React.FC<ProviderProductsProps> = ({ initialProducts, us
                     </div>
 
                     <div className={styles['provider-products__categories-wrapper']}>
-                        <span className={styles['provider-products__categories-label']}>Category:</span>
+                        <span className={styles['provider-products__categories-label']}>Category</span>
                         <div className={styles['provider-products__categories-list']}>
                             {categories.map(cat => (
                                 <button

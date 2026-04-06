@@ -1,80 +1,115 @@
 @reference "tailwindcss";
 
 .product-card {
-    @apply bg-[#0f1523] border border-slate-800 rounded-xl p-5 hover:border-slate-700 transition-all cursor-pointer;
+    @apply bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 transition-all cursor-pointer relative overflow-hidden;
+    backdrop-filter: blur(8px);
     
-    // Support for grouping in CSS even if 'group' utility is missing in standard apply
+    &::before {
+        content: '';
+        @apply absolute inset-0 opacity-0 transition-opacity duration-500 pointer-events-none;
+        background: radial-gradient(circle at 50% 0%, rgba(25, 120, 229, 0.08) 0%, transparent 70%);
+        z-index: 0;
+    }
+
     &:hover {
+        @apply border-slate-700/80 bg-slate-900/60 translate-y-[-4px] shadow-2xl shadow-blue-500/10;
+        
+        &::before {
+            @apply opacity-100;
+        }
+
         .product-card__title {
-            @apply text-[#1978e5];
+            @apply text-white;
+        }
+
+        .product-card__icon-box {
+            @apply scale-110 border-slate-600;
+        }
+
+        .product-card__details-btn {
+            @apply text-blue-400;
+            
+            svg, i {
+                @apply translate-x-1;
+            }
         }
     }
 
     &__header {
-        @apply flex justify-between items-start mb-4;
+        @apply flex justify-between items-start mb-6 relative z-10;
     }
 
     &__icon-box {
-        @apply w-12 h-12 rounded-lg flex items-center justify-center shrink-0 border border-slate-700/50;
+        @apply w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border border-slate-800/50 transition-all duration-300;
+        background-color: var(--icon-bg);
+        color: var(--icon-color);
     }
 
     &__status {
-        @apply text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full border;
+        @apply text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg border backdrop-blur-md;
 
         &--active {
-            @apply bg-emerald-500/10 text-emerald-500 border-emerald-500/20;
+            @apply bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_12px_-4px_rgba(16,185,129,0.3)];
         }
 
         &--maintenance {
-            @apply bg-amber-500/10 text-amber-500 border-amber-500/20;
+            @apply bg-amber-500/10 text-amber-400 border-amber-500/20 shadow-[0_0_12px_-4px_rgba(245,158,11,0.3)];
         }
 
         &--inactive {
-            @apply bg-slate-500/10 text-slate-500 border-slate-500/20;
+            @apply bg-slate-500/10 text-slate-400 border-slate-500/20;
         }
     }
 
     &__body {
-        @apply mb-4;
+        @apply mb-6 relative z-10;
     }
 
     &__title {
-        @apply text-lg font-bold text-slate-100 mb-1 transition-colors;
+        @apply text-lg font-bold text-slate-200 mb-2 transition-colors duration-300;
     }
 
     &__description {
-        @apply text-sm text-slate-400 line-clamp-2 leading-relaxed;
+        @apply text-sm text-slate-500 line-clamp-2 leading-relaxed font-medium;
     }
 
     &__stats {
-        @apply grid grid-cols-2 gap-4 pt-4 border-t border-slate-800/50;
+        @apply grid grid-cols-2 gap-4 pt-5 border-t border-white/[0.03] relative z-10;
     }
 
     &__label {
-        @apply text-[10px] text-slate-500 uppercase font-bold tracking-widest block mb-1;
+        @apply text-[10px] text-slate-600 uppercase font-bold tracking-[0.2em] block mb-1.5;
     }
 
     &__value {
-        @apply text-slate-100 font-bold text-base;
+        @apply text-slate-200 font-bold text-base flex items-baseline gap-1;
     }
 
     &__period {
-        @apply text-slate-500 text-xs font-normal;
+        @apply text-slate-600 text-xs font-medium lowercase;
     }
 
     &__sold {
-        @apply flex items-center justify-end gap-1.5 text-slate-200 font-semibold;
+        @apply flex items-center justify-end gap-2 text-slate-300 font-bold;
+        
+        span {
+            @apply text-base;
+        }
     }
 
     &__footer {
-        @apply mt-4 flex items-center justify-between;
+        @apply mt-6 flex items-center justify-between relative z-10;
     }
 
     &__code {
-        @apply text-slate-500 font-mono text-[10px] tracking-wider uppercase;
+        @apply text-slate-600 font-mono text-[9px] tracking-[0.15em] uppercase px-2 py-1 bg-white/[0.02] rounded;
     }
 
     &__details-btn {
-        @apply text-[#1978e5] text-xs font-bold hover:underline flex items-center gap-1 bg-transparent border-none p-0 cursor-pointer;
+        @apply text-[#1978e5] text-xs font-bold transition-all flex items-center gap-1.5 bg-transparent border-none p-0 cursor-pointer;
+        
+        svg, i {
+            @apply transition-transform duration-300;
+        }
     }
 }

@@ -65,7 +65,7 @@ export default {
         backgrounds: {
             default: 'dark',
             values: [
-                { name: 'dark', value: '#0f1523' },
+                { name: 'dark', value: '#020617' },
             ]
         }
     }
@@ -74,20 +74,33 @@ export default {
 export const Default = {
     args: {
         initialProducts: mockProducts,
-        userProfile: { name: 'Admin User', role: 'Provider' }
+        userProfile: { 
+            name: 'Alex Thompson', 
+            role: 'Product Manager',
+            photoUrl: 'https://i.pravatar.cc/150?u=alex',
+            clientType: 'corporate'
+        }
     }
 };
 
 export const EmptyState = {
     args: {
         initialProducts: [],
-        userProfile: { name: 'New Provider', role: 'Provider' }
+        userProfile: { 
+            name: 'New Provider', 
+            role: 'Administrator',
+            clientType: 'natural_person'
+        }
     }
 };
 
 export const FilteredByCategory = {
     args: {
         initialProducts: mockProducts.filter(p => p.category === 'Security'),
-        userProfile: { name: 'Admin User', role: 'Provider' }
+        userProfile: { 
+            name: 'Alex Thompson', 
+            role: 'Product Manager',
+            clientType: 'corporate'
+        }
     }
 };

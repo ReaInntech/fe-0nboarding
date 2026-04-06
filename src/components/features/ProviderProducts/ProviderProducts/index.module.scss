@@ -1,15 +1,28 @@
 @reference "tailwindcss";
 
 .provider-products {
-    @apply pt-[64px] min-h-screen bg-[#0f1523] text-slate-300 font-sans pb-20;
+    @apply pt-[64px] min-h-screen bg-[#020617] text-slate-300 font-sans pb-20 relative overflow-x-hidden;
+
+    // Premium background effect to match ProductView
+    &::before {
+        content: '';
+        @apply absolute top-0 left-0 w-full h-[600px] pointer-events-none;
+        background: radial-gradient(circle at 50% -20%, rgba(25, 120, 229, 0.12) 0%, transparent 70%);
+        z-index: 0;
+    }
 
     &__main {
-        @apply max-w-7xl mx-auto px-6 py-12 space-y-16;
-        // Animation handled by standard CSS if needed or Framer Motion
+        @apply max-w-7xl mx-auto px-6 py-12 flex flex-col gap-12 relative z-10;
     }
 
     &__filters-bar {
-        @apply max-w-4xl mx-auto bg-[#0f1523] border border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row gap-6 items-center;
+        @apply w-full max-w-5xl mx-auto bg-[#0f1523]/40 border border-slate-800/60 rounded-2xl p-5 flex flex-col lg:flex-row gap-6 items-center transition-all;
+        backdrop-filter: blur(12px);
+        box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.5);
+
+        &:focus-within {
+            @apply border-slate-700/80 bg-[#0f1523]/60;
+        }
     }
 
     &__search-wrapper {
@@ -17,23 +30,30 @@
     }
 
     &__search-icon {
-        @apply absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500;
+        @apply absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 transition-colors;
     }
 
     &__search-input {
-        @apply bg-slate-900/50 border border-slate-800 text-slate-200 text-sm rounded-lg focus:ring-[#1978e5] focus:border-[#1978e5] block w-full pl-10 p-2.5 outline-none transition-all focus:bg-slate-900;
+        @apply bg-[#020617]/40 border border-slate-800/80 text-slate-100 text-sm rounded-xl focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500/50 block w-full pl-11 pr-4 py-3 outline-none transition-all placeholder:text-slate-600;
+        
+        &:focus {
+            @apply bg-[#020617]/60;
+            + .provider-products__search-icon {
+                @apply text-blue-400;
+            }
+        }
     }
 
     &__categories-wrapper {
-        @apply flex items-center gap-2 w-full md:w-auto;
+        @apply flex items-center gap-4 w-full lg:w-auto;
     }
 
     &__categories-label {
-        @apply text-xs font-bold text-slate-500 uppercase tracking-widest hidden lg:block;
+        @apply text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] hidden xl:block;
     }
 
     &__categories-list {
-        @apply flex gap-1 overflow-x-auto pb-1 md:pb-0;
+        @apply flex gap-2 overflow-x-auto pb-2 lg:pb-0 scroll-smooth;
         scrollbar-width: none;
         &::-webkit-scrollbar {
             display: none;
@@ -41,38 +61,42 @@
     }
 
     &__category-btn {
-        @apply px-4 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all border bg-transparent border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200 cursor-pointer;
+        @apply px-5 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-all border bg-slate-900/40 border-slate-800/80 text-slate-500 hover:border-slate-600 hover:text-slate-300 cursor-pointer;
 
         &--active {
-            @apply bg-[#1978e5]/10 border-[#1978e5] text-[#1978e5];
+            @apply bg-blue-500/10 border-blue-500/40 text-blue-400 shadow-[0_0_15px_-3px_rgba(59,130,246,0.3)];
         }
     }
 
     &__grid {
-        @apply max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6;
+        @apply w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8;
     }
 
     &__empty {
-        @apply bg-[#0f1523] border border-dashed border-slate-800 rounded-2xl p-20 text-center;
+        @apply bg-[#0f1523]/20 border border-dashed border-slate-800/80 rounded-3xl p-24 text-center backdrop-blur-sm;
     }
 
     &__empty-icon {
-        @apply w-20 h-20 bg-slate-900/50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-700;
+        @apply w-24 h-24 bg-slate-900/40 rounded-full flex items-center justify-center mx-auto mb-8 text-slate-700 transition-transform duration-500;
         
-        i {
-            @apply text-4xl;
+        i, svg {
+            @apply text-5xl opacity-40;
+        }
+
+        &:hover {
+            @apply scale-110 text-slate-600;
         }
     }
 
     &__empty-title {
-        @apply text-xl font-bold text-slate-100 mb-2;
+        @apply text-2xl font-bold text-slate-200 mb-3;
     }
 
     &__empty-text {
-        @apply text-slate-400 max-w-sm mx-auto;
+        @apply text-slate-500 max-w-sm mx-auto leading-relaxed font-medium;
     }
 
     &__clear-btn {
-        @apply mt-6 text-[#1978e5] font-bold hover:underline bg-transparent border-none cursor-pointer;
+        @apply mt-8 px-8 py-3 rounded-xl text-blue-400 font-bold hover:bg-blue-500/10 transition-all bg-transparent border-none cursor-pointer;
     }
 }

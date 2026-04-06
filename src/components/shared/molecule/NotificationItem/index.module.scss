@@ -1,0 +1,73 @@
+@reference "tailwindcss";
+
+.notification {
+    @apply relative px-4 py-3 pl-9 flex items-start gap-3 transition-colors;
+
+    &--critical {
+        @apply border-l-4 border-red-500 bg-red-500/5 hover:bg-red-500/10;
+    }
+
+    &--warning {
+        @apply border-l-4 border-amber-500 bg-amber-500/5 hover:bg-amber-500/10;
+    }
+
+    &--info {
+        @apply border-l-4 border-[#1978e5] bg-[#1978e5]/5 hover:bg-[#1978e5]/10;
+    }
+
+    &__delete-btn {
+        @apply absolute top-[14px] left-2.5 text-slate-400 hover:text-red-500 opacity-0 transition-opacity cursor-pointer;
+    }
+
+    &:hover &__delete-btn {
+        @apply opacity-100;
+    }
+
+    &__icon-box {
+        @apply size-8 shrink-0 flex items-center justify-center rounded-md mt-0.5;
+
+        &--critical {
+            @apply bg-red-500/10 text-red-500;
+        }
+
+        &--warning {
+            @apply bg-amber-500/10 text-amber-500;
+        }
+
+        &--info {
+            @apply bg-[#1978e5]/10 text-[#1978e5];
+        }
+    }
+
+    &__body {
+        @apply flex-1;
+    }
+
+    &__header {
+        @apply flex items-center justify-between mb-0.5;
+    }
+
+    &__title {
+        @apply text-xs font-bold uppercase tracking-wider;
+
+        &--critical {
+            @apply text-red-500;
+        }
+
+        &--warning {
+            @apply text-amber-500;
+        }
+
+        &--info {
+            @apply text-[#1978e5];
+        }
+    }
+
+    &__time {
+        @apply text-[10px] text-slate-500 shrink-0 ml-2;
+    }
+
+    &__message {
+        @apply text-xs font-medium text-slate-700 dark:text-slate-300 leading-snug;
+    }
+}

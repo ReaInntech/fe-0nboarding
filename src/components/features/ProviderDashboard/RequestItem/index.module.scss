@@ -1,0 +1,97 @@
+@reference "tailwindcss";
+
+.request-item {
+    @apply flex flex-col p-3.5 border rounded-lg gap-3 transition-colors;
+
+    &--approved {
+        @apply bg-emerald-500/10 border-emerald-500/20 text-emerald-500;
+    }
+
+    &--rejected {
+        @apply bg-rose-500/10 border-rose-500/20 text-rose-500;
+    }
+
+    &--pending {
+        @apply bg-amber-500/10 border-amber-500/20 text-amber-500;
+    }
+
+    &__header {
+        @apply flex items-start gap-3;
+    }
+
+    &__icon-wrapper {
+        @apply mt-0.5;
+    }
+
+    &__icon {
+        @apply text-lg;
+
+        &--approved {
+            @apply text-emerald-400;
+        }
+
+        &--rejected {
+            @apply text-rose-400;
+        }
+
+        &--pending {
+            @apply text-amber-500;
+        }
+    }
+
+    &__content {
+        @apply flex-1;
+    }
+
+    &__title-row {
+        @apply flex items-center justify-between;
+    }
+
+    &__title {
+        @apply text-sm font-medium;
+    }
+
+    &__status-badge {
+        @apply text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full;
+
+        &--approved {
+            @apply bg-emerald-500/20;
+        }
+
+        &--rejected {
+            @apply bg-rose-500/20;
+        }
+    }
+
+    &__due-date {
+        @apply text-xs mt-1 flex items-center gap-1 opacity-70;
+    }
+
+    &__due-date-icon {
+        @apply text-[10px];
+    }
+
+    &__actions {
+        @apply flex items-center gap-2 justify-end pt-2 border-t w-full mt-1;
+
+        &--pending {
+            @apply border-amber-500/20;
+        }
+    }
+
+    &__action-btn {
+        @apply flex-1 py-1.5 text-xs font-bold rounded transition-colors whitespace-nowrap flex items-center justify-center gap-1.5 cursor-pointer;
+
+        &--reject {
+            @apply bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border border-rose-500/20;
+        }
+
+        &--accept {
+            @apply bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30;
+        }
+        
+        &--view {
+            @apply w-full mt-1 bg-[#0f1523] hover:bg-slate-800 text-slate-300 border border-slate-700 hover:border-slate-600 font-medium;
+        }
+    }
+}

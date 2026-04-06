@@ -1,0 +1,25 @@
+@reference "tailwindcss";
+
+.support-links {
+    @apply mt-12 pt-12 border-t border-slate-200 dark:border-slate-800;
+
+    &__grid {
+        @apply grid grid-cols-1 sm:grid-cols-2 gap-4;
+    }
+
+    &__card {
+        @apply p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:border-slate-300 dark:hover:border-slate-600 transition-colors cursor-pointer;
+    }
+
+    &__icon {
+        @apply text-slate-400 dark:text-slate-500 mb-4 group-hover:text-[#1978e5] dark:group-hover:text-[#1978e5] transition-colors text-3xl block;
+    }
+
+    &__title {
+        @apply font-bold mb-1 text-slate-900 dark:text-slate-100;
+    }
+
+    &__desc {
+        @apply text-sm text-slate-500;
+    }
+}

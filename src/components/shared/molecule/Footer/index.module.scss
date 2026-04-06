@@ -1,0 +1,29 @@
+@reference "tailwindcss";
+
+.footer {
+    @apply mt-auto border-t border-slate-800 bg-[#0f1523] py-8 px-6;
+
+    &__container {
+        @apply max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4;
+    }
+
+    &__brand {
+        @apply flex items-center gap-2 text-slate-400;
+    }
+
+    &__brand-icon {
+        @apply text-xl;
+    }
+
+    &__copyright {
+        @apply text-xs font-medium;
+    }
+
+    &__links {
+        @apply flex items-center gap-6;
+    }
+
+    &__link {
+        @apply text-xs text-slate-500 hover:text-[#1978e5] transition-colors;
+    }
+}

@@ -1,0 +1,41 @@
+@reference "tailwindcss";
+
+.provider-dashboard {
+    @apply pt-[64px] min-h-screen bg-[#0f1523] text-slate-300 font-sans;
+
+    &__content {
+        @apply max-w-7xl mx-auto px-6 py-8 space-y-16;
+    }
+
+    &__stats-grid {
+        @apply grid grid-cols-1 md:grid-cols-4 gap-4 mb-8;
+    }
+
+    &__stat-card {
+        @apply bg-slate-800/30 border border-slate-700/50 p-4 rounded-lg;
+    }
+
+    &__stat-label {
+        @apply text-xs text-slate-500 uppercase font-semibold mb-1;
+    }
+
+    &__stat-value {
+        @apply text-2xl font-bold;
+
+        &--default {
+            @apply text-slate-200;
+        }
+
+        &--warning {
+            @apply text-amber-400;
+        }
+
+        &--danger {
+            @apply text-red-400;
+        }
+
+        &--success {
+            @apply text-emerald-400;
+        }
+    }
+}

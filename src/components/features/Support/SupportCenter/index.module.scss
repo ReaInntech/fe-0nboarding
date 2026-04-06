@@ -1,0 +1,29 @@
+@reference "tailwindcss";
+
+.support-center {
+    @apply pt-[64px] bg-[#f5f6f8] dark:bg-[#0f1523] font-sans text-slate-900 dark:text-slate-100 min-h-screen antialiased flex flex-col w-full overflow-x-hidden;
+
+    &__main {
+        @apply max-w-7xl mx-auto w-full px-6 py-8 flex flex-col gap-8 flex-1;
+    }
+
+    &__stats-grid {
+        @apply grid grid-cols-2 lg:grid-cols-4 gap-4;
+    }
+
+    &__stat-icon-wrapper {
+        @apply size-12 rounded-xl flex items-center justify-center;
+    }
+
+    &__stat-icon {
+        @apply text-2xl;
+    }
+
+    &__stat-value {
+        @apply text-2xl font-bold;
+    }
+
+    &__stat-label {
+        @apply text-xs font-medium text-slate-500;
+    }
+}

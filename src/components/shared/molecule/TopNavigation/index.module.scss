@@ -1,0 +1,105 @@
+@reference "tailwindcss";
+
+.nav {
+    @apply border-b border-slate-800 bg-[#0f1523] dark:bg-[#0f1523]/50 backdrop-blur-md fixed top-0 left-0 w-full z-50;
+
+    &__container {
+        @apply max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between;
+    }
+
+    &__logo-wrapper {
+        @apply flex items-center z-20;
+    }
+
+    &__logo-link {
+        @apply transition-transform hover:scale-105 active:scale-95;
+    }
+
+    &__desktop-nav {
+        @apply hidden md:flex items-center gap-8 h-full absolute left-1/2 -translate-x-1/2;
+    }
+
+    &__nav-link {
+        @apply text-sm font-semibold h-full flex items-center px-2 md:px-0 whitespace-nowrap transition-colors text-slate-400 hover:text-slate-100 border-b-2 border-transparent;
+
+        &--active {
+            @apply text-[#1978e5] border-b-2 border-[#1978e5];
+        }
+    }
+
+    &__controls {
+        @apply flex items-center gap-4 shrink-0 z-20;
+    }
+
+    &__mode-selector {
+        @apply relative hidden md:flex items-center;
+    }
+
+    &__mode-label {
+        @apply text-xs text-slate-400 font-medium uppercase tracking-wider mr-2;
+    }
+
+    &__mode-select {
+        @apply bg-slate-800/50 border border-slate-700 text-slate-200 text-sm rounded-md focus:ring-[#1978e5] focus:border-[#1978e5] block w-full p-1.5 focus:outline-none appearance-none pr-8 cursor-pointer;
+    }
+
+    &__mode-icon {
+        @apply pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400;
+    }
+
+    &__logout-btn {
+        @apply hidden md:flex items-center text-slate-400 hover:text-white transition-colors cursor-pointer;
+    }
+
+    &__logout-icon {
+        @apply text-xl;
+    }
+
+    &__mobile-toggle {
+        @apply md:hidden text-slate-400 hover:text-white p-1 rounded transition-colors cursor-pointer;
+    }
+
+    &__mobile-toggle-icon {
+        @apply text-2xl;
+    }
+
+    &__mobile-menu {
+        @apply md:hidden absolute top-16 left-0 w-full bg-[#0f1523] border-b border-slate-800 py-2 shadow-xl z-40;
+    }
+
+    &__mobile-nav {
+        @apply flex flex-col px-4;
+    }
+
+    &__mobile-link {
+        @apply text-base font-semibold py-3 transition-colors border-b border-slate-800/50 last:border-0 text-slate-400 hover:text-slate-100;
+
+        &--active {
+            @apply text-[#1978e5];
+        }
+    }
+
+    &__mobile-mode {
+        @apply py-4 mt-2 border-t border-slate-800/50 flex items-center justify-between;
+    }
+
+    &__mobile-mode-label {
+        @apply text-sm text-slate-400 font-medium uppercase tracking-wider;
+    }
+
+    &__mobile-mode-wrapper {
+        @apply relative flex items-center w-32;
+    }
+
+    &__mobile-logout {
+        @apply py-4 mt-2 border-t border-slate-800/50 flex items-center text-slate-400 hover:text-slate-100 transition-colors cursor-pointer;
+    }
+
+    &__mobile-logout-icon {
+        @apply text-xl mr-2;
+    }
+
+    &__mobile-logout-text {
+        @apply text-base font-semibold;
+    }
+}

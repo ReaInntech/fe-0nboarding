@@ -1,0 +1,53 @@
+@reference "tailwindcss";
+
+.product-header {
+    @apply flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-slate-200 dark:border-slate-800;
+
+    &__info-section {
+        @apply flex items-center gap-6;
+    }
+
+    &__icon-box {
+        @apply size-20 rounded-xl flex items-center justify-center border shrink-0;
+    }
+
+    &__icon {
+        @apply text-5xl;
+    }
+
+    &__details {
+        @apply flex flex-col;
+    }
+
+    &__title-row {
+        @apply flex items-center gap-3;
+    }
+
+    &__title {
+        @apply text-3xl font-bold tracking-tight;
+    }
+
+    &__id {
+        @apply text-slate-500 mt-1 font-medium italic;
+    }
+
+    &__meta-list {
+        @apply flex items-center gap-4 mt-2;
+    }
+
+    &__meta-item {
+        @apply flex items-center gap-1 text-xs text-slate-400;
+    }
+
+    &__meta-icon {
+        @apply text-sm;
+    }
+
+    &__actions-section {
+        @apply flex gap-3;
+    }
+
+    &__action-icon {
+        @apply text-lg;
+    }
+}

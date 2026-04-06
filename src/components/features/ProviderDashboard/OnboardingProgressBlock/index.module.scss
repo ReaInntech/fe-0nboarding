@@ -1,0 +1,65 @@
+@reference "tailwindcss";
+
+.onboarding-progress {
+    @apply w-full flex flex-col justify-center;
+
+    &__title {
+        @apply text-xs font-semibold uppercase tracking-wider text-slate-500 mb-4;
+    }
+
+    &__container {
+        @apply bg-slate-800/30 border border-slate-700/50 rounded-xl p-6 w-full relative;
+    }
+
+    &__line-bg {
+        @apply absolute top-[44px] left-[60px] right-[60px] h-0.5 bg-slate-700/50 -translate-y-1/2 hidden md:block z-0;
+    }
+
+    &__line-progress {
+        @apply absolute top-[44px] left-[60px] h-0.5 bg-[#1978e5] -translate-y-1/2 hidden md:block z-0 transition-all duration-500 ease-out;
+    }
+
+    &__steps-row {
+        @apply relative flex flex-col md:flex-row justify-between items-center gap-8 md:gap-0 z-10 w-full overflow-hidden;
+    }
+
+    &__step {
+        @apply relative flex flex-col items-center w-full md:w-[120px];
+    }
+
+    &__icon-container {
+        @apply h-10 flex items-center justify-center mb-3;
+    }
+
+    &__icon-wrapper {
+        @apply size-12 md:size-10 rounded-full flex items-center justify-center border-[4px] border-slate-900 transition-colors duration-300;
+
+        &--active {
+            @apply bg-[#1978e5] text-white shadow-[0_0_15px_rgba(25,120,229,0.3)];
+        }
+
+        &--inactive {
+            @apply bg-slate-800 text-slate-500;
+        }
+    }
+
+    &__icon {
+        @apply text-lg;
+    }
+
+    &__step-name {
+        @apply text-xs md:text-sm font-bold uppercase tracking-wider text-center max-w-[140px] leading-tight transition-colors duration-300;
+
+        &--current {
+            @apply text-[#1978e5];
+        }
+
+        &--completed {
+            @apply text-slate-300;
+        }
+
+        &--pending {
+            @apply text-slate-600;
+        }
+    }
+}

@@ -1,0 +1,25 @@
+[09:35:44.650] [INFO] storybook v10.3.4
+[09:35:45.579] [DEBUG] Getting package.json info for C:/Users/tamar/Documents/RealInovation.tech/saslution/fe-0nboarding/package.json...
+[09:35:47.370] [DEBUG] Serving static files from [36mpublic[39m at [36m/[39m
+[09:35:47.374] [INFO] Starting...
+[09:35:47.710] [DEBUG] Starting preview..
+[09:35:47.765] [INFO] Using implicit CSS loaders
+[09:35:48.084] [INFO] Using SWC as compiler
+[09:35:48.142] [INFO] Using default Webpack5 setup
+[09:35:49.197] [DEBUG] Using tsconfig paths for react-docgen
+[09:35:52.932] [ERROR] Failed to build the preview
+[09:35:52.935] [WARN] Force closed preview build
+[09:35:52.937] [ERROR] [38;2;241;97;97mSB_BUILDER-WEBPACK5_0003 (WebpackCompilationError): There were problems when compiling your code with Webpack.
+Run Storybook with --debug-webpack for more information.[39m
+    at starter (file:///C:/Users/tamar/Documents/RealInovation.tech/saslution/fe-0nboarding/node_modules/@storybook/builder-webpack5/dist/index.js:799:11)
+    at starter.next (<anonymous>)
+    at Module.start (file:///C:/Users/tamar/Documents/RealInovation.tech/saslution/fe-0nboarding/node_modules/@storybook/builder-webpack5/dist/index.js:857:34)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async storybookDevServer (file:///C:/Users/tamar/Documents/RealInovation.tech/saslution/fe-0nboarding/node_modules/storybook/dist/core-server/index.js:7503:83)
+    at async buildOrThrow (file:///C:/Users/tamar/Documents/RealInovation.tech/saslution/fe-0nboarding/node_modules/storybook/dist/core-server/index.js:4508:12)
+    at async buildDevStandalone (file:///C:/Users/tamar/Documents/RealInovation.tech/saslution/fe-0nboarding/node_modules/storybook/dist/core-server/index.js:8033:41)
+    at async withTelemetry (file:///C:/Users/tamar/Documents/RealInovation.tech/saslution/fe-0nboarding/node_modules/storybook/dist/_node-chunks/chunk-HUYNFPPD.js:225:12)
+    at async dev (file:///C:/Users/tamar/Documents/RealInovation.tech/saslution/fe-0nboarding/node_modules/storybook/dist/bin/core.js:2736:3)
+    at async _Command.<anonymous> (file:///C:/Users/tamar/Documents/RealInovation.tech/saslution/fe-0nboarding/node_modules/storybook/dist/bin/core.js:2806:92)
+[09:35:52.943] [WARN] Broken build, fix the error above.
+You may need to refresh the browser.

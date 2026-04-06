@@ -1,0 +1,229 @@
+@reference "tailwindcss";
+
+.subscription-row {
+    @apply border border-slate-800 bg-[#151c2c] rounded-lg overflow-hidden transition-colors hover:border-slate-700;
+
+    &__header {
+        @apply p-4 flex flex-col md:flex-row md:items-center justify-between cursor-pointer gap-4;
+    }
+
+    &__client-info {
+        @apply flex items-center gap-3 flex-1;
+    }
+
+    &__client-icon-wrapper {
+        @apply w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 shrink-0;
+    }
+
+    &__client-details {
+        @apply flex flex-col;
+    }
+
+    &__client-name {
+        @apply font-semibold text-slate-200;
+    }
+
+    &__client-id {
+        @apply text-xs text-slate-400;
+    }
+
+    &__product-info {
+        @apply flex items-center gap-2 flex-1;
+    }
+
+    &__product-icon {
+        @apply text-lg;
+    }
+
+    &__product-details {
+        @apply flex flex-col;
+    }
+
+    &__product-name {
+        @apply text-sm font-medium text-slate-300;
+    }
+
+    &__product-tier {
+        @apply text-xs text-slate-500;
+    }
+
+    &__status-wrapper {
+        @apply flex items-center gap-6 justify-between md:justify-end flex-1;
+    }
+
+    &__status-badge {
+        @apply px-2.5 py-1 rounded-full text-xs font-medium border;
+
+        &--active {
+            @apply bg-emerald-500/10 text-emerald-400 border-emerald-500/20;
+        }
+
+        &--in_progress {
+            @apply bg-blue-500/10 text-blue-400 border-blue-500/20;
+        }
+
+        &--suspended {
+            @apply bg-red-500/10 text-red-400 border-red-500/20;
+        }
+
+        &--cancelled, &--default {
+            @apply bg-slate-500/10 text-slate-400 border-slate-500/20;
+        }
+    }
+
+    &__revenue {
+        @apply text-right;
+    }
+
+    &__revenue-amount {
+        @apply text-sm font-bold text-slate-200;
+    }
+
+    &__revenue-period {
+        @apply text-xs text-slate-500 block;
+    }
+
+    &__expand-btn {
+        @apply text-slate-500 transition-colors;
+    }
+
+    &__header:hover &__expand-btn {
+        @apply text-slate-300;
+    }
+
+    &__expanded-content {
+        @apply border-t border-slate-800 p-6 bg-[#0f1523]/50 grid grid-cols-1 md:grid-cols-3 gap-8;
+    }
+
+    &__section-title {
+        @apply text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3;
+    }
+
+    &__info-group {
+        @apply space-y-6;
+    }
+
+    &__info-block {
+        @apply space-y-2 text-sm text-slate-300;
+    }
+
+    &__info-row {
+        @apply flex items-center gap-2;
+    }
+
+    &__info-icon {
+        @apply text-slate-500 text-sm;
+    }
+
+    &__info-label {
+        @apply text-slate-500;
+    }
+
+    &__mono-badge {
+        @apply font-mono text-xs bg-slate-800 px-1 py-0.5 rounded text-slate-300;
+    }
+
+    &__payments-list {
+        @apply flex flex-col h-full;
+    }
+
+    &__payments-container {
+        @apply space-y-3;
+    }
+
+    &__payment-item {
+        @apply flex items-center justify-between text-sm bg-slate-800/50 p-2.5 rounded border border-slate-700/50;
+    }
+
+    &__payment-info {
+        @apply flex items-start gap-3;
+    }
+
+    &__payment-icon-wrapper {
+        @apply mt-0.5;
+    }
+
+    &__payment-icon {
+        @apply text-base;
+
+        &--paid {
+            @apply text-emerald-500;
+        }
+        
+        &--pending {
+            @apply text-blue-500;
+        }
+
+        &--error {
+            @apply text-red-500;
+        }
+    }
+
+    &__payment-details {
+        @apply flex flex-col;
+    }
+
+    &__payment-date {
+        @apply text-slate-300 font-medium;
+    }
+
+    &__payment-method {
+        @apply text-xs text-slate-500;
+    }
+
+    &__payment-amount-wrapper {
+        @apply flex flex-col items-end;
+    }
+
+    &__payment-amount {
+        @apply font-medium text-slate-200;
+    }
+
+    &__payment-status {
+        @apply text-[10px] uppercase text-slate-500 tracking-wider mix-blend-screen;
+    }
+
+    &__see-more-btn {
+        @apply mt-3 text-sm text-[#1978e5] hover:text-[#1978e5]/80 font-medium text-left transition-colors flex items-center gap-1;
+    }
+
+    &__see-more-icon {
+        @apply text-xs transition-transform group-hover:translate-x-1;
+    }
+
+    &__empty-text {
+        @apply text-sm text-slate-500 italic;
+    }
+
+    &__docs-container {
+        @apply space-y-3;
+    }
+
+    &__doc-item {
+        @apply flex items-start justify-between text-sm;
+    }
+
+    &__doc-info {
+        @apply flex items-center gap-2;
+    }
+
+    &__doc-icon {
+        @apply text-slate-500 text-base;
+    }
+
+    &__doc-name {
+        @apply text-slate-300 line-clamp-1 flex-1;
+    }
+
+    &__doc-status {
+        @apply text-xs px-2 py-0.5 rounded-full whitespace-nowrap ml-2;
+
+        &--signed {
+            @apply bg-emerald-500/10 text-emerald-400;
+        }
+
+        &--pending {
+            @apply bg-amber-500/10 text-amber-400;
+        }
+    }
+}

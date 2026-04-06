@@ -1,0 +1,57 @@
+@reference "tailwindcss";
+
+.login-form {
+    @apply w-full max-w-md p-8 space-y-6 bg-white rounded-2xl shadow-xl dark:bg-gray-800;
+
+    &__header {
+        @apply text-center flex flex-col items-center;
+    }
+
+    &__logo {
+        @apply h-10 mb-6;
+    }
+
+    &__title {
+        @apply text-3xl font-bold text-gray-900 dark:text-white;
+    }
+
+    &__subtitle {
+        @apply mt-2 text-sm text-gray-500 dark:text-gray-400;
+    }
+
+    &__error {
+        @apply p-3 text-sm text-red-600 bg-red-100 rounded-lg dark:bg-red-900 dark:text-red-100;
+    }
+
+    &__form {
+        @apply space-y-4;
+    }
+
+    &__submit {
+        @apply w-full px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium text-sm text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 disabled:opacity-50 cursor-pointer;
+    }
+
+    &__toggle-wrapper {
+        @apply text-center mt-4;
+    }
+
+    &__toggle {
+        @apply text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 cursor-pointer bg-transparent border-none;
+    }
+
+    &__google-btn {
+        @apply w-full px-4 py-2 font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 disabled:opacity-50 flex justify-center items-center cursor-pointer;
+    }
+
+    &__google-icon {
+        @apply w-5 h-5 mr-2;
+    }
+
+    &__password-toggle {
+        @apply text-gray-500 hover:text-gray-700 dark:text-gray-400 cursor-pointer bg-transparent border-none;
+    }
+
+    &__password-toggle-icon {
+        @apply text-xl;
+    }
+}

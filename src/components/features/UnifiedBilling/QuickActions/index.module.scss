@@ -1,0 +1,9 @@
+@reference "tailwindcss";
+
+.quick-actions {
+    @apply mt-8 flex flex-wrap gap-4;
+
+    &__btn-icon {
+        @apply text-[20px];
+    }
+}

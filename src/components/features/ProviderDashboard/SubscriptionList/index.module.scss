@@ -1,0 +1,65 @@
+@reference "tailwindcss";
+
+.subscription-list {
+    @apply space-y-6;
+
+    &__filters {
+        @apply flex flex-col sm:flex-row gap-4;
+    }
+
+    &__search-wrapper {
+        @apply relative flex-1;
+    }
+
+    &__search-icon-container {
+        @apply absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500;
+    }
+
+    &__search-icon {
+        @apply text-xl;
+    }
+
+    &__search-input {
+        @apply w-full pl-10 pr-4 py-2.5 bg-slate-800/50 border border-slate-700 text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1978e5] focus:border-[#1978e5] transition-colors;
+    }
+
+    &__select-wrapper {
+        @apply relative sm:w-64 shrink-0;
+    }
+
+    &__select-icon-left {
+        @apply absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500;
+    }
+
+    &__select-input {
+        @apply w-full pl-10 pr-10 py-2.5 bg-slate-800/50 border border-slate-700 text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1978e5] focus:border-[#1978e5] transition-colors appearance-none cursor-pointer;
+    }
+
+    &__select-icon-right {
+        @apply absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-500;
+    }
+
+    &__list-container {
+        @apply space-y-3;
+    }
+
+    &__empty-state {
+        @apply p-12 text-center border border-dashed border-slate-700 rounded-lg bg-slate-800/20;
+    }
+
+    &__empty-icon {
+        @apply text-4xl text-slate-600 mb-2 mx-auto;
+    }
+
+    &__empty-title {
+        @apply text-lg font-medium text-slate-300;
+    }
+
+    &__empty-text {
+        @apply text-slate-500 mt-1;
+    }
+
+    &__footer-text {
+        @apply text-right text-xs text-slate-500;
+    }
+}

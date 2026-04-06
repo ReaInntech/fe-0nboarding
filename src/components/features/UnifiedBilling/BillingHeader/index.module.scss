@@ -1,0 +1,13 @@
+@reference "tailwindcss";
+
+.billing-header {
+    @apply mb-10;
+
+    &__title {
+        @apply text-3xl lg:text-4xl font-black leading-tight tracking-tight mb-2 text-slate-900 dark:text-slate-100;
+    }
+
+    &__desc {
+        @apply text-slate-500 dark:text-slate-400 text-base;
+    }
+}

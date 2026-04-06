@@ -1,0 +1,165 @@
+@reference "tailwindcss";
+
+.ticket-list {
+    @apply bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden;
+
+    &__header {
+        @apply px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50/50 dark:bg-slate-800/30;
+    }
+
+    &__title {
+        @apply text-lg font-bold flex items-center gap-2;
+    }
+
+    &__title-icon {
+        @apply text-[#1978e5];
+    }
+
+    &__title-count {
+        @apply text-sm font-normal text-slate-400 ml-1;
+    }
+
+    &__new-btn {
+        @apply text-sm;
+    }
+
+    &__new-btn-icon {
+        @apply text-lg;
+    }
+
+    &__filters {
+        @apply px-6 py-3 border-b border-slate-200 dark:border-slate-800 flex items-center gap-2 flex-wrap;
+    }
+
+    &__filter-btn {
+        @apply px-3 py-1.5 rounded-lg text-xs font-bold transition-colors;
+
+        &--active {
+            @apply bg-[#1978e5] text-white;
+        }
+
+        &--inactive {
+            @apply bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700;
+        }
+    }
+
+    &__rows {
+        @apply divide-y divide-slate-200 dark:divide-slate-800;
+    }
+
+    &__row-btn {
+        @apply w-full text-left px-6 py-4 flex items-center gap-4 transition-colors cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50;
+
+        &--expanded {
+            @apply bg-slate-50/80 dark:bg-slate-800/40;
+        }
+    }
+
+    &__expand-icon {
+        @apply text-slate-400 text-xl shrink-0;
+    }
+
+    &__info {
+        @apply flex-1 min-w-0;
+    }
+
+    &__top-line {
+        @apply flex items-center gap-3 flex-wrap;
+    }
+
+    &__id {
+        @apply text-xs font-mono text-slate-400;
+    }
+
+    &__priority-bg {
+        @apply text-[10px] font-bold uppercase px-2 py-0.5 rounded-full;
+    }
+
+    &__subject {
+        @apply text-sm font-semibold mt-1 truncate;
+    }
+
+    &__meta {
+        @apply flex items-center gap-4 mt-1 text-xs text-slate-400;
+    }
+
+    &__meta-item {
+        @apply flex items-center gap-1;
+    }
+
+    &__meta-icon {
+        @apply text-sm;
+    }
+
+    &__status-badge {
+        @apply shrink-0 text-[10px] uppercase font-bold px-2 py-1;
+    }
+
+    &__conversation-wrapper {
+        @apply px-6 pb-6 pt-2 bg-slate-50/50 dark:bg-slate-800/20 border-t border-slate-100 dark:border-slate-800;
+    }
+
+    &__conversation {
+        @apply ml-9 space-y-4;
+    }
+
+    &__msg {
+        @apply flex gap-3;
+    }
+
+    &__sender-avatar {
+        @apply shrink-0 size-8 rounded-full flex items-center justify-center text-sm font-bold;
+
+        &--user {
+            @apply bg-[#1978e5]/10 text-[#1978e5];
+        }
+
+        &--support {
+            @apply bg-emerald-500/10 text-emerald-600 dark:text-emerald-400;
+        }
+    }
+
+    &__sender-icon {
+        @apply text-lg;
+    }
+
+    &__msg-content {
+        @apply flex-1 min-w-0;
+    }
+
+    &__msg-header {
+        @apply flex items-center gap-2;
+    }
+
+    &__sender-name {
+        @apply text-sm font-bold;
+    }
+
+    &__msg-time {
+        @apply text-xs text-slate-400;
+    }
+
+    &__msg-text {
+        @apply text-sm text-slate-600 dark:text-slate-300 mt-1 leading-relaxed;
+    }
+
+    &__reply-area {
+        @apply flex items-center gap-3 mt-4 pt-4 border-t border-slate-200 dark:border-slate-700;
+    }
+
+    &__reply-input {
+        @apply flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-sm text-slate-400 cursor-text;
+    }
+
+    &__footer {
+        @apply p-4 bg-slate-50 dark:bg-slate-800/30 border-t border-slate-200 dark:border-slate-800 flex justify-center;
+    }
+
+    &__load-older {
+        @apply text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-[#1978e5] dark:hover:text-[#1978e5] transition-colors flex items-center gap-2;
+    }
+
+    &__load-older-icon {
+        @apply text-sm;
+    }
+}

@@ -31,14 +31,14 @@ const preview: Preview = {
                 htmlNode.style.backgroundColor = '#f5f6f8';
             }
 
-            // Using React.createElement instead of JSX to avoid compilation issues in .ts files
-            return React.createElement(AppProvider, null, React.createElement(Story));
+            return (
+                <AppProvider>
+                    <Story />
+                </AppProvider>
+            );
         },
     ],
     parameters: {
-        nextjs: {
-            appDirectory: true,
-        },
         controls: {
             matchers: {
                 color: /(background|color)$/i,

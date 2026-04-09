@@ -1,5 +1,9 @@
+'use client';
+
 import React from 'react';
+import { useApp } from '@/src/context/AppContext';
 import ProviderTopNavigation from '../../../shared/molecule/ProviderTopNavigation';
+import Footer from '../../../shared/molecule/Footer';
 import FinanceKpiCard from '../FinanceKpiCard';
 import RevenueAreaChart, { RevenueDataPoint } from '../RevenueAreaChart';
 import DistributionPieChart, { DistributionData } from '../DistributionPieChart';
@@ -24,8 +28,8 @@ export interface ProviderFinanceProps {
     productsFilterList: string[];
     clientsFilterList: string[];
     paymentMethodsList: string[];
-    userProfile?: any;
     className?: string;
+    userProfile?: any;
 }
 
 export default function ProviderFinance({
@@ -36,14 +40,14 @@ export default function ProviderFinance({
     productsFilterList,
     clientsFilterList,
     paymentMethodsList,
-    userProfile,
-    className
+    className,
+    userProfile
 }: ProviderFinanceProps) {
+    const { user } = useApp();
+
     return (
         <div className={`${styles['provider-finance']} ${className || ''}`}>
-            {/* Nav */}
             <ProviderTopNavigation activeTab="Finance" userProfile={userProfile} />
-
             {/* Main Content */}
             <main className={styles['provider-finance__main']}>
                 <PageHeader
@@ -124,8 +128,8 @@ export default function ProviderFinance({
                     clientsFilterList={clientsFilterList}
                     paymentMethodsList={paymentMethodsList}
                 />
-
             </main>
+            <Footer />
         </div>
     );
 }

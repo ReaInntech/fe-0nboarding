@@ -1,10 +1,12 @@
-import React from 'react';
+'use client';
+
+import { useApp } from '@/src/context/AppContext';
 import TopNavigation from '../../../shared/molecule/TopNavigation';
-import ProductHeader, { ProductHeaderProps } from '../../UnifiedProductView/ProductHeader';
 import Footer from '../../../shared/molecule/Footer';
+import ProductHeader, { ProductHeaderProps } from '../../UnifiedProductView/ProductHeader';
 import Icon from '../../../shared/atoms/Icon';
 import Card from '../../../shared/atoms/Card';
-import TicketList, { TicketListProps } from '../TicketList';
+import TicketList, { TicketListProps } from '../TicketList/index';
 import styles from './index.module.scss';
 
 export interface SupportStats {
@@ -18,7 +20,6 @@ export interface SupportCenterProps {
     headerProps: ProductHeaderProps;
     stats: SupportStats;
     ticketListProps: TicketListProps;
-    userProfile?: any;
     className?: string;
 }
 
@@ -26,9 +27,10 @@ export default function SupportCenter({
     headerProps,
     stats,
     ticketListProps,
-    userProfile,
     className
 }: SupportCenterProps) {
+    const { user } = useApp();
+
     const statItems = [
         { icon: 'error_outline', label: 'Open', value: stats.open, color: 'text-red-500', bg: 'bg-red-500/10' },
         { icon: 'sync', label: 'In Progress', value: stats.inProgress, color: 'text-amber-500', bg: 'bg-amber-500/10' },
@@ -38,8 +40,7 @@ export default function SupportCenter({
 
     return (
         <div className={`${styles['support-center']} ${className || ''}`}>
-            <TopNavigation activeTab="Support" userProfile={userProfile} />
-
+            <TopNavigation activeTab="Support" />
             <main className={styles['support-center__main']}>
                 <ProductHeader {...headerProps} />
 

@@ -67,7 +67,10 @@ export default {
             values: [
                 { name: 'dark', value: '#020617' },
             ]
-        }
+        },
+        nextjs: {
+            appDirectory: true,
+        },
     }
 };
 

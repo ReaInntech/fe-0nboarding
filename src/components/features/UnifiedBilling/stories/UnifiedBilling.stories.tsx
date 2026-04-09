@@ -8,6 +8,9 @@ export default {
     component: UnifiedBilling,
     parameters: {
         layout: 'fullscreen',
+        nextjs: {
+            appDirectory: true,
+        },
     },
 };
 

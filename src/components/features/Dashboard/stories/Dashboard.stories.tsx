@@ -6,6 +6,9 @@ export default {
     component: Dashboard,
     parameters: {
         layout: 'fullscreen',
+        nextjs: {
+            appDirectory: true,
+        },
     },
 };
 

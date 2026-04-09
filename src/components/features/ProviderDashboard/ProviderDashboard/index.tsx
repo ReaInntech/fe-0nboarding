@@ -1,5 +1,9 @@
+'use client';
+
 import React, { useMemo } from 'react';
+import { useApp } from '@/src/context/AppContext';
 import ProviderTopNavigation from '../../../shared/molecule/ProviderTopNavigation';
+import Footer from '../../../shared/molecule/Footer';
 import SubscriptionList from '../SubscriptionList';
 import PageHeader from '../../../shared/atoms/PageHeader';
 import { SubscriptionData } from '../SubscriptionRow';
@@ -7,11 +11,12 @@ import styles from './index.module.scss';
 
 export interface ProviderDashboardProps {
     subscriptions?: SubscriptionData[];
-    userProfile?: any;
     className?: string;
+    userProfile?: any;
 }
 
-export default function ProviderDashboard({ subscriptions = [], userProfile, className }: ProviderDashboardProps) {
+export default function ProviderDashboard({ subscriptions = [], className, userProfile }: ProviderDashboardProps) {
+    const { user } = useApp();
 
     const stats = useMemo(() => {
         const activeLimits = subscriptions.filter(s => s.status === 'active').length;
@@ -24,7 +29,6 @@ export default function ProviderDashboard({ subscriptions = [], userProfile, cla
     return (
         <div className={`${styles['provider-dashboard']} ${className || ''}`}>
             <ProviderTopNavigation activeTab="Dashboard" userProfile={userProfile} />
-
             <div className={styles['provider-dashboard__content']}>
                 <PageHeader
                     title={<>Client <span className="text-[#1978e5]">Subscriptions</span></>}
@@ -54,6 +58,7 @@ export default function ProviderDashboard({ subscriptions = [], userProfile, cla
 
                 <SubscriptionList subscriptions={subscriptions} />
             </div>
+            <Footer />
         </div>
     );
 }

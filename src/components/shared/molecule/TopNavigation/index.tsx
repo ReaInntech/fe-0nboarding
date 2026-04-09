@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useApp } from '@/src/context/AppContext';
 import Logo from '../../atoms/Logo';
 import Icon from '../../atoms/Icon';
 import Avatar from '../../atoms/Avatar';
@@ -11,22 +13,21 @@ interface NavItem {
     path: string;
 }
 
-interface UserProfile {
-    photoUrl?: string;
-    clientType?: string;
-}
-
 interface TopNavigationProps {
-    activeTab?: string;
     isProvider?: boolean;
-    userProfile?: UserProfile;
     onLogout?: () => void;
+    activeTab?: string;
+    userProfile?: any;
 }
 
-export default function TopNavigation({ activeTab, isProvider, userProfile, onLogout }: TopNavigationProps) {
+export default function TopNavigation({ isProvider, onLogout, activeTab: activeTabProp, userProfile }: TopNavigationProps) {
+    const pathname = usePathname();
+    const router = useRouter();
+    const { user: contextUser, clearStorage } = useApp();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-    const profile = userProfile || { photoUrl: "", clientType: "" };
+    const user = userProfile || contextUser;
+    const profile = user || { photoUrl: "", clientType: "" as any };
     const isNaturalPerson = profile.clientType === 'natural_person';
 
     const [mode, setMode] = useState(isProvider ? 'provider' : 'client');
@@ -37,8 +38,21 @@ export default function TopNavigation({ activeTab, isProvider, userProfile, onLo
         { name: 'Support', path: '/support' },
     ];
 
+    const activeTab = activeTabProp || navItems.find(item => pathname?.startsWith(item.path))?.name || 'Services';
+
     const handleLogout = async () => {
+        clearStorage();
         onLogout?.();
+        router.push('/login');
+    };
+
+    const handleModeChange = (newMode: string) => {
+        setMode(newMode);
+        if (newMode === 'provider') {
+            router.push('/provider/dashboard');
+        } else {
+            router.push('/dashboard');
+        }
     };
 
     return (

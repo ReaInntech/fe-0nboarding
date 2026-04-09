@@ -1,5 +1,8 @@
-import React from 'react';
+'use client';
+
+import { useApp } from '@/src/context/AppContext';
 import TopNavigation from '../../../shared/molecule/TopNavigation';
+import Footer from '../../../shared/molecule/Footer';
 import BillingHeader from '../BillingHeader';
 import CostMetricCard from '../CostMetricCard';
 import PaymentMethodsContainer, { PaymentMethod } from '../PaymentMethodsContainer';
@@ -14,10 +17,11 @@ export interface UnifiedBillingProps {
 }
 
 export default function UnifiedBilling({ transactions, methods, userProfile }: UnifiedBillingProps) {
+    const { user } = useApp();
+
     return (
         <div className={styles['unified-billing']}>
             <TopNavigation activeTab="Billing" userProfile={userProfile} />
-
             <div className={styles['unified-billing__layout-outer']}>
                 <main className={styles['unified-billing__layout-inner']}>
                     <BillingHeader />
@@ -38,6 +42,7 @@ export default function UnifiedBilling({ transactions, methods, userProfile }: U
                     <QuickActions />
                 </main>
             </div>
+            <Footer />
         </div>
     );
 }

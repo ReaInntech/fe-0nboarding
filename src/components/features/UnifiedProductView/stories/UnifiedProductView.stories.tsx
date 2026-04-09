@@ -13,6 +13,9 @@ const meta: Meta<typeof UnifiedProductView> = {
     component: UnifiedProductView,
     parameters: {
         layout: 'fullscreen',
+        nextjs: {
+            appDirectory: true,
+        },
     },
 };
 

@@ -7,6 +7,9 @@ export default {
     component: ProviderDashboard,
     parameters: {
         layout: 'fullscreen',
+        nextjs: {
+            appDirectory: true,
+        },
     },
 };
 

@@ -2,10 +2,13 @@ import type { Meta, StoryObj } from '@storybook/react';
 import ProviderProductView from '../ProviderProductView';
 
 const meta: Meta<typeof ProviderProductView> = {
-    title: 'Features/ProviderProductView',
+    title: 'Features/ProviderProductDetail',
     component: ProviderProductView,
     parameters: {
         layout: 'fullscreen',
+        nextjs: {
+            appDirectory: true,
+        },
     },
     tags: ['autodocs'],
 };
@@ -64,11 +67,6 @@ export const Standard: Story = {
         onboardingSteps: mockSteps as any,
         requirements: mockRequirements,
         requests: mockRequests as any,
-        userProfile: {
-            name: 'Provider Admin',
-            role: 'Administrator',
-            avatar: '',
-        },
     },
 };
 
@@ -90,6 +88,5 @@ export const Empty: Story = {
         onboardingSteps: [],
         requirements: [],
         requests: [],
-        userProfile: Standard.args?.userProfile,
     },
 };

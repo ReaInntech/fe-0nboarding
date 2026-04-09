@@ -1,23 +1,21 @@
+'use client';
+
 import React, { useState } from 'react';
+import { useApp } from '@/src/context/AppContext';
+import ProviderTopNavigation from '../../../shared/molecule/ProviderTopNavigation';
+import Footer from '../../../shared/molecule/Footer';
 import Icon from '../../../shared/atoms/Icon';
 import PageHeader from '../../../shared/atoms/PageHeader';
-import ProviderTopNavigation from '../../../shared/molecule/ProviderTopNavigation';
 import ProductCard, { Product } from '../ProductCard';
 import styles from './index.module.scss';
 
-export interface UserProfile {
-    photoUrl?: string;
-    name?: string;
-    role?: string;
-    clientType?: string;
-}
-
 interface ProviderProductsProps {
     initialProducts: Product[];
-    userProfile?: UserProfile;
+    userProfile?: any;
 }
 
 const ProviderProducts: React.FC<ProviderProductsProps> = ({ initialProducts, userProfile }) => {
+    const { user } = useApp();
     const [searchTerm, setSearchTerm] = useState('');
     const [filterCategory, setFilterCategory] = useState('All');
 
@@ -38,7 +36,6 @@ const ProviderProducts: React.FC<ProviderProductsProps> = ({ initialProducts, us
     return (
         <div className={styles['provider-products']}>
             <ProviderTopNavigation activeTab="Products" userProfile={userProfile} />
-
             <main className={styles['provider-products__main']}>
                 <PageHeader
                     title={<>Products & <span className="text-blue-500">Services</span></>}
@@ -107,6 +104,7 @@ const ProviderProducts: React.FC<ProviderProductsProps> = ({ initialProducts, us
                     </div>
                 )}
             </main>
+            <Footer />
         </div>
     );
 };

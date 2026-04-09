@@ -10,7 +10,7 @@ import ProviderRequestsManager from '../ProviderRequestsManager';
 // Meta for Onboarding Manager (the default export of this file for simplicity, 
 // though usually you'd have one file per component)
 const meta: Meta<typeof ProviderOnboardingManager> = {
-    title: 'Features/ProviderProductView/SubComponents',
+    title: 'provider/Components/Organisms/ProviderProductView',
     component: ProviderOnboardingManager,
     tags: ['autodocs'],
     parameters: {
@@ -58,12 +58,12 @@ export const OnboardingManager: Story = {
 export const RequestsManager: StoryObj<typeof ProviderRequestsManager> = {
     render: () => (
         <div style={{ width: '800px' }}>
-            <ProviderRequestsManager 
+            <ProviderRequestsManager
                 requests={[
                     { id: 'REQ-01', subject: 'Proof of Incorporation', status: 'pending', priority: 'high', date: 'Oct 12, 2024' },
                     { id: 'REQ-02', subject: 'Tax ID Certificate', status: 'approved', priority: 'medium', date: 'Oct 10, 2024' },
                     { id: 'REQ-03', subject: 'Signed Contract', status: 'rejected', priority: 'low', date: 'Oct 08, 2024' },
-                ]} 
+                ]}
             />
         </div>
     ),
@@ -74,9 +74,9 @@ export const RequestsManager: StoryObj<typeof ProviderRequestsManager> = {
 export const DocumentCard: StoryObj<typeof DocumentRequestCard> = {
     render: () => (
         <div style={{ width: '400px' }}>
-            <DocumentRequestCard 
-                title="Identity Verification" 
-                onDelete={() => console.log('Delete')} 
+            <DocumentRequestCard
+                title="Identity Verification"
+                onDelete={() => console.log('Delete')}
             />
         </div>
     ),
@@ -85,9 +85,9 @@ export const DocumentCard: StoryObj<typeof DocumentRequestCard> = {
 export const FormCard: StoryObj<typeof FormRequestCard> = {
     render: () => (
         <div style={{ width: '400px' }}>
-            <FormRequestCard 
-                title="Compliance Survey" 
-                onDelete={() => console.log('Delete')} 
+            <FormRequestCard
+                title="Compliance Survey"
+                onDelete={() => console.log('Delete')}
             />
         </div>
     ),
@@ -96,9 +96,9 @@ export const FormCard: StoryObj<typeof FormRequestCard> = {
 export const PaymentCard: StoryObj<typeof RequestPaymentCard> = {
     render: () => (
         <div style={{ width: '400px' }}>
-            <RequestPaymentCard 
-                title="Security Deposit" 
-                onDelete={() => console.log('Delete')} 
+            <RequestPaymentCard
+                title="Security Deposit"
+                onDelete={() => console.log('Delete')}
             />
         </div>
     ),
@@ -107,9 +107,9 @@ export const PaymentCard: StoryObj<typeof RequestPaymentCard> = {
 export const TermsCard: StoryObj<typeof TermsAndConditionsRequestCard> = {
     render: () => (
         <div style={{ width: '400px' }}>
-            <TermsAndConditionsRequestCard 
-                title="End User License Agreement" 
-                onDelete={() => console.log('Delete')} 
+            <TermsAndConditionsRequestCard
+                title="End User License Agreement"
+                onDelete={() => console.log('Delete')}
             />
         </div>
     ),

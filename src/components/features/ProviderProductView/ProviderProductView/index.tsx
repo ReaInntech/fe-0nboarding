@@ -1,12 +1,13 @@
 'use client';
 
 import React from 'react';
+import { useApp } from '@/src/context/AppContext';
 import ProviderTopNavigation from '../../../shared/molecule/ProviderTopNavigation';
+import Footer from '../../../shared/molecule/Footer';
 import ProviderProductHeader from '../ProviderProductHeader';
 import ProviderOnboardingManager, { OnboardingStep } from '../ProviderOnboardingManager';
 import ProviderRequestsManager, { ClientRequest } from '../ProviderRequestsManager';
 import ProviderRequirementsManager, { RequirementField } from '../ProviderRequirementsManager';
-import Footer from '../../../shared/molecule/Footer';
 import styles from './index.module.scss';
 
 export interface ProductData {
@@ -17,20 +18,12 @@ export interface ProductData {
     status: 'active' | 'pending' | string;
 }
 
-export interface UserProfile {
-    photoUrl?: string;
-    name?: string;
-    role?: string;
-    avatar?: string;
-    clientType?: string;
-}
-
 export interface ProviderProductViewProps {
     product: ProductData;
     onboardingSteps: OnboardingStep[];
     requirements: RequirementField[];
     requests: ClientRequest[];
-    userProfile: UserProfile;
+    userProfile?: any;
 }
 
 export default function ProviderProductView({ 
@@ -38,12 +31,13 @@ export default function ProviderProductView({
     onboardingSteps, 
     requirements, 
     requests,
-    userProfile 
+    userProfile
 }: ProviderProductViewProps) {
+    const { user } = useApp();
+
     return (
         <div className={styles['provider-view']}>
             <ProviderTopNavigation activeTab="Products" userProfile={userProfile} />
-
             <main className={styles['provider-view__main']}>
                 <div className={styles['provider-view__header-section']}>
                     <ProviderProductHeader 
@@ -73,7 +67,6 @@ export default function ProviderProductView({
                     <p>Detailed logs of client interactions and service consumption will appear here.</p>
                 </div>
             </main>
-
             <Footer />
         </div>
     );

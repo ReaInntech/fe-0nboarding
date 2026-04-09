@@ -1,6 +1,6 @@
-'use client';
-
 import React, { useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useApp } from '@/src/context/AppContext';
 import Logo from '../../atoms/Logo';
 import Icon from '../../atoms/Icon';
 import Avatar from '../../atoms/Avatar';
@@ -11,19 +11,19 @@ interface NavItem {
     path: string;
 }
 
-interface UserProfile {
-    photoUrl?: string;
-    clientType?: string;
-}
-
 interface ProviderTopNavigationProps {
-    activeTab?: string;
-    userProfile?: UserProfile;
     onLogout?: () => void;
+    activeTab?: string;
+    userProfile?: any;
 }
 
-export default function ProviderTopNavigation({ activeTab, userProfile, onLogout }: ProviderTopNavigationProps) {
-    const profile = userProfile || { photoUrl: "", clientType: "" };
+export default function ProviderTopNavigation({ onLogout, activeTab: activeTabProp, userProfile }: ProviderTopNavigationProps) {
+    const pathname = usePathname();
+    const router = useRouter();
+    const { user: contextUser, clearStorage } = useApp();
+    
+    const user = userProfile || contextUser;
+    const profile = user || { photoUrl: "", clientType: "" as any };
     const isNaturalPerson = profile.clientType === 'natural_person';
 
     const [mode, setMode] = useState('provider');
@@ -37,8 +37,12 @@ export default function ProviderTopNavigation({ activeTab, userProfile, onLogout
         { name: 'Settings', path: '/provider/settings' },
     ];
 
+    const activeTab = activeTabProp || navItems.find(item => pathname?.startsWith(item.path))?.name || 'Dashboard';
+
     const handleLogout = async () => {
+        clearStorage();
         onLogout?.();
+        router.push('/login');
     };
 
     return (

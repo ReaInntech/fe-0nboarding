@@ -6,6 +6,9 @@ export default {
     component: SupportCenter,
     parameters: {
         layout: 'fullscreen',
+        nextjs: {
+            appDirectory: true,
+        },
     },
 };
 

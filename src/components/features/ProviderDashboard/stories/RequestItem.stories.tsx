@@ -13,54 +13,95 @@ export default {
     ],
 };
 
-export const Pending = {
+export const FormVerification = {
     args: {
         req: {
-            id: '1',
-            type: 'document_review',
-            status: 'pending',
-            title: 'Review Signed MSA',
-            description: 'Please verify the signatures on the Master Service Agreement version 2.4.',
-            dueDate: '2025-05-01T00:00:00Z',
-            metadata: [
-                { label: 'Document ID', value: 'DOC-MSA-2025-001' },
-                { label: 'Version', value: '2.4.1' }
-            ]
-        }
-    },
-};
-
-export const KYCValidation = {
-    args: {
-        req: {
-            id: 'kyc-1',
+            id: 'form-1',
             type: 'other',
             status: 'pending',
-            title: 'Verify Business Identity',
-            description: 'Validate the provided legal information against the national database.',
-            metadata: [
-                { label: 'Legal Name', value: 'Acme Corp Int.' },
-                { label: 'Tax ID', value: 'VAT-99228811' },
-                { label: 'Country', value: 'United States' },
-                { label: 'Founded', value: '1998-04-12' }
-            ]
+            title: 'Verify Client Data Form',
+            description: 'Customer submitted the onboarding questionnaire.',
+            payload: {
+                type: 'form',
+                data: {
+                    fields: [
+                        { id: 'company_name', label: 'Company Name' },
+                        { id: 'founding_year', label: 'Founding Year' },
+                        { id: 'industry', label: 'Industry' },
+                        { id: 'employee_count', label: 'Employees' }
+                    ],
+                    responses: {
+                        company_name: 'Starlight Tech',
+                        founding_year: '2021',
+                        industry: 'Quantum Computing',
+                        employee_count: '45'
+                    }
+                }
+            }
         }
     }
 };
 
-export const BillingVerification = {
+export const PaymentVerification = {
     args: {
         req: {
-            id: 'bill-1',
+            id: 'pay-1',
             type: 'other',
             status: 'pending',
-            title: 'Process Custom Payment',
-            description: 'Verify the manual wire transfer receipt uploaded by the client.',
-            metadata: [
-                { label: 'Amount', value: '$12,500.00' },
-                { label: 'Currency', value: 'USD' },
-                { label: 'Ref Number', value: 'WIRE-ACME-4455' }
-            ]
+            title: 'Validate Service Payment',
+            description: 'Check if the receipt matches the invoice amount.',
+            payload: {
+                type: 'payment',
+                data: {
+                    invoiceNumber: 'INV-2025-4422',
+                    amount: '$2,450.00',
+                    receiptUrl: 'https://images.unsplash.com/photo-1554224155-1696413565d3?auto=format&fit=crop&q=80&w=800'
+                }
+            }
+        }
+    }
+};
+
+export const DocumentVerification = {
+    args: {
+        req: {
+            id: 'doc-1',
+            type: 'document_review',
+            status: 'pending',
+            title: 'Verify Business License',
+            description: 'Ensure the document is valid and not expired.',
+            payload: {
+                type: 'document',
+                data: {
+                    fileName: 'business_license_2025.jpg',
+                    uploadDate: '2025-04-10',
+                    fileUrl: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&q=80&w=800'
+                }
+            }
+        }
+    }
+};
+
+export const TermsVerification = {
+    args: {
+        req: {
+            id: 'terms-1',
+            type: 'other',
+            status: 'pending',
+            title: 'Verify MSA Acceptance',
+            description: 'Provider needs to acknowledge the user accepted all clauses.',
+            payload: {
+                type: 'terms',
+                data: {
+                    content: 'This Master Service Agreement ("Agreement") is entered into between...',
+                    acceptedClauses: [
+                        'I agree to the Terms of Service',
+                        'I accept the Privacy Policy',
+                        'I agree to the Data Processing Addendum',
+                        'I authorize automatic monthly billing'
+                    ]
+                }
+            }
         }
     }
 };
@@ -72,7 +113,14 @@ export const Approved = {
             type: 'other',
             status: 'approved',
             title: 'KYC Verified',
-            description: 'Aprovado por el sistema de validación automática.'
+            description: 'Automated check passed.',
+            payload: {
+                type: 'form',
+                data: {
+                    fields: [{ id: 'status', label: 'System Status' }],
+                    responses: { status: 'Verification Successful' }
+                }
+            }
         }
     },
 };
@@ -83,8 +131,16 @@ export const Rejected = {
             id: '3',
             type: 'other',
             status: 'rejected',
-            title: 'Invalid Payment Method',
-            description: 'El número de tarjeta proporcionado no es válido para transacciones internacionales.'
+            title: 'Invalid Documents',
+            description: 'Uploaded file is blurry and unreadable.',
+            payload: {
+                type: 'document',
+                data: {
+                    fileName: 'blurry_id.jpg',
+                    uploadDate: '2025-04-10',
+                    fileUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=800'
+                }
+            }
         }
     },
 };

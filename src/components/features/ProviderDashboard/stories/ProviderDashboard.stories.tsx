@@ -70,8 +70,43 @@ const mockSubscriptions: SubscriptionData[] = [
         ],
         steps: commonSteps,
         requests: [
-            { id: 'req-1', type: 'document_review', status: 'pending', title: 'Review SLA Addendum', dueDate: '2025-05-01T00:00:00Z' },
-            { id: 'req-2', type: 'info_request', status: 'pending', title: 'Provide Tax ID', description: 'We need your VAT/Tax ID for billing purposes.' }
+            { 
+                id: 'req-form-1', 
+                type: 'other', 
+                status: 'pending', 
+                title: 'Review Onboarding Data', 
+                description: 'Client submitted the initial configuration form.',
+                payload: {
+                    type: 'form',
+                    data: {
+                        fields: [
+                            { id: 'region', label: 'Preferred Region' },
+                            { id: 'nodes', label: 'Cluster Nodes' },
+                            { id: 'autoscale', label: 'Autoscaling' }
+                        ],
+                        responses: {
+                            region: 'Europe West (Paris)',
+                            nodes: '12',
+                            autoscale: 'Yes (Max 24)'
+                        }
+                    }
+                }
+            },
+            { 
+                id: 'req-doc-1', 
+                type: 'document_review', 
+                status: 'pending', 
+                title: 'Verify Signed SLA', 
+                description: 'Please check the digital signature on the latest SLA version.',
+                payload: {
+                    type: 'document',
+                    data: {
+                        fileName: 'SLA_Signed_Acme.pdf',
+                        uploadDate: 'Apr 11, 2025',
+                        fileUrl: 'https://images.unsplash.com/photo-1554224155-1696413565d3?auto=format&fit=crop&q=80&w=800'
+                    }
+                }
+            }
         ]
     },
     {
@@ -99,7 +134,23 @@ const mockSubscriptions: SubscriptionData[] = [
             { name: 'Privacy Policy Agreement', status: 'signed' }
         ],
         steps: completedSteps,
-        requests: []
+        requests: [
+            {
+                id: 'req-pay-1',
+                type: 'other',
+                status: 'pending',
+                title: 'Verify Manual Payment',
+                description: 'User uploaded a receipt for a manual bank transfer.',
+                payload: {
+                    type: 'payment',
+                    data: {
+                        invoiceNumber: 'INV-DB-8899',
+                        amount: '$249.00',
+                        receiptUrl: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&q=80&w=800'
+                    }
+                }
+            }
+        ]
     },
     {
         id: 'sub-gamma-003',
@@ -129,7 +180,24 @@ const mockSubscriptions: SubscriptionData[] = [
         ],
         steps: completedSteps,
         requests: [
-            { id: 'req-3', type: 'payment_failed', status: 'pending', title: 'Update Payment Method', description: 'Your last payment was declined. Please update your billing info.' }
+            { 
+                id: 'req-terms-1', 
+                type: 'other', 
+                status: 'pending', 
+                title: 'Verify Terms Acceptance', 
+                description: 'Client needs to be verified for custom terms acceptance.',
+                payload: {
+                    type: 'terms',
+                    data: {
+                        content: 'This Security Compliance Addendum covers all aspects of data encryption...',
+                        acceptedClauses: [
+                            'AES-256 Encryption at rest',
+                            'No logging policy acknowledgment',
+                            '24/7 Security audit authorization'
+                        ]
+                    }
+                }
+            }
         ]
     }
 ];

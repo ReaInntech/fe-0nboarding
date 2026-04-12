@@ -7,7 +7,9 @@ export interface Request {
     type: 'document_review' | 'other' | string;
     status: 'approved' | 'rejected' | 'pending';
     title: string;
+    description?: string;
     dueDate?: string;
+    metadata?: Array<{ label: string; value: string }>;
 }
 
 export interface RequestItemProps {
@@ -35,6 +37,9 @@ export default function RequestItem({ req, className }: RequestItemProps) {
                             </span>
                         )}
                     </div>
+                    {req.description && (
+                        <p className={styles['request-item__description']}>{req.description}</p>
+                    )}
                     {req.dueDate && req.status === 'pending' && (
                         <p className={styles['request-item__due-date']}>
                             <Icon name="schedule" className={styles['request-item__due-date-icon']} />
@@ -43,6 +48,20 @@ export default function RequestItem({ req, className }: RequestItemProps) {
                     )}
                 </div>
             </div>
+
+            {req.metadata && req.metadata.length > 0 && (
+                <div className={styles['request-item__metadata']}>
+                    <p className={styles['request-item__metadata-title']}>Validation Details</p>
+                    <div className={styles['request-item__metadata-grid']}>
+                        {req.metadata.map((item, idx) => (
+                            <div key={idx} className={styles['request-item__metadata-item']}>
+                                <span className={styles['request-item__metadata-label']}>{item.label}:</span>
+                                <span className={styles['request-item__metadata-value']}>{item.value}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {req.status === 'pending' && (
                 <div className={`${styles['request-item__actions']} ${styles['request-item__actions--pending']}`}>

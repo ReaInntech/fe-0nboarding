@@ -13,9 +13,10 @@ export interface ProviderDashboardProps {
     subscriptions?: SubscriptionData[];
     className?: string;
     userProfile?: any;
+    allExpanded?: boolean;
 }
 
-export default function ProviderDashboard({ subscriptions = [], className, userProfile }: ProviderDashboardProps) {
+export default function ProviderDashboard({ subscriptions = [], className, userProfile, allExpanded = false }: ProviderDashboardProps) {
     const { user } = useApp();
 
     const stats = useMemo(() => {
@@ -56,7 +57,7 @@ export default function ProviderDashboard({ subscriptions = [], className, userP
                     </div>
                 </div>
 
-                <SubscriptionList subscriptions={subscriptions} />
+                <SubscriptionList subscriptions={subscriptions} allExpanded={allExpanded} />
             </div>
             <Footer />
         </div>

@@ -67,6 +67,34 @@
         @apply text-xs mt-1 flex items-center gap-1 opacity-70;
     }
 
+    &__description {
+        @apply text-xs mt-1 opacity-80 leading-relaxed;
+    }
+
+    &__metadata {
+        @apply mt-3 pt-3 border-t border-white/5;
+    }
+
+    &__metadata-title {
+        @apply text-[10px] font-bold uppercase tracking-widest opacity-50 mb-2;
+    }
+
+    &__metadata-grid {
+        @apply grid grid-cols-1 gap-1.5;
+    }
+
+    &__metadata-item {
+        @apply flex items-center justify-between text-xs py-1 px-2 bg-white/5 rounded;
+    }
+
+    &__metadata-label {
+        @apply opacity-60;
+    }
+
+    &__metadata-value {
+        @apply font-mono font-medium text-slate-200;
+    }
+
     &__due-date-icon {
         @apply text-[10px];
     }

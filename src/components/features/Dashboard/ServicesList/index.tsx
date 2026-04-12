@@ -9,8 +9,7 @@ export interface Subscription {
     name: string;
     tier: string;
     hasActionRequest?: boolean;
-    badgeVariant?: 'default' | 'success' | 'warning' | 'primary';
-    badgeText?: string;
+    status: 'active' | 'pause' | 'cancel';
     progressLabel?: string;
     progressValue?: string;
     currentStep?: number;
@@ -18,6 +17,7 @@ export interface Subscription {
     price: string;
     pricePeriod: string;
 }
+
 
 export interface ServicesListProps {
     subscriptions: Subscription[];
@@ -66,8 +66,12 @@ export default function ServicesList({ subscriptions, className }: ServicesListP
                                         <p className={styles['services-list__card-tier']}>{sub.tier}</p>
                                     </div>
                                 </div>
-                                <Badge variant={sub.badgeVariant || 'success'} className={styles['services-list__card-badge']}>
-                                    {sub.badgeText}
+                                <Badge
+                                    variant={sub.status === 'active' ? 'success' : sub.status === 'pause' ? 'warning' : 'default'}
+                                    className={styles['services-list__card-badge']}
+                                    title={`Status: ${sub.status}`}
+                                >
+                                    {sub.status.charAt(0).toUpperCase() + sub.status.slice(1)}
                                 </Badge>
                             </div>
 
@@ -75,7 +79,7 @@ export default function ServicesList({ subscriptions, className }: ServicesListP
                                 <div className={styles['services-list__progress-wrapper']}>
                                     <div className={styles['services-list__progress-header']}>
                                         <span className={`${styles['services-list__progress-label']} ${sub.hasActionRequest ? styles['services-list__progress-label--action-request'] : styles['services-list__progress-label--normal']}`}>
-                                            {sub.progressLabel || 'Current Phase'}
+                                            {'Current Phase'}
                                             {(sub.currentStep && sub.totalSteps) && (
                                                 <span className={styles['services-list__progress-steps']}>
                                                     {sub.currentStep}/{sub.totalSteps}

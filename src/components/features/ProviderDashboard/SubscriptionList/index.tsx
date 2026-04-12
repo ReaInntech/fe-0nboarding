@@ -6,9 +6,10 @@ import styles from './index.module.scss';
 export interface SubscriptionListProps {
     subscriptions: SubscriptionData[];
     className?: string;
+    allExpanded?: boolean;
 }
 
-export default function SubscriptionList({ subscriptions = [], className }: SubscriptionListProps) {
+export default function SubscriptionList({ subscriptions = [], className, allExpanded = false }: SubscriptionListProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [productFilter, setProductFilter] = useState('All');
 
@@ -67,7 +68,7 @@ export default function SubscriptionList({ subscriptions = [], className }: Subs
             <div className={styles['subscription-list__list-container']}>
                 {filteredSubscriptions.length > 0 ? (
                     filteredSubscriptions.map(sub => (
-                        <SubscriptionRow key={sub.id} sub={sub} />
+                        <SubscriptionRow key={sub.id} sub={sub} initialExpanded={allExpanded} />
                     ))
                 ) : (
                     <div className={styles['subscription-list__empty-state']}>

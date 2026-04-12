@@ -40,10 +40,11 @@ export interface SubscriptionData {
 export interface SubscriptionRowProps {
     sub: SubscriptionData;
     className?: string;
+    initialExpanded?: boolean;
 }
 
-export default function SubscriptionRow({ sub, className }: SubscriptionRowProps) {
-    const [isExpanded, setIsExpanded] = useState(false);
+export default function SubscriptionRow({ sub, className, initialExpanded = false }: SubscriptionRowProps) {
+    const [isExpanded, setIsExpanded] = useState(initialExpanded);
 
     let statusModifier = 'default';
     if (sub.status === 'active') statusModifier = 'active';

@@ -26,64 +26,111 @@ const commonSteps = [
     { name: 'Provisioned', status: 'pending' as const }
 ];
 
+const completedSteps = [
+    { name: 'Initial Request', status: 'completed' as const },
+    { name: 'Client Verification', status: 'completed' as const },
+    { name: 'Legal Review', status: 'completed' as const },
+    { name: 'Configuration', status: 'completed' as const },
+    { name: 'Provisioned', status: 'completed' as const }
+];
+
+const mockPayments = [
+    { id: 'pay-1', date: 'Apr 15, 2025', amount: 1500, status: 'Paid', paymentMethod: 'Card ending in 4242' },
+    { id: 'pay-2', date: 'Mar 15, 2025', amount: 1500, status: 'Paid', paymentMethod: 'Card ending in 4242' },
+    { id: 'pay-3', date: 'Feb 15, 2025', amount: 1500, status: 'Paid', paymentMethod: 'Card ending in 4242' },
+    { id: 'pay-4', date: 'Jan 15, 2025', amount: 1500, status: 'Paid', paymentMethod: 'Bank Transfer' },
+    { id: 'pay-5', date: 'Dec 15, 2024', amount: 1500, status: 'Paid', paymentMethod: 'Bank Transfer' },
+];
+
 const mockSubscriptions: SubscriptionData[] = [
     {
         id: 'sub-acme-001',
         client: {
             id: 'cli-acme-01',
-            legalName: 'Acme Corp',
+            legalName: 'Acme Corp International',
             clientType: 'legal_entity',
             email: 'admin@acmecorp.com',
             phone: '+1 (555) 123-4567'
         },
         product: {
-            name: 'Enterprise Cloud Server',
+            name: 'Enterprise Cloud Suite',
             icon: 'cloud',
-            iconColor: '#1978e5'
+            iconColor: '#3b82f6'
         },
-        tierName: 'Platinum Tier',
+        tierName: 'Platinum Enterprise',
         status: 'in_progress',
         monthlyPrice: 1500,
         pricePeriod: '/mo',
         provisionedAt: null,
-        payments: [],
+        payments: mockPayments.slice(0, 2),
         documents: [
             { name: 'Master Service Agreement', status: 'signed' },
-            { name: 'SLA Addendum', status: 'pending' }
+            { name: 'SLA Addendum v2', status: 'pending' },
+            { name: 'Data Processing Agreement', status: 'pending' }
         ],
         steps: commonSteps,
         requests: [
-            { id: 'req-1', type: 'document_review', status: 'pending', title: 'Review SLA Addendum', dueDate: '2025-05-01T00:00:00Z' }
+            { id: 'req-1', type: 'document_review', status: 'pending', title: 'Review SLA Addendum', dueDate: '2025-05-01T00:00:00Z' },
+            { id: 'req-2', type: 'info_request', status: 'pending', title: 'Provide Tax ID', description: 'We need your VAT/Tax ID for billing purposes.' }
         ]
     },
     {
         id: 'sub-beta-002',
         client: {
             id: 'cli-beta-02',
-            legalName: 'Jane Doe',
+            legalName: 'Sarah Jenkins',
             clientType: 'person',
-            email: 'jane@example.com',
+            email: 'sarah.j@freelance.io',
             phone: '+1 (555) 987-6543'
         },
         product: {
-            name: 'Managed Database',
+            name: 'Managed Database Pro',
             icon: 'database',
             iconColor: '#10b981'
         },
-        tierName: 'Standard Tier',
+        tierName: 'Standard Monthly',
         status: 'active',
-        monthlyPrice: 250,
+        monthlyPrice: 249,
         pricePeriod: '/mo',
         provisionedAt: '2024-01-15T00:00:00Z',
+        payments: mockPayments,
+        documents: [
+            { name: 'Simple Terms of Service', status: 'signed' },
+            { name: 'Privacy Policy Agreement', status: 'signed' }
+        ],
+        steps: completedSteps,
+        requests: []
+    },
+    {
+        id: 'sub-gamma-003',
+        client: {
+            id: 'cli-gamma-03',
+            legalName: 'TechNova Solutions',
+            clientType: 'legal_entity',
+            email: 'billing@technova.com',
+            phone: '+44 20 7946 0958'
+        },
+        product: {
+            name: 'Security Shield VPN',
+            icon: 'shield',
+            iconColor: '#f59e0b'
+        },
+        tierName: 'Advanced Security',
+        status: 'suspended',
+        monthlyPrice: 599,
+        pricePeriod: '/mo',
+        provisionedAt: '2024-11-20T00:00:00Z',
         payments: [
-            { id: 'pay-1', date: 'Mar 15, 2025', amount: 250, status: 'Paid', paymentMethod: 'Card ending in 4242' },
-            { id: 'pay-2', date: 'Feb 15, 2025', amount: 250, status: 'Paid', paymentMethod: 'Card ending in 4242' }
+            { id: 'pay-err-1', date: 'Apr 01, 2025', amount: 599, status: 'Error', paymentMethod: 'Visa ending in 8888' },
+            { id: 'pay-ok-2', date: 'Mar 01, 2025', amount: 599, status: 'Paid', paymentMethod: 'Visa ending in 8888' }
         ],
         documents: [
-            { name: 'Terms of Service', status: 'signed' }
+            { name: 'Security Compliance Cert', status: 'signed' }
         ],
-        steps: [],
-        requests: []
+        steps: completedSteps,
+        requests: [
+            { id: 'req-3', type: 'payment_failed', status: 'pending', title: 'Update Payment Method', description: 'Your last payment was declined. Please update your billing info.' }
+        ]
     }
 ];
 
@@ -91,6 +138,15 @@ export const Default = {
     args: {
         subscriptions: mockSubscriptions,
         userProfile: mockUserProfile,
+        allExpanded: false,
+    },
+};
+
+export const AllExpanded = {
+    args: {
+        subscriptions: mockSubscriptions,
+        userProfile: mockUserProfile,
+        allExpanded: true,
     },
 };
 

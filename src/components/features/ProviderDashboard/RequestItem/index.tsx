@@ -13,6 +13,7 @@ export interface Request {
     dueDate?: string;
     metadata?: Array<{ label: string; value: string }>;
     payload?: VerificationPayload;
+    rejectionReason?: string;
 }
 
 export interface RequestItemProps {
@@ -22,13 +23,35 @@ export interface RequestItemProps {
 
 export default function RequestItem({ req, className }: RequestItemProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isRejecting, setIsRejecting] = useState(false);
+    const [feedback, setFeedback] = useState('');
 
     if (!req) return null;
 
     const modifier = req.status === 'approved' ? 'approved' : req.status === 'rejected' ? 'rejected' : 'pending';
 
-    const handleOpenDetails = () => setIsModalOpen(true);
-    const handleCloseDetails = () => setIsModalOpen(false);
+    const handleOpenDetails = () => {
+        setIsRejecting(false);
+        setIsModalOpen(true);
+    };
+    
+    const handleCloseDetails = () => {
+        setIsModalOpen(false);
+        setIsRejecting(false);
+        setFeedback('');
+    };
+
+    const handleStartRejection = () => setIsRejecting(true);
+    const handleCancelRejection = () => {
+        setIsRejecting(false);
+        setFeedback('');
+    };
+
+    const handleConfirmRejection = () => {
+        // Here we would normally call an API
+        console.log(`Rejected ${req.id} with feedback: ${feedback}`);
+        handleCloseDetails();
+    };
 
     return (
         <>
@@ -58,6 +81,16 @@ export default function RequestItem({ req, className }: RequestItemProps) {
                     </div>
                 </div>
 
+                {req.status === 'rejected' && req.rejectionReason && (
+                    <div className={styles['request-item__rejection-info']}>
+                        <Icon name="error_outline" className={styles['request-item__rejection-info-icon']} />
+                        <div className={styles['request-item__rejection-info-text']}>
+                            <strong className="text-rose-500 text-[10px] uppercase font-bold mb-1 block">Feedback provided:</strong>
+                            {req.rejectionReason}
+                        </div>
+                    </div>
+                )}
+
                 {req.metadata && req.metadata.length > 0 && (
                     <div className={styles['request-item__metadata']}>
                         <p className={styles['request-item__metadata-title']}>Validation Details</p>
@@ -78,11 +111,11 @@ export default function RequestItem({ req, className }: RequestItemProps) {
                         onClick={handleOpenDetails}
                     >
                         <Icon name="visibility" className="text-[14px]" />
-                        View Submission Details
+                        {req.status === 'pending' ? 'Review & Decision' : 'View Submission Details'}
                     </button>
                 )}
 
-                {req.status === 'pending' && (
+                {req.status === 'pending' && !req.payload && (
                     <div className={`${styles['request-item__actions']} ${styles['request-item__actions--pending']}`}>
                         <button className={`${styles['request-item__action-btn']} ${styles['request-item__action-btn--reject']}`}>
                             <Icon name="close" className="text-[14px]" />
@@ -100,28 +133,67 @@ export default function RequestItem({ req, className }: RequestItemProps) {
                 <Modal
                     isOpen={isModalOpen}
                     onClose={handleCloseDetails}
-                    title={`Verifying: ${req.title}`}
+                    title={isRejecting ? 'Rejecting: ' + req.title : 'Verifying: ' + req.title}
                     size="lg"
                     footer={
                         req.status === 'pending' ? (
-                            <>
-                                <button 
-                                    className={`${styles['request-item__action-btn']} ${styles['request-item__action-btn--reject']}`}
-                                    onClick={handleCloseDetails}
-                                >
-                                    <Icon name="close" /> Reject Request
-                                </button>
-                                <button 
-                                    className={`${styles['request-item__action-btn']} ${styles['request-item__action-btn--accept']}`}
-                                    onClick={handleCloseDetails}
-                                >
-                                    <Icon name="check" /> Approve Request
-                                </button>
-                            </>
+                            isRejecting ? (
+                                <>
+                                    <button 
+                                        className={`${styles['request-item__action-btn']} ${styles['request-item__action-btn--details']}`}
+                                        onClick={handleCancelRejection}
+                                    >
+                                        Back to Details
+                                    </button>
+                                    <button 
+                                        className={`${styles['request-item__action-btn']} ${styles['request-item__action-btn--reject']}`}
+                                        onClick={handleConfirmRejection}
+                                        disabled={!feedback.trim()}
+                                    >
+                                        <Icon name="report" /> Confirm Rejection
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <button 
+                                        className={`${styles['request-item__action-btn']} ${styles['request-item__action-btn--reject']}`}
+                                        onClick={handleStartRejection}
+                                    >
+                                        <Icon name="close" /> Reject Request
+                                    </button>
+                                    <button 
+                                        className={`${styles['request-item__action-btn']} ${styles['request-item__action-btn--accept']}`}
+                                        onClick={handleCloseDetails}
+                                    >
+                                        <Icon name="check" /> Approve Request
+                                    </button>
+                                </>
+                            )
                         ) : null
                     }
                 >
-                    <RequestVerificationContent payload={req.payload} />
+                    {isRejecting ? (
+                        <div className="space-y-4">
+                            <div className="p-4 bg-rose-500/5 border border-rose-500/10 rounded-xl">
+                                <h4 className="text-rose-400 font-bold text-sm mb-2 flex items-center gap-2">
+                                    <Icon name="info" className="text-base" />
+                                    Why are you rejecting this?
+                                </h4>
+                                <p className="text-xs text-slate-400 mb-4">
+                                    This feedback will be shown to the client so they can correct the issue and re-submit.
+                                </p>
+                                <textarea 
+                                    className={styles['verification-feedback-input']}
+                                    placeholder="Example: The document is blurry, please re-scan..."
+                                    value={feedback}
+                                    onChange={(e) => setFeedback(e.target.value)}
+                                    autoFocus
+                                />
+                            </div>
+                        </div>
+                    ) : (
+                        <RequestVerificationContent payload={req.payload} />
+                    )}
                 </Modal>
             )}
         </>

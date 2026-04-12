@@ -129,10 +129,11 @@ export const Rejected = {
     args: {
         req: {
             id: '3',
-            type: 'other',
+            type: 'document_review',
             status: 'rejected',
             title: 'Invalid Documents',
             description: 'Uploaded file is blurry and unreadable.',
+            rejectionReason: 'The uploaded scan of the Business License is too blurry to read the expiration date. Please provide a high-resolution scan or a digital copy.',
             payload: {
                 type: 'document',
                 data: {

@@ -23,12 +23,12 @@ interface TopNavigationProps {
 export default function TopNavigation({ isProvider, onLogout, activeTab: activeTabProp, userProfile }: TopNavigationProps) {
     const pathname = usePathname();
     const router = useRouter();
-    const { user: contextUser, clearStorage } = useApp();
+    const { user: contextUser, signOut } = useApp();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const user = userProfile || contextUser;
-    const profile = user || { photoUrl: "", clientType: "" as any };
-    const isNaturalPerson = profile.clientType === 'natural_person';
+    const profile = user || { photoUrl: "", organization: { client_type: "" as any } };
+    const isNaturalPerson = profile.organization?.client_type === 'natural_person';
 
     const [mode, setMode] = useState(isProvider ? 'provider' : 'client');
 
@@ -41,7 +41,7 @@ export default function TopNavigation({ isProvider, onLogout, activeTab: activeT
     const activeTab = activeTabProp || navItems.find(item => pathname?.startsWith(item.path))?.name || 'Services';
 
     const handleLogout = async () => {
-        clearStorage();
+        await signOut();
         onLogout?.();
         router.push('/login');
     };
@@ -82,10 +82,7 @@ export default function TopNavigation({ isProvider, onLogout, activeTab: activeT
                             <span className={styles['nav__mode-label']}>Mode:</span>
                             <select
                                 value={mode}
-                                onChange={(e) => {
-                                    const newMode = e.target.value;
-                                    setMode(newMode);
-                                }}
+                                onChange={(e) => handleModeChange(e.target.value)}
                                 className={styles['nav__mode-select']}
                             >
                                 <option value="client">Client</option>
@@ -133,7 +130,7 @@ export default function TopNavigation({ isProvider, onLogout, activeTab: activeT
                                 <div className={styles['nav__mobile-mode-wrapper']}>
                                     <select
                                         value={mode}
-                                        onChange={(e) => setMode(e.target.value)}
+                                        onChange={(e) => handleModeChange(e.target.value)}
                                         className={styles['nav__mode-select']}
                                     >
                                         <option value="client">Client</option>

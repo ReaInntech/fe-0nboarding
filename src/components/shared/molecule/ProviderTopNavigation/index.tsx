@@ -20,11 +20,11 @@ interface ProviderTopNavigationProps {
 export default function ProviderTopNavigation({ onLogout, activeTab: activeTabProp, userProfile }: ProviderTopNavigationProps) {
     const pathname = usePathname();
     const router = useRouter();
-    const { user: contextUser, clearStorage } = useApp();
+    const { user: contextUser, signOut } = useApp();
     
     const user = userProfile || contextUser;
-    const profile = user || { photoUrl: "", clientType: "" as any };
-    const isNaturalPerson = profile.clientType === 'natural_person';
+    const profile = user || { photoUrl: "", organization: { client_type: "" as any } };
+    const isNaturalPerson = profile.organization?.client_type === 'natural_person';
 
     const [mode, setMode] = useState('provider');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -40,7 +40,7 @@ export default function ProviderTopNavigation({ onLogout, activeTab: activeTabPr
     const activeTab = activeTabProp || navItems.find(item => pathname?.startsWith(item.path))?.name || 'Dashboard';
 
     const handleLogout = async () => {
-        clearStorage();
+        await signOut();
         onLogout?.();
         router.push('/login');
     };

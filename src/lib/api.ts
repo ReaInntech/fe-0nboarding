@@ -1,17 +1,17 @@
 // Service to fetch data from the external REST API
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.mock.saslution.tech';
+const API_BASE_URL = process.env.BACKEND_URL_CORE;
 
 export async function getDashboardData() {
     try {
         const response = await fetch(`${API_BASE_URL}/dashboard`, {
             next: { revalidate: 60 } // Revalidate every 60 seconds
         });
-        
+
         if (!response.ok) {
             throw new Error('Failed to fetch dashboard data');
         }
-        
+
         return await response.json();
     } catch (error) {
         console.warn('[API] Dashboard fetch failed, using fallback data:', error);
@@ -24,11 +24,11 @@ export async function getBillingData() {
         const response = await fetch(`${API_BASE_URL}/billing`, {
             next: { revalidate: 300 }
         });
-        
+
         if (!response.ok) {
             throw new Error('Failed to fetch billing data');
         }
-        
+
         return await response.json();
     } catch (error) {
         console.warn('[API] Billing fetch failed, using fallback data:', error);
@@ -41,11 +41,11 @@ export async function getSupportData() {
         const response = await fetch(`${API_BASE_URL}/support`, {
             next: { revalidate: 3600 } // Revalidate every hour
         });
-        
+
         if (!response.ok) {
             throw new Error('Failed to fetch support data');
         }
-        
+
         return await response.json();
     } catch (error) {
         console.warn('[API] Support fetch failed, using fallback data:', error);
@@ -58,11 +58,11 @@ export async function getProviderDashboardData() {
         const response = await fetch(`${API_BASE_URL}/provider/dashboard`, {
             next: { revalidate: 60 }
         });
-        
+
         if (!response.ok) {
             throw new Error('Failed to fetch provider dashboard data');
         }
-        
+
         return await response.json();
     } catch (error) {
         console.warn('[API] Provider Dashboard fetch failed, using fallback data:', error);
@@ -75,11 +75,11 @@ export async function getProviderProductsData() {
         const response = await fetch(`${API_BASE_URL}/provider/products`, {
             next: { revalidate: 300 }
         });
-        
+
         if (!response.ok) {
             throw new Error('Failed to fetch provider products data');
         }
-        
+
         return await response.json();
     } catch (error) {
         console.warn('[API] Provider Products fetch failed, using fallback data:', error);
@@ -92,11 +92,11 @@ export async function getProviderProductDetailData(id: string) {
         const response = await fetch(`${API_BASE_URL}/provider/products/${id}`, {
             next: { revalidate: 60 }
         });
-        
+
         if (!response.ok) {
             throw new Error('Failed to fetch provider product detail data');
         }
-        
+
         return await response.json();
     } catch (error) {
         console.warn(`[API] Provider Product Detail (${id}) fetch failed, using fallback data:`, error);
@@ -109,11 +109,11 @@ export async function getProviderFinanceData() {
         const response = await fetch(`${API_BASE_URL}/provider/finance`, {
             next: { revalidate: 3600 }
         });
-        
+
         if (!response.ok) {
             throw new Error('Failed to fetch provider finance data');
         }
-        
+
         return await response.json();
     } catch (error) {
         console.warn('[API] Provider Finance fetch failed, using fallback data:', error);

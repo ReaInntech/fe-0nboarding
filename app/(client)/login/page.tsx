@@ -1,13 +1,21 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signInWithPopup,
+  getIdToken
+} from 'firebase/auth';
+import { auth, googleProvider } from '@/src/lib/firebase/config';
 import LoginForm from '@/src/components/shared/molecule/LoginForm';
 import { useApp } from '@/src/context/AppContext';
 
 export default function LoginPage() {
-    const { user, setUser, isLoading } = useApp();
+    const { user, isLoading } = useApp();
     const router = useRouter();
+    const [authError, setAuthError] = useState<string | null>(null);
 
     // If already logged in, redirect to dashboard
     useEffect(() => {
@@ -17,40 +25,45 @@ export default function LoginPage() {
     }, [user, isLoading, router]);
 
     const handleEmailAuth = async (email: string, password: string, isSignUp: boolean) => {
-        // Mock authentication for now, as the real Firebase integrated auth 
-        // will be handled by the services. 
-        // We update the AppContext which persists to localStorage.
-        
-        // Simulating a small delay
-        await new Promise(resolve => setTimeout(resolve, 800));
+        setAuthError(null);
+        try {
+            let userCredential;
+            if (isSignUp) {
+                userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                console.log('[LoginPage] Sign up success');
+            } else {
+                userCredential = await signInWithEmailAndPassword(auth, email, password);
+                console.log('[LoginPage] Sign in success');
+            }
 
-        if (email && password) {
-            const mockUser = {
-                id: 'usr-' + Math.random().toString(36).substr(2, 9),
-                name: email.split('@')[0],
-                email: email,
-                role: 'client',
-                clientType: 'natural_person' as const,
-                photoUrl: 'https://i.pravatar.cc/150'
-            };
-            setUser(mockUser);
-            router.push('/dashboard');
+            // The onAuthStateChanged listener in AppContext will handle session creation and profile fetching.
+            // We just need to wait for the redirect handled by the useEffect above.
+        } catch (err: any) {
+            console.error('[LoginPage] Auth error:', err);
+            let message = 'Authentication failed.';
+            if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+                message = 'Invalid email or password.';
+            } else if (err.code === 'auth/email-already-in-use') {
+                message = 'This email is already registered.';
+            } else if (err.code === 'auth/weak-password') {
+                message = 'Password should be at least 6 characters.';
+            }
+            setAuthError(message);
+            throw new Error(message);
         }
     };
 
     const handleGoogleLogin = async () => {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        const mockUser = {
-            id: 'google-123',
-            name: 'Google User',
-            email: 'user@gmail.com',
-            role: 'client',
-            clientType: 'legal_entity' as const,
-            photoUrl: 'https://i.pravatar.cc/150?u=google'
-        };
-        setUser(mockUser);
-        router.push('/dashboard');
+        setAuthError(null);
+        try {
+            await signInWithPopup(auth, googleProvider);
+            console.log('[LoginPage] Google sign in success');
+            router.push('/dashboard');
+        } catch (err: any) {
+            console.error('[LoginPage] Google login error:', err);
+            setAuthError('Failed to login with Google.');
+            throw err;
+        }
     };
 
     if (isLoading) {
@@ -62,7 +75,6 @@ export default function LoginPage() {
     }
 
     // If user is already resolved and present, the useEffect will handle redirect.
-    // We show nothing or a loader while that happens to prevent flashing the login form.
     if (user) return null;
 
     return (
@@ -72,6 +84,9 @@ export default function LoginPage() {
                     onEmailAuth={handleEmailAuth}
                     onGoogleLogin={handleGoogleLogin}
                 />
+                {authError && (
+                    <p className="mt-4 text-center text-red-500 text-sm">{authError}</p>
+                )}
             </div>
         </div>
     );

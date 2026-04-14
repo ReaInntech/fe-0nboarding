@@ -49,7 +49,7 @@
 
     &__card {
         @apply bg-white dark:bg-slate-900 border rounded-xl p-6 flex flex-col gap-6 hover:border-slate-400 dark:hover:border-slate-600 transition-all relative;
-        
+
         &--normal {
             @apply border-slate-200 dark:border-slate-800;
         }
@@ -100,14 +100,14 @@
     }
 
     &__card-badge {
-        @apply text-[10px] font-bold uppercase tracking-wider h-fit;
+        @apply text-[10px] font-bold uppercase;
     }
 
     &__progress-block {
         @apply rounded-lg p-3 border transition-colors;
 
         &--normal {
-            @apply bg-slate-100/50 dark:bg-slate-800/30 border-slate-200/50 dark:border-slate-700/50;
+            @apply dark:bg-slate-800/30 border-slate-200/50 dark:border-slate-700/50;
         }
 
         &--action-request {

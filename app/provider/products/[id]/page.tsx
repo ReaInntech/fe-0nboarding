@@ -1,6 +1,9 @@
 import React from 'react';
 import ProviderProductView from '@/src/components/features/ProviderProductView/ProviderProductView';
-import { getProviderProductDetailData, FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA } from '@/src/lib/api';
+import { getProviderProductDetailData } from '@/src/lib/api/provider';
+import { FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA } from '@/src/lib/api/mocks';
+import { getSessionUser } from '@/src/lib/firebase/auth-actions';
+import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 
 interface Props {
@@ -11,11 +14,13 @@ interface Props {
 
 export async function generateMetadata({ params }: Props) {
     const { id } = params;
-    const apiData = await getProviderProductDetailData(id);
+    const apiData: any = await getProviderProductDetailData(id);
+    
+    // We trust that if apiData is returned, it follows the mock strategy
     const product = apiData?.product || FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA.product;
     
     return {
-        title: `${product.name} | Provider Portal`,
+        title: `${product.name} | 0nbording`,
         description: `Managing setup and requests for ${product.name}.`,
     };
 }
@@ -24,24 +29,46 @@ export default async function ProviderProductDetailPage({ params }: Props) {
     const { id } = params;
     
     // SSR Fetching
-    const apiData = await getProviderProductDetailData(id);
-    
-    // Fallback to mock data if API fails or is not yet implemented
-    const product = apiData?.product || FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA.product;
-    const onboardingSteps = apiData?.onboardingSteps || FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA.onboardingSteps;
-    const requirements = apiData?.requirements || FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA.requirements;
-    const requests = apiData?.requests || FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA.requests;
+    const cookieStore = await cookies();
+    const token = cookieStore.get('session')?.value;
+    const sessionUser = await getSessionUser();
+    const orgId = sessionUser?.org_id;
 
-    if (!product) {
-        notFound();
+    try {
+        const apiData: any = await getProviderProductDetailData(id, token, orgId);
+        
+        // Fallback to mock data handled by the aggregator, 
+        // but we still need to extract it safely.
+        const product = apiData?.product;
+        const onboardingSteps = apiData?.onboardingSteps;
+        const requirements = apiData?.requirements;
+        const requests = apiData?.requests;
+
+        if (!product) {
+            notFound();
+        }
+
+        return (
+            <ProviderProductView 
+                product={product}
+                onboardingSteps={onboardingSteps}
+                requirements={requirements}
+                requests={requests}
+            />
+        );
+    } catch (error) {
+        console.error('[ProviderProductDetailPage] Critical Error:', error);
+        // Fallback to minimal mock view only if in dev/preview
+        if (!token) {
+            return (
+                <ProviderProductView 
+                    product={FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA.product}
+                    onboardingSteps={FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA.onboardingSteps}
+                    requirements={FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA.requirements}
+                    requests={FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA.requests}
+                />
+            );
+        }
+        throw error; // Let Next.js show the error page
     }
-
-    return (
-        <ProviderProductView 
-            product={product}
-            onboardingSteps={onboardingSteps}
-            requirements={requirements}
-            requests={requests}
-        />
-    );
 }

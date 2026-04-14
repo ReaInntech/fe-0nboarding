@@ -52,6 +52,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   // Register user in backend
   const registerUser = async (fbUser: FirebaseUser, token: string): Promise<UserProfile | null> => {
+    if (!fbUser.email) {
+      console.warn('[AppContext] Cannot register user without email');
+      return null;
+    }
+
     try {
       console.log('[AppContext] Attempting auto-registration for:', fbUser.email);
       const resp = await fetch(`${API_BASE_URL}/register`, {
@@ -61,14 +66,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          full_name: fbUser.displayName || fbUser.email?.split('@')[0] || 'New User',
+          full_name: fbUser.displayName || fbUser.email.split('@')[0] || 'New User',
           email: fbUser.email
         })
       });
 
       if (!resp.ok) {
-        const errorData = await resp.json();
-        console.error('[AppContext] Registration failed:', errorData);
+        const errorData = await resp.json().catch(() => ({}));
+        console.error('[AppContext] Registration failed:', JSON.stringify(errorData, null, 2));
         return null;
       }
 
@@ -90,22 +95,49 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setState(prev => ({ ...prev, isLoading: true }));
 
         try {
-          const token = await fbUser.getIdToken();
+          const idTokenResult = await fbUser.getIdTokenResult();
+          const token = idTokenResult.token;
+          const claims = idTokenResult.claims as any;
 
           // 1. Sync session cookie with server
           await createSession(token);
 
-          // 2. Try to fetch extended profile from backend
+          // 2. Try to initialize state from Custom Claims (Zero-Fetch)
+          if (claims.org_id && claims.role_name) {
+            console.log('[AppContext] Zero-fetch: User claims found', claims);
+            setState({
+              user: {
+                id: fbUser.uid,
+                email: fbUser.email || '',
+                full_name: fbUser.displayName || fbUser.email?.split('@')[0] || 'User',
+                role_name: claims.role_name,
+                organization: {
+                  id: claims.org_id,
+                  legal_name: claims.org_name || 'Organization', // Optional claim
+                  client_type: claims.client_type || 'legal_entity',
+                }
+              },
+              isLoading: false,
+              error: null
+            });
+            // Background sync just in case, or for truly extended data
+            fetchProfile(fbUser.uid, token).then(profile => {
+               if (profile) setState(prev => ({ ...prev, user: profile }));
+            });
+            return;
+          }
+
+          // 3. Fallback: Try to fetch extended profile from backend if claims are missing
           let profile = await fetchProfile(fbUser.uid, token);
 
-          // 3. If profile not found, attempt auto-registration
+          // 4. If profile not found, attempt auto-registration
           if (!profile) {
             profile = await registerUser(fbUser, token);
 
-            // If registration worked, we might need to fetch /me again to get the full organization data
-            // which the backend 'register' endpoint might return partially vs /me
             if (profile) {
-              profile = await fetchProfile(fbUser.uid, token);
+              // Registration successful - force token refresh to get new claims
+              const newToken = await fbUser.getIdToken(true);
+              profile = await fetchProfile(fbUser.uid, newToken);
             }
           }
 

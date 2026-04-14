@@ -1,14 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Icon from '../../../shared/atoms/Icon';
 import NotificationItem from '../../../shared/molecule/NotificationItem';
+import { Notification } from '@/src/lib/api/types';
 import styles from './index.module.scss';
-
-export interface Notification {
-    title: string;
-    time: string;
-    message: string;
-    variant?: 'critical' | 'warning' | 'info' | 'success';
-}
 
 export interface NotificationHeroProps {
     notifications?: Notification[];

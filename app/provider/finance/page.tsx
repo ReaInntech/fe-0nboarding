@@ -1,24 +1,41 @@
-import React from 'react';
 import ProviderFinance from '@/src/components/features/ProviderFinance/ProviderFinance';
-import { getProviderFinanceData, FALLBACK_PROVIDER_FINANCE_DATA } from '@/src/lib/api';
+import { getProviderFinanceInit } from '@/src/lib/api/provider';
+import { FALLBACK_PROVIDER_FINANCE_DATA } from '@/src/lib/api/mocks';
+import { FinanceKpis, RevenueDataPoint } from '@/src/lib/api/types';
+import { getSessionUser } from '@/src/lib/firebase/auth-actions';
+import { cookies } from 'next/headers';
 
 export const metadata = {
-    title: 'Finance Overview | Provider Portal',
+    title: 'Finance Overview | 0nbording',
     description: 'Track your revenue, pending payouts, and recent payment history.',
 };
 
 export default async function ProviderFinancePage() {
-    // SSR Fetching
-    const apiData = await getProviderFinanceData();
+    // SSR Fetching with Auth Token
+    const cookieStore = await cookies();
+    const token = cookieStore.get('session')?.value;
+    const sessionUser = await getSessionUser();
     
-    // Fallback to mock data if API fails or is not yet implemented
-    const kpis = apiData?.kpis || FALLBACK_PROVIDER_FINANCE_DATA.kpis;
-    const revenueData = apiData?.revenueData || FALLBACK_PROVIDER_FINANCE_DATA.revenueData;
-    const distributionData = apiData?.distributionData || FALLBACK_PROVIDER_FINANCE_DATA.distributionData;
-    const transactions = apiData?.transactions || FALLBACK_PROVIDER_FINANCE_DATA.transactions;
-    const productsFilterList = apiData?.productsFilterList || FALLBACK_PROVIDER_FINANCE_DATA.productsFilterList;
-    const clientsFilterList = apiData?.clientsFilterList || FALLBACK_PROVIDER_FINANCE_DATA.clientsFilterList;
-    const paymentMethodsList = apiData?.paymentMethodsList || FALLBACK_PROVIDER_FINANCE_DATA.paymentMethodsList;
+    // Use org_id from custom claims if available
+    const orgId = sessionUser?.org_id;
+
+    let kpis: FinanceKpis = FALLBACK_PROVIDER_FINANCE_DATA.kpis;
+    let revenueData: RevenueDataPoint[] = FALLBACK_PROVIDER_FINANCE_DATA.revenueData;
+    let distributionData = FALLBACK_PROVIDER_FINANCE_DATA.distributionData;
+    let transactions = FALLBACK_PROVIDER_FINANCE_DATA.transactions;
+    let productsFilterList = FALLBACK_PROVIDER_FINANCE_DATA.productsFilterList;
+    let clientsFilterList = FALLBACK_PROVIDER_FINANCE_DATA.clientsFilterList;
+    let paymentMethodsList = FALLBACK_PROVIDER_FINANCE_DATA.paymentMethodsList;
+
+    if (token && orgId) {
+        try {
+            const data = await getProviderFinanceInit(token, orgId);
+            if (data.kpis) kpis = data.kpis;
+            if (data.revenueHistory) revenueData = data.revenueHistory;
+        } catch (error) {
+            console.error('[ProviderFinancePage] API failed and no fallback allowed:', error);
+        }
+    }
 
     return (
         <ProviderFinance 

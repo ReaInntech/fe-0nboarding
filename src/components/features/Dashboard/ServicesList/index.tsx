@@ -1,22 +1,8 @@
 import React from 'react';
 import Icon from '../../../shared/atoms/Icon';
 import Badge from '../../../shared/atoms/Badge';
+import { Subscription } from '@/src/lib/api/types';
 import styles from './index.module.scss';
-
-export interface Subscription {
-    id: string;
-    icon: string;
-    name: string;
-    tier: string;
-    hasActionRequest?: boolean;
-    status: 'active' | 'pause' | 'cancel';
-    progressLabel?: string;
-    progressValue?: string;
-    currentStep?: number;
-    totalSteps?: number;
-    price: string;
-    pricePeriod: string;
-}
 
 
 export interface ServicesListProps {

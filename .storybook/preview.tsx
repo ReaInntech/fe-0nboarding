@@ -1,7 +1,23 @@
 import type { Preview } from '@storybook/react';
-import React from 'react';
-import { AppProvider } from '../src/context/AppContext';
+import React, { createContext, useContext, useState } from 'react';
 import '../app/globals.css';
+
+// Mock AppContext for Storybook (avoids loading server-only dependencies)
+const MockAppContext = createContext<any>(undefined);
+
+function MockAppProvider({ children }: { children: React.ReactNode }) {
+  const [state] = useState({
+    user: null,
+    isLoading: false,
+    error: null,
+  });
+
+  return (
+    <MockAppContext.Provider value={{ ...state, setUser: () => {}, signOut: async () => {}, refreshProfile: async () => {} }}>
+      {children}
+    </MockAppContext.Provider>
+  );
+}
 
 const preview: Preview = {
     globalTypes: {
@@ -32,13 +48,16 @@ const preview: Preview = {
             }
 
             return (
-                <AppProvider>
+                <MockAppProvider>
                     <Story />
-                </AppProvider>
+                </MockAppProvider>
             );
         },
     ],
     parameters: {
+        nextjs: {
+            appDirectory: true,
+        },
         controls: {
             matchers: {
                 color: /(background|color)$/i,

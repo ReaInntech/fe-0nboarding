@@ -80,7 +80,7 @@ export const Default = {
         userProfile: { 
             name: 'Alex Thompson', 
             role: 'Product Manager',
-            photoUrl: 'https://i.pravatar.cc/150?u=alex',
+            avatar_url: 'https://i.pravatar.cc/150?u=alex',
             clientType: 'corporate'
         }
     }

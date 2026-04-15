@@ -3,7 +3,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { auth } from '../lib/firebase/config';
-import { createSession, removeSession } from '../lib/firebase/auth-actions';
 import { UserProfile, AppState } from '../types/user';
 
 interface AppContextType extends AppState {
@@ -88,77 +87,109 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     console.log('[AppContext] Initializing Firebase Auth listener...');
-
-    const unsubscribe = onAuthStateChanged(auth, async (fbUser: FirebaseUser | null) => {
-      if (fbUser) {
-        console.log('[AppContext] Firebase user detected:', fbUser.email);
-        setState(prev => ({ ...prev, isLoading: true }));
-
-        try {
-          const idTokenResult = await fbUser.getIdTokenResult();
-          const token = idTokenResult.token;
-          const claims = idTokenResult.claims as any;
-
-          // 1. Sync session cookie with server
-          await createSession(token);
-
-          // 2. Try to initialize state from Custom Claims (Zero-Fetch)
-          if (claims.org_id && claims.role_name) {
-            console.log('[AppContext] Zero-fetch: User claims found', claims);
-            setState({
-              user: {
-                id: fbUser.uid,
-                email: fbUser.email || '',
-                full_name: fbUser.displayName || fbUser.email?.split('@')[0] || 'User',
-                role_name: claims.role_name,
-                organization: {
-                  id: claims.org_id,
-                  legal_name: claims.org_name || 'Organization', // Optional claim
-                  client_type: claims.client_type || 'legal_entity',
-                }
-              },
-              isLoading: false,
-              error: null
-            });
-            // Background sync just in case, or for truly extended data
-            fetchProfile(fbUser.uid, token).then(profile => {
-               if (profile) setState(prev => ({ ...prev, user: profile }));
-            });
-            return;
-          }
-
-          // 3. Fallback: Try to fetch extended profile from backend if claims are missing
-          let profile = await fetchProfile(fbUser.uid, token);
-
-          // 4. If profile not found, attempt auto-registration
-          if (!profile) {
-            profile = await registerUser(fbUser, token);
-
-            if (profile) {
-              // Registration successful - force token refresh to get new claims
-              const newToken = await fbUser.getIdToken(true);
-              profile = await fetchProfile(fbUser.uid, newToken);
-            }
-          }
-
-          if (profile) {
-            setState({ user: profile, isLoading: false, error: null });
-          } else {
-            console.error('[AppContext] Could not resolve user profile after registration attempt');
-            setState({ user: null, isLoading: false, error: 'Registration failed' });
-          }
-        } catch (err) {
-          console.error('[AppContext] Error syncing auth:', err);
-          setState({ user: null, isLoading: false, error: 'Authentication error' });
-        }
-      } else {
-        console.log('[AppContext] No Firebase user detected.');
-        await removeSession();
-        setState({ user: null, isLoading: false, error: null });
+    
+    // Async function to handle server auth actions
+    const setupAuthListener = async () => {
+      let createSession: ((token: string) => Promise<any>) | null = null;
+      let removeSession: (() => Promise<any>) | null = null;
+      
+      try {
+        const { createSession: cs, removeSession: rs } = await import('../lib/firebase/auth-actions');
+        createSession = cs;
+        removeSession = rs;
+      } catch (error) {
+        console.warn('[AppContext] Server auth-actions not available. Running in client-only mode.');
       }
+
+      const unsubscribe = onAuthStateChanged(auth, async (fbUser: FirebaseUser | null) => {
+        if (fbUser) {
+          console.log('[AppContext] Firebase user detected:', fbUser.email);
+          setState(prev => ({ ...prev, isLoading: true }));
+
+          try {
+            const idTokenResult = await fbUser.getIdTokenResult();
+            const token = idTokenResult.token;
+            const claims = idTokenResult.claims as any;
+
+            // 1. Sync session cookie with server (if available)
+            if (createSession) {
+              await createSession(token);
+            }
+
+            // 2. Try to initialize state from Custom Claims (Zero-Fetch)
+            if (claims.org_id && claims.role_name) {
+              console.log('[AppContext] Zero-fetch: User claims found', claims);
+              setState({
+                user: {
+                  id: fbUser.uid,
+                  email: fbUser.email || '',
+                  full_name: fbUser.displayName || fbUser.email?.split('@')[0] || 'User',
+                  role_name: claims.role_name,
+                  firebasePhotoUrl: fbUser.photoURL || undefined,
+                  organization: {
+                    id: claims.org_id,
+                    legal_name: claims.org_name || 'Organization', // Optional claim
+                    client_type: claims.client_type || 'legal_entity',
+                  }
+                },
+                isLoading: false,
+                error: null
+              });
+              // Background sync just in case, or for truly extended data
+              fetchProfile(fbUser.uid, token).then(profile => {
+                 if (profile) {
+                   profile.firebasePhotoUrl = fbUser.photoURL || undefined;
+                   setState(prev => ({ ...prev, user: profile }));
+                 }
+              });
+              return;
+            }
+
+            // 3. Fallback: Try to fetch extended profile from backend if claims are missing
+            let profile = await fetchProfile(fbUser.uid, token);
+
+            // 4. If profile not found, attempt auto-registration
+            if (!profile) {
+              profile = await registerUser(fbUser, token);
+
+              if (profile) {
+                // Registration successful - force token refresh to get new claims
+                const newToken = await fbUser.getIdToken(true);
+                profile = await fetchProfile(fbUser.uid, newToken);
+              }
+            }
+
+             if (profile) {
+               profile.firebasePhotoUrl = fbUser.photoURL || undefined;
+               setState({ user: profile, isLoading: false, error: null });
+             } else {
+               console.error('[AppContext] Could not resolve user profile after registration attempt');
+               setState({ user: null, isLoading: false, error: 'Registration failed' });
+             }
+          } catch (err) {
+            console.error('[AppContext] Error syncing auth:', err);
+            setState({ user: null, isLoading: false, error: 'Authentication error' });
+          }
+        } else {
+          console.log('[AppContext] No Firebase user detected.');
+          if (removeSession) {
+            await removeSession();
+          }
+          setState({ user: null, isLoading: false, error: null });
+        }
+      });
+
+      return unsubscribe;
+    };
+
+    let unsubscribe: (() => void) | null = null;
+    setupAuthListener().then(unsub => {
+      unsubscribe = unsub;
     });
 
-    return () => unsubscribe();
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
 

@@ -7,6 +7,7 @@ export interface UserProfile {
     role_name: RoleName;
     org_id: string;
     avatar_url?: string | null;
+    firebasePhotoUrl?: string;
     organization?: {
         id: string;
         legal_name: string;

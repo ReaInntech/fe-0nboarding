@@ -23,7 +23,7 @@ export default function ProviderTopNavigation({ onLogout, activeTab: activeTabPr
     const { user: contextUser, signOut } = useApp();
     
     const user = userProfile || contextUser;
-    const profile = user || { photoUrl: "", organization: { client_type: "" as any } };
+    const profile = user || { avatar_url: "", organization: { client_type: "" as any } };
     const isNaturalPerson = profile.organization?.client_type === 'natural_person';
 
     const [mode, setMode] = useState('provider');
@@ -84,7 +84,7 @@ export default function ProviderTopNavigation({ onLogout, activeTab: activeTabPr
                         </div>
                     )}
 
-                    <Avatar sizeClasses="size-8" src={profile.photoUrl || ''} />
+                    <Avatar sizeClasses="size-8" src={profile.avatar_url || profile.firebasePhotoUrl || ''} />
 
                     <button onClick={handleLogout} className={styles['nav__logout-btn']} title="Logout">
                         <Icon name="logout" className={styles['nav__logout-icon']} />

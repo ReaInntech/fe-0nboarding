@@ -14,6 +14,7 @@ export interface UserProfile {
   full_name: string;
   email: string;
   avatar_url?: string;
+  firebasePhotoUrl?: string;
   role_name: RoleName;
   organization?: Organization;
 }

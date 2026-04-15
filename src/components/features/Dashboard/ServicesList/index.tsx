@@ -34,9 +34,7 @@ export default function ServicesList({ subscriptions, className }: ServicesListP
                     <p className={styles['services-list__empty-text']}>
                         You don't have any active subscriptions yet. Explore our services to start empowering your business.
                     </p>
-                    <a href="/marketplace" className={styles['services-list__empty-button']}>
-                        Explore Services <Icon name="arrow_forward" className="ml-2 text-xl" />
-                    </a>
+                    {/* Explore Services button hidden as requested */}
                 </div>
             ) : (
                 <div className={styles['services-list__grid']}>

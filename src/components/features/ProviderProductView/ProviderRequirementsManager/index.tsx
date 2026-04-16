@@ -4,14 +4,8 @@ import React, { useState } from 'react';
 import Icon from '../../../shared/atoms/Icon';
 import Card from '../../../shared/atoms/Card';
 import Button from '../../../shared/atoms/Button';
+import { RequirementField } from '@/src/lib/api/types';
 import styles from './index.module.scss';
-
-export interface RequirementField {
-    id: string;
-    label: string;
-    value: string;
-    required: boolean;
-}
 
 export interface ProviderRequirementsManagerProps {
     initialRequirements: RequirementField[];

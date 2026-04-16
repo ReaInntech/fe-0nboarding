@@ -4,11 +4,18 @@
  */
 
 const getBaseUrl = (microservice: 'core' | 'payments' | 'provider') => {
-  switch (microservice) {
-    case 'payments': return process.env.NEXT_PUBLIC_BACKEND_URL_PAYMENTS || 'http://localhost:3001/api/v1/payments';
-    case 'provider': return process.env.NEXT_PUBLIC_BACKEND_URL_PROVIDER || 'http://localhost:3001/api/v1/provider';
-    default: return process.env.NEXT_PUBLIC_BACKEND_URL_CORE || 'http://localhost:3001/api/v1/core';
+  // If we are on the server, we use direct microservice URLs
+  if (typeof window === 'undefined') {
+    switch (microservice) {
+      case 'payments': return process.env.BACKEND_URL_PAYMENTS || 'http://localhost:3002/api/v1/payments';
+      case 'provider': return process.env.BACKEND_URL_PROVIDER || 'http://localhost:3003/api/v1/provider';
+      default: return process.env.BACKEND_URL_CORE || 'http://localhost:3001/api/v1/core';
+    }
   }
+
+  // If we are on the client, we route through our Next.js BFF API
+  // Pattern: /api/v1/{microservice}
+  return `/api/v1/${microservice}`;
 };
 
 interface ApiOptions extends RequestInit {
@@ -16,6 +23,14 @@ interface ApiOptions extends RequestInit {
   token?: string;
   orgId?: string;
 }
+
+// Global listener for 401 Unauthorized errors
+type UnauthorizedListener = () => void;
+let unauthorizedListener: UnauthorizedListener | null = null;
+
+export const setUnauthorizedListener = (listener: UnauthorizedListener) => {
+  unauthorizedListener = listener;
+};
 
 export type MockStrategy = 'always' | 'fallback' | 'off';
 
@@ -53,6 +68,11 @@ export async function apiFetch<T>(endpoint: string, options: ApiOptions = {}): P
     ...fetchOptions,
     headers,
   });
+
+  if (response.status === 401) {
+    console.warn('[API] Unauthorized (401) detected. Notifying listener.');
+    if (unauthorizedListener) unauthorizedListener();
+  }
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));

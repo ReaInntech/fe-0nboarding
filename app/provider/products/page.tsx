@@ -12,7 +12,7 @@ export const metadata = {
 export default async function ProviderProductsPage() {
     // SSR Fetching with Auth Token
     const cookieStore = await cookies();
-    const token = cookieStore.get('session')?.value;
+    const token = cookieStore.get('id_token')?.value;
     const sessionUser = await getSessionUser();
     const orgId = sessionUser?.org_id;
 

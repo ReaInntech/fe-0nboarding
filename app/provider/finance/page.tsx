@@ -13,14 +13,14 @@ export const metadata = {
 export default async function ProviderFinancePage() {
     // SSR Fetching with Auth Token
     const cookieStore = await cookies();
-    const token = cookieStore.get('session')?.value;
+    const token = cookieStore.get('id_token')?.value;
     const sessionUser = await getSessionUser();
     
     // Use org_id from custom claims if available
     const orgId = sessionUser?.org_id;
 
     let kpis: FinanceKpis = FALLBACK_PROVIDER_FINANCE_DATA.kpis;
-    let revenueData: RevenueDataPoint[] = FALLBACK_PROVIDER_FINANCE_DATA.revenueData;
+    let revenueData: RevenueDataPoint[] = FALLBACK_PROVIDER_FINANCE_DATA.revenueHistory;
     let distributionData = FALLBACK_PROVIDER_FINANCE_DATA.distributionData;
     let transactions = FALLBACK_PROVIDER_FINANCE_DATA.transactions;
     let productsFilterList = FALLBACK_PROVIDER_FINANCE_DATA.productsFilterList;

@@ -1,41 +1,9 @@
 import React, { useState } from 'react';
 import Icon from '../../../shared/atoms/Icon';
 import SubscriptionActionCenter from '../SubscriptionActionCenter';
+import { Subscription } from '@/src/lib/api/types';
+export type SubscriptionData = Subscription;
 import styles from './index.module.scss';
-
-export interface SubscriptionData {
-    id: string;
-    client: {
-        id: string;
-        legalName: string;
-        clientType: 'legal_entity' | 'person' | string;
-        email: string;
-        phone: string;
-    };
-    product: {
-        name: string;
-        icon: string;
-        iconColor: string;
-    };
-    tierName: string;
-    status: 'active' | 'in_progress' | 'suspended' | 'cancelled' | string;
-    monthlyPrice: number;
-    pricePeriod: string;
-    provisionedAt?: string | null;
-    payments: Array<{
-        id: string;
-        date: string;
-        amount: number;
-        status: 'Paid' | 'Pending' | 'Error' | string;
-        paymentMethod?: string;
-    }>;
-    documents: Array<{
-        name: string;
-        status: 'signed' | 'pending' | string;
-    }>;
-    steps?: any[];
-    requests?: any[];
-}
 
 export interface SubscriptionRowProps {
     sub: SubscriptionData;
@@ -62,19 +30,19 @@ export default function SubscriptionRow({ sub, className, initialExpanded = fals
                 {/* Client Info */}
                 <div className={styles['subscription-row__client-info']}>
                     <div className={styles['subscription-row__client-icon-wrapper']}>
-                        <Icon name={sub.client.clientType === 'legal_entity' ? 'domain' : 'person'} />
+                        <Icon name={sub.client?.clientType === 'legal_entity' ? 'domain' : 'person'} />
                     </div>
                     <div className={styles['subscription-row__client-details']}>
-                        <h4 className={styles['subscription-row__client-name']}>{sub.client.legalName}</h4>
-                        <p className={styles['subscription-row__client-id']}>ID: {sub.client.id}</p>
+                        <h4 className={styles['subscription-row__client-name']}>{sub.client?.legalName}</h4>
+                        <p className={styles['subscription-row__client-id']}>ID: {sub.client?.id}</p>
                     </div>
                 </div>
 
                 {/* Product Info */}
                 <div className={styles['subscription-row__product-info']}>
-                    <Icon name={sub.product.icon} className={styles['subscription-row__product-icon']} style={{ color: sub.product.iconColor }} />
+                    <Icon name={sub.product?.icon || 'category'} className={styles['subscription-row__product-icon']} style={{ color: sub.product?.iconColor }} />
                     <div className={styles['subscription-row__product-details']}>
-                        <span className={styles['subscription-row__product-name']}>{sub.product.name}</span>
+                        <span className={styles['subscription-row__product-name']}>{sub.product?.name}</span>
                         <span className={styles['subscription-row__product-tier']}>{sub.tierName}</span>
                     </div>
                 </div>
@@ -82,10 +50,10 @@ export default function SubscriptionRow({ sub, className, initialExpanded = fals
                 {/* Status & Revenue */}
                 <div className={styles['subscription-row__status-wrapper']}>
                     <span className={`${styles['subscription-row__status-badge']} ${styles[`subscription-row__status-badge--${statusModifier}`]}`}>
-                        {sub.status.replace('_', ' ').toUpperCase()}
+                        {(sub.status || 'pending').replace('_', ' ').toUpperCase()}
                     </span>
                     <div className={styles['subscription-row__revenue']}>
-                        <span className={styles['subscription-row__revenue-amount']}>${sub.monthlyPrice.toLocaleString()}</span>
+                        <span className={styles['subscription-row__revenue-amount']}>${(sub.monthlyPrice || 0).toLocaleString()}</span>
                         <span className={styles['subscription-row__revenue-period']}>{sub.pricePeriod}</span>
                     </div>
                     <button className={styles['subscription-row__expand-btn']}>
@@ -105,11 +73,11 @@ export default function SubscriptionRow({ sub, className, initialExpanded = fals
                                 <div className={styles['subscription-row__info-block']}>
                                     <div className={styles['subscription-row__info-row']}>
                                         <Icon name="mail" className={styles['subscription-row__info-icon']} />
-                                        <span>{sub.client.email}</span>
+                                        <span>{sub.client?.email}</span>
                                     </div>
                                     <div className={styles['subscription-row__info-row']}>
                                         <Icon name="phone" className={styles['subscription-row__info-icon']} />
-                                        <span>{sub.client.phone}</span>
+                                        <span>{sub.client?.phone}</span>
                                     </div>
                                 </div>
                             </div>

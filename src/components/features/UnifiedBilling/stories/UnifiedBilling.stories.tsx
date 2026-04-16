@@ -18,25 +18,25 @@ const mockTransactions: Transaction[] = [
     {
         date: 'Oct 12, 2023',
         description: 'Enterprise API Subscription - Tier 3',
-        amount: '$299.00',
+        amount: 299.00,
         status: 'Paid',
     },
     {
         date: 'Oct 05, 2023',
         description: 'Cloud Storage Add-on (500GB)',
-        amount: '$45.00',
+        amount: 45.00,
         status: 'Paid',
     },
     {
         date: 'Sep 12, 2023',
         description: 'Enterprise API Subscription - Tier 3',
-        amount: '$299.00',
+        amount: 299.00,
         status: 'Paid',
     },
     {
         date: 'Sep 01, 2023',
         description: 'Consultation Fee - Migration Service',
-        amount: '$850.00',
+        amount: 850.00,
         status: 'Paid',
     }
 ];

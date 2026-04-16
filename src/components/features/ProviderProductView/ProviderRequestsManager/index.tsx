@@ -5,15 +5,8 @@ import Icon from '../../../shared/atoms/Icon';
 import Badge from '../../../shared/atoms/Badge';
 import Card from '../../../shared/atoms/Card';
 import Button from '../../../shared/atoms/Button';
+import { ClientRequest } from '@/src/lib/api/types';
 import styles from './index.module.scss';
-
-export interface ClientRequest {
-    id: string;
-    subject: string;
-    status: 'pending' | 'in_review' | 'approved' | 'rejected' | string;
-    priority: 'high' | 'medium' | 'low' | string;
-    date: string;
-}
 
 export interface ProviderRequestsManagerProps {
     requests: ClientRequest[];

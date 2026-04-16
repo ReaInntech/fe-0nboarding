@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { auth } from '../lib/firebase/config';
 import { UserProfile, AppState } from '../types/user';
@@ -13,7 +13,7 @@ interface AppContextType extends AppState {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL_INTERNAL;
+import { apiFetch } from '../lib/api/config';
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<AppState>({
@@ -22,34 +22,29 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     error: null,
   });
 
-  // Fetch profile from backend
+  // Fetch profile from backend (Now via BFF/apiFetch)
   const fetchProfile = async (uid: string, token: string): Promise<UserProfile | null> => {
     try {
-      const resp = await fetch(`${API_BASE_URL}/me`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      console.log(`[AppContext] Fetching profile for UID: ${token}`);
+      const data = await apiFetch<UserProfile>('/me', {
+        token,
+        // Optional: you can specify microservice if not core
       });
-      console.log(resp, API_BASE_URL);
-      if (resp.status === 404) {
-        console.log('[AppContext] User not found in backend (404)');
-        return null;
+      return data;
+    } catch (err: any) {
+      if (err.message.includes('401')) {
+        console.warn('[AppContext] Unauthorized (401) during profile fetch. Logging out.');
+        handleLogout();
+      } else if (err.message.includes('404')) {
+        console.log('[AppContext] User not found (404)');
+      } else {
+        console.error('[AppContext] Error fetching profile:', err);
       }
-
-      if (!resp.ok) {
-        console.warn('[AppContext] Failed to fetch profile from backend with status:', resp.status);
-        return null;
-      }
-
-      const result = await resp.json();
-      return result.data || result;
-    } catch (err) {
-      console.error('[AppContext] Error fetching profile:', err);
       return null;
     }
   };
 
-  // Register user in backend
+  // Register user in backend (Now via BFF/apiFetch)
   const registerUser = async (fbUser: FirebaseUser, token: string): Promise<UserProfile | null> => {
     if (!fbUser.email) {
       console.warn('[AppContext] Cannot register user without email');
@@ -58,41 +53,53 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     try {
       console.log('[AppContext] Attempting auto-registration for:', fbUser.email);
-      const resp = await fetch(`${API_BASE_URL}/register`, {
+      const data = await apiFetch<UserProfile>('/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        token,
         body: JSON.stringify({
           full_name: fbUser.displayName || fbUser.email.split('@')[0] || 'New User',
           email: fbUser.email
-        })
+        }),
+        headers: { 'Content-Type': 'application/json' }
       });
 
-      if (!resp.ok) {
-        const errorData = await resp.json().catch(() => ({}));
-        console.error('[AppContext] Registration failed:', JSON.stringify(errorData, null, 2));
-        return null;
-      }
-
-      const result = await resp.json();
       console.log('[AppContext] Registration successful');
-      return result.data?.user || result.user || null;
-    } catch (err) {
+      return data;
+    } catch (err: any) {
       console.error('[AppContext] Error during registration:', err);
       return null;
     }
   };
 
+  // Force logout and cleanup
+  const handleLogout = useCallback(async () => {
+    console.warn('[AppContext] Logging out user...');
+    await auth.signOut();
+    try {
+      const { removeSession } = await import('../lib/firebase/auth-actions');
+      await removeSession();
+    } catch {
+      // Server auth-actions not available
+    }
+    setState({ user: null, isLoading: false, error: null });
+  }, []);
+
   useEffect(() => {
+    // Subscribe to Global API Unauthorized events (401)
+    import('../lib/api/config').then(({ setUnauthorizedListener }) => {
+      setUnauthorizedListener(() => {
+        console.warn('[AppContext] Global 401 detected via API listener. Triggering logout.');
+        handleLogout();
+      });
+    });
+
     console.log('[AppContext] Initializing Firebase Auth listener...');
-    
+
     // Async function to handle server auth actions
     const setupAuthListener = async () => {
       let createSession: ((token: string) => Promise<any>) | null = null;
       let removeSession: (() => Promise<any>) | null = null;
-      
+
       try {
         const { createSession: cs, removeSession: rs } = await import('../lib/firebase/auth-actions');
         createSession = cs;
@@ -107,12 +114,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           setState(prev => ({ ...prev, isLoading: true }));
 
           try {
+            // 🆕 Always get a fresh ID Token from Firebase Client SDK
+            // This is crucial to avoid "incorrect iss" errors from session cookies
+            const token = await fbUser.getIdToken();
             const idTokenResult = await fbUser.getIdTokenResult();
-            const token = idTokenResult.token;
             const claims = idTokenResult.claims as any;
 
-            // 1. Sync session cookie with server (if available)
+            console.log(`[AppContext] Sending ID Token (Issuer: ${idTokenResult.issuer})`);
+
+            // 1. Sync session & id_token cookies with server for SSR
             if (createSession) {
+              console.log('[AppContext] Syncing ID Token to server cookies...');
               await createSession(token);
             }
 
@@ -125,29 +137,31 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
                   email: fbUser.email || '',
                   full_name: fbUser.displayName || fbUser.email?.split('@')[0] || 'User',
                   role_name: claims.role_name,
+                  org_id: claims.org_id,
                   firebasePhotoUrl: fbUser.photoURL || undefined,
                   organization: {
                     id: claims.org_id,
-                    legal_name: claims.org_name || 'Organization', // Optional claim
+                    legal_name: claims.org_name || 'Organization',
                     client_type: claims.client_type || 'legal_entity',
                   }
                 },
                 isLoading: false,
                 error: null
               });
-              // Background sync just in case, or for truly extended data
+
+              // Background sync with API using ID Token
               fetchProfile(fbUser.uid, token).then(profile => {
-                 if (profile) {
-                   profile.firebasePhotoUrl = fbUser.photoURL || undefined;
-                   setState(prev => ({ ...prev, user: profile }));
-                 }
+                if (profile) {
+                  profile.firebasePhotoUrl = fbUser.photoURL || undefined;
+                  setState(prev => ({ ...prev, user: profile }));
+                }
               });
               return;
             }
 
             // 3. Fallback: Try to fetch extended profile from backend if claims are missing
             let profile = await fetchProfile(fbUser.uid, token);
-
+            console.warn('profile', profile);
             // 4. If profile not found, attempt auto-registration
             if (!profile) {
               profile = await registerUser(fbUser, token);
@@ -159,13 +173,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               }
             }
 
-             if (profile) {
-               profile.firebasePhotoUrl = fbUser.photoURL || undefined;
-               setState({ user: profile, isLoading: false, error: null });
-             } else {
-               console.error('[AppContext] Could not resolve user profile after registration attempt');
-               setState({ user: null, isLoading: false, error: 'Registration failed' });
-             }
+            if (profile) {
+              profile.firebasePhotoUrl = fbUser.photoURL || undefined;
+              setState({ user: profile, isLoading: false, error: null });
+            } else {
+              console.error('[AppContext] Could not resolve user profile after registration attempt');
+              setState({ user: null, isLoading: false, error: 'Registration failed' });
+            }
           } catch (err) {
             console.error('[AppContext] Error syncing auth:', err);
             setState({ user: null, isLoading: false, error: 'Authentication error' });
@@ -198,9 +212,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    await auth.signOut();
-    await removeSession();
-    setState({ user: null, isLoading: false, error: null });
+    await handleLogout();
   };
 
   const refreshProfile = async () => {

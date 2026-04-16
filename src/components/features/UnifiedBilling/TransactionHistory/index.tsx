@@ -1,14 +1,9 @@
 import React from 'react';
 import Icon from '../../../shared/atoms/Icon';
 import Badge from '../../../shared/atoms/Badge';
+import { Transaction as SharedTransaction } from '@/src/lib/api/types';
+export type Transaction = SharedTransaction;
 import styles from './index.module.scss';
-
-export interface Transaction {
-    date: string;
-    description: string;
-    amount: string;
-    status: 'Paid' | 'Pending' | 'Error' | string;
-}
 
 export interface TransactionHistoryProps {
     transactions: Transaction[];

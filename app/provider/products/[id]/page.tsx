@@ -30,7 +30,7 @@ export default async function ProviderProductDetailPage({ params }: Props) {
     
     // SSR Fetching
     const cookieStore = await cookies();
-    const token = cookieStore.get('session')?.value;
+    const token = cookieStore.get('id_token')?.value;
     const sessionUser = await getSessionUser();
     const orgId = sessionUser?.org_id;
 

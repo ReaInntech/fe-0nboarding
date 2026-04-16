@@ -22,10 +22,13 @@ export function mapPaymentMethod(dto: PaymentMethodDTO): PaymentMethod {
   return {
     id: dto.id,
     type: dto.brand.toLowerCase() as any,
-    last4: dto.last_four,
-    expiry: `${dto.exp_month}/${dto.exp_year}`,
-    isDefault: dto.is_primary,
+    typeLabel: dto.payment_type || 'Credit Card',
+    name: dto.cardholder_name || 'Card',
+    lastFour: dto.last_four,
+    holder: dto.cardholder_name,
+    expiry: dto.expiration_date,
     brand: dto.brand,
+    isDefault: dto.is_primary
   };
 }
 

@@ -14,18 +14,18 @@ export default function SubscriptionList({ subscriptions = [], className, allExp
     const [productFilter, setProductFilter] = useState('All');
 
     const uniqueProducts = useMemo(() => {
-        const products = new Set(subscriptions.map(sub => sub.product.name));
-        return ['All', ...Array.from(products)];
+        const products = new Set(subscriptions.map(sub => sub.product?.name).filter(Boolean));
+        return ['All', ...Array.from(products)] as string[];
     }, [subscriptions]);
 
     const filteredSubscriptions = useMemo(() => {
         return subscriptions.filter(sub => {
             const matchesSearch =
-                sub.client.legalName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                (sub.client?.legalName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 sub.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                sub.client.email.toLowerCase().includes(searchQuery.toLowerCase());
+                sub.client?.email?.toLowerCase().includes(searchQuery.toLowerCase()));
 
-            const matchesProduct = productFilter === 'All' || sub.product.name === productFilter;
+            const matchesProduct = productFilter === 'All' || sub.product?.name === productFilter;
 
             return matchesSearch && matchesProduct;
         });

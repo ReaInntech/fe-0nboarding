@@ -1,4 +1,4 @@
-import { Notification, Subscription } from "./types";
+import { Notification, Subscription, OnboardingStep, ClientRequest, RequirementField } from "./types";
 
 export const FALLBACK_DASHBOARD_DATA: { notifications: Notification[], subscriptions: Subscription[] } = {
     notifications: [
@@ -68,7 +68,7 @@ export const FALLBACK_BILLING_DATA = {
             date: '2026-04-01',
             description: 'Cloud Infrastructure Subscription - April',
             amount: 129.00,
-            status: 'completed',
+            status: 'Paid',
             type: 'subscription'
         },
         {
@@ -76,7 +76,7 @@ export const FALLBACK_BILLING_DATA = {
             date: '2026-03-28',
             description: 'Security Suite Annual Renewal',
             amount: 499.00,
-            status: 'completed',
+            status: 'Paid',
             type: 'one-time'
         }
     ],
@@ -84,7 +84,10 @@ export const FALLBACK_BILLING_DATA = {
         {
             id: 'M1',
             type: 'visa',
-            last4: '4242',
+            typeLabel: 'Credit Card',
+            name: 'Main Payment Method',
+            lastFour: '4242',
+            holder: 'John Doe',
             expiry: '12/28',
             isDefault: true,
             brand: 'Visa'
@@ -96,14 +99,32 @@ export const FALLBACK_PROVIDER_DASHBOARD_DATA = {
     subscriptions: [
         {
             id: 'S-7001',
-            client: 'Real Inovation Tech',
-            product: 'Cloud Infrastructure',
+            name: 'Cloud Infrastructure',
+            tier: 'Enterprise Plan',
+            icon: 'cloud',
             status: 'active',
+            progressLabel: 'Provisionamiento',
+            progressPct: 100,
+            price: '$1,290.00',
+            pricePeriod: '/mo',
+            client: {
+                id: 'C-001',
+                legalName: 'Real Inovation Tech',
+                clientType: 'legal_entity',
+                email: 'contact@realinnovation.tech',
+                phone: '+1 555-0123'
+            },
             monthlyPrice: 1290,
             documents: [{ name: 'SLA', status: 'signed' }],
-            payments: [{ status: 'Paid', date: '2026-04-01' }]
+            payments: [{ id: 'P1', status: 'Paid', date: '2026-04-01', amount: 1290 }]
         }
-    ]
+    ],
+    stats: {
+        active_subscriptions: 42,
+        pending_signatures: 3,
+        failed_payments: 1,
+        monthly_mrr: 18500
+    }
 };
 
 export const FALLBACK_PROVIDER_FINANCE_DATA = {
@@ -114,16 +135,16 @@ export const FALLBACK_PROVIDER_FINANCE_DATA = {
         successRate: 98.5,
         growth: 12
     },
-    revenueData: [
-        { month: 'Jan', revenue: 8500 },
-        { month: 'Feb', revenue: 9200 },
-        { month: 'Mar', revenue: 10500 },
-        { month: 'Apr', revenue: 11200 },
+    revenueHistory: [
+        { month: 'Jan', revenue: 8500, label: 'Jan', value: 8500 },
+        { month: 'Feb', revenue: 9200, label: 'Feb', value: 9200 },
+        { month: 'Mar', revenue: 10500, label: 'Mar', value: 10500 },
+        { month: 'Apr', revenue: 11200, label: 'Apr', value: 11200 },
     ],
     distributionData: [
-        { name: 'Cloud Infra', value: 45, color: '#10b981' },
-        { name: 'Security Suite', value: 30, color: '#3b82f6' },
-        { name: 'Managed Services', value: 25, color: '#f59e0b' },
+        { name: 'Cloud Infra', value: 45, color: '#10b981', label: 'Cloud Infra' },
+        { name: 'Security Suite', value: 30, color: '#3b82f6', label: 'Security Suite' },
+        { name: 'Managed Services', value: 25, color: '#f59e0b', label: 'Managed Services' },
     ],
     transactions: [],
     productsFilterList: ['Cloud Infra', 'Security Suite', 'Managed Services'],
@@ -155,17 +176,34 @@ export const FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA = {
         status: "active"
     },
     onboardingSteps: [
-        { title: "Configuration", status: "completed", date: "2026-04-01" },
-        { title: "Validation", status: "completed", date: "2026-04-03" },
-        { title: "Deployment", status: "current" },
-    ],
+        { 
+            id: "step-1",
+            name: "Initial Configuration", 
+            description: "Setup basic network and access parameters.",
+            icon: "settings",
+            type: "auto",
+            requests: []
+        },
+        { 
+            id: "step-2",
+            name: "Security Validation", 
+            description: "Verify compliance and encryption requirements.",
+            icon: "security",
+            type: "review",
+            requests: [
+                { id: "req-1", title: "Compliance Document", type: "document" }
+            ]
+        },
+    ] as OnboardingStep[],
     requirements: [
-        { label: "IP Whitelist", value: "192.168.1.1", status: "verified" },
-        { label: "SSH Keys", value: "Uploaded", status: "verified" },
-    ],
+        { id: "reqf-1", label: "IP Whitelist", value: "192.168.1.1", required: true },
+        { id: "reqf-2", label: "SSH Keys", value: "Uploaded", required: true },
+        { id: "reqf-3", label: "Backup Policy", value: "Daily", required: false },
+    ] as RequirementField[],
     requests: [
-        { id: "REQ-1", title: "Scale Up Request", status: "pending", date: "2026-04-12" }
-    ]
+        { id: "CL-REQ-001", subject: "Scale Up Request", status: "pending", priority: "high", date: "2026-04-12" },
+        { id: "CL-REQ-002", subject: "New Firewall Rule", status: "approved", priority: "medium", date: "2026-04-10" }
+    ] as ClientRequest[]
 };
 
 export const FALLBACK_PROVIDER_PRODUCTS_DATA = {

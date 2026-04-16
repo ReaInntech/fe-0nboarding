@@ -3,9 +3,10 @@
 import { useApp } from '@/src/context/AppContext';
 import TopNavigation from '../../../shared/molecule/TopNavigation';
 import Footer from '../../../shared/molecule/Footer';
-import NotificationHero, { Notification } from '../NotificationHero';
-import ServicesList, { Subscription } from '../ServicesList';
+import NotificationHero from '../NotificationHero';
+import ServicesList from '../ServicesList';
 import SupportLinks from '../SupportLinks';
+import { Notification, Subscription } from '@/src/lib/api/types';
 import styles from './index.module.scss';
 
 export interface DashboardProps {

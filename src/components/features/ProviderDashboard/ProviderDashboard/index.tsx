@@ -6,11 +6,13 @@ import ProviderTopNavigation from '../../../shared/molecule/ProviderTopNavigatio
 import Footer from '../../../shared/molecule/Footer';
 import SubscriptionList from '../SubscriptionList';
 import PageHeader from '../../../shared/atoms/PageHeader';
-import { SubscriptionData } from '../SubscriptionRow';
+import SubscriptionRow from '../SubscriptionRow';
+import { Subscription } from '@/src/lib/api/types';
 import styles from './index.module.scss';
 
 export interface ProviderDashboardProps {
-    subscriptions?: SubscriptionData[];
+    subscriptions: Subscription[];
+    stats: any;
     className?: string;
     userProfile?: any;
     allExpanded?: boolean;
@@ -23,7 +25,7 @@ export default function ProviderDashboard({ subscriptions = [], className, userP
         const activeLimits = subscriptions.filter(s => s.status === 'active').length;
         const pendingSignatures = subscriptions.filter(s => s.documents?.some(d => d.status === 'pending')).length;
         const failedPayments = subscriptions.filter(s => s.payments?.some(p => p.status === 'Failed' || p.status === 'Error')).length;
-        const monthlyMrr = subscriptions.filter(s => s.status === 'active').reduce((acc, s) => acc + s.monthlyPrice, 0);
+        const monthlyMrr = subscriptions.filter(s => s.status === 'active').reduce((acc, s) => acc + (s.monthlyPrice || 0), 0);
         return { activeLimits, pendingSignatures, failedPayments, monthlyMrr };
     }, [subscriptions]);
 

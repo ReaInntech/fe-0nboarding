@@ -13,7 +13,7 @@ export const metadata = {
 export default async function BillingPage() {
     // SSR Fetching with Auth Token
     const cookieStore = await cookies();
-    const token = cookieStore.get('session')?.value;
+    const token = cookieStore.get('id_token')?.value;
     const sessionUser = await getSessionUser();
     
     // Use org_id from custom claims if available

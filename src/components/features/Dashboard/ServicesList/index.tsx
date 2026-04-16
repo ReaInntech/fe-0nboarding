@@ -43,7 +43,7 @@ export default function ServicesList({ subscriptions, className }: ServicesListP
                             <div className={styles['services-list__card-header']}>
                                 <div className={styles['services-list__card-header-info']}>
                                     <div className={`${styles['services-list__card-icon-wrapper']} ${sub.hasActionRequest ? styles['services-list__card-icon-wrapper--action-request'] : styles['services-list__card-icon-wrapper--normal']}`}>
-                                        <Icon name={sub.icon} className={`${styles['services-list__card-icon']} ${sub.hasActionRequest ? styles['services-list__card-icon--action-request'] : styles['services-list__card-icon--normal']}`} />
+                                        <Icon name={sub.icon || 'category'} className={`${styles['services-list__card-icon']} ${sub.hasActionRequest ? styles['services-list__card-icon--action-request'] : styles['services-list__card-icon--normal']}`} />
                                     </div>
                                     <div>
                                         <h3 className={styles['services-list__card-title']}>{sub.name}</h3>

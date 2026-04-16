@@ -5,7 +5,11 @@ import {
   FinanceKpis, 
   FinanceKpiDTO, 
   RevenueDataPoint, 
-  RevenuePointDTO 
+  RevenuePointDTO,
+  CreateProductDTO,
+  UpdateProductDTO,
+  CreateContractingStepDTO,
+  ReorderStepsDTO
 } from './types';
 import { 
   FALLBACK_PROVIDER_DASHBOARD_DATA, 
@@ -29,6 +33,8 @@ export function mapRevenuePoint(dto: RevenuePointDTO): RevenueDataPoint {
   return {
     month: dto.period,
     revenue: dto.amount,
+    label: dto.period,
+    value: dto.amount,
   };
 }
 
@@ -92,6 +98,58 @@ export async function getProviderProductDetailData(id: string, token?: string, o
     // until real endpoints are fully wired.
     throw new Error('Not implemented');
   }, FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA);
+}
+
+/**
+ * Create a new product (Core API)
+ */
+export async function createProduct(token: string, orgId: string, dto: CreateProductDTO) {
+  return apiFetch('/products', {
+    method: 'POST',
+    token,
+    orgId,
+    body: JSON.stringify(dto),
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+/**
+ * Update a product (Core API)
+ */
+export async function updateProduct(id: string, token: string, orgId: string, dto: UpdateProductDTO) {
+  return apiFetch(`/products/${id}`, {
+    method: 'PUT',
+    token,
+    orgId,
+    body: JSON.stringify(dto),
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+/**
+ * Add a step to a product (Core API)
+ */
+export async function createProductStep(productId: string, token: string, orgId: string, dto: CreateContractingStepDTO) {
+  return apiFetch(`/products/${productId}/steps`, {
+    method: 'POST',
+    token,
+    orgId,
+    body: JSON.stringify(dto),
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+/**
+ * Reorder steps for a product (Core API)
+ */
+export async function reorderProductSteps(productId: string, token: string, orgId: string, dto: ReorderStepsDTO) {
+  return apiFetch(`/products/${productId}/steps/reorder`, {
+    method: 'PATCH',
+    token,
+    orgId,
+    body: JSON.stringify(dto),
+    headers: { 'Content-Type': 'application/json' }
+  });
 }
 
 /**

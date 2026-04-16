@@ -5,9 +5,10 @@ import { useApp } from '@/src/context/AppContext';
 import ProviderTopNavigation from '../../../shared/molecule/ProviderTopNavigation';
 import Footer from '../../../shared/molecule/Footer';
 import ProviderProductHeader from '../ProviderProductHeader';
-import ProviderOnboardingManager, { OnboardingStep } from '../ProviderOnboardingManager';
-import ProviderRequestsManager, { ClientRequest } from '../ProviderRequestsManager';
-import ProviderRequirementsManager, { RequirementField } from '../ProviderRequirementsManager';
+import ProviderOnboardingManager from '../ProviderOnboardingManager';
+import ProviderRequestsManager from '../ProviderRequestsManager';
+import ProviderRequirementsManager from '../ProviderRequirementsManager';
+import { OnboardingStep, ClientRequest, RequirementField } from '@/src/lib/api/types';
 import styles from './index.module.scss';
 
 export interface ProductData {

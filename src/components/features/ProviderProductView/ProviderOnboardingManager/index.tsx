@@ -8,23 +8,8 @@ import RequestPaymentCard from '../RequestPaymentCard';
 import DocumentRequestCard from '../DocumentRequestCard';
 import TermsAndConditionsRequestCard from '../TermsAndConditionsRequestCard';
 import FormRequestCard from '../FormRequestCard';
+import { OnboardingStep, OnboardingRequest } from '@/src/lib/api/types';
 import styles from './index.module.scss';
-
-export interface OnboardingRequest {
-    id: string;
-    title: string;
-    type: 'payment' | 'document' | 'terms' | 'form';
-    config?: any;
-}
-
-export interface OnboardingStep {
-    id: string;
-    name: string;
-    description: string;
-    icon: string;
-    type: 'auto' | 'review';
-    requests: OnboardingRequest[];
-}
 
 const STEP_TYPES = [
     { value: 'auto', label: 'Self-managed', icon: 'bolt', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },

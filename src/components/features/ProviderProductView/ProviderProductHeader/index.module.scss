@@ -93,15 +93,15 @@
     }
 
     &__input-wrapper {
-        @apply relative flex items-center bg-slate-800/40 border border-slate-700/50 rounded-xl transition-all;
+        @apply pl-2 pr-2 relative flex items-center bg-slate-800/40 border border-slate-700/50 rounded-xl transition-all;
 
         &:focus-within {
             @apply ring-2 ring-[#1978e5]/40 border-[#1978e5];
         }
 
-        .prefix {
-            padding: 0 8px;
-            @apply pl-3.5 pr-1 text-slate-400 text-sm pointer-events-none;
+        span {
+            margin-right: 7px;
+
         }
     }
 

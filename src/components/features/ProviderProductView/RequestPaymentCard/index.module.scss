@@ -29,7 +29,7 @@
 
     &__actions {
         @apply flex items-center gap-1.5 transition-opacity;
-        
+
         button {
             @apply p-1.5 rounded-md text-slate-500 hover:text-white hover:bg-white/5 transition-all;
         }
@@ -99,6 +99,7 @@
         @apply relative;
 
         .prefix {
+            padding: 8px 0px;
             @apply absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs font-mono;
         }
     }
@@ -109,7 +110,7 @@
 
     &__option-label {
         @apply flex items-center gap-2.5 cursor-pointer select-none transition-all;
-        
+
         &:hover span {
             @apply text-slate-300;
         }
@@ -145,7 +146,7 @@
 
     &__sync-badge {
         @apply flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 shadow-inner shadow-emerald-500/5;
-        
+
         span {
             @apply text-[8px] font-bold text-emerald-400/90 uppercase tracking-widest;
         }
@@ -158,7 +159,7 @@
 
     &__itemized-header {
         @apply flex items-center justify-between;
-        
+
         span {
             @apply text-[9px] font-black text-slate-500 uppercase tracking-[0.2em];
         }
@@ -172,10 +173,11 @@
         @apply space-y-3 max-h-[150px] overflow-y-auto pr-1;
         scrollbar-width: thin;
         scrollbar-color: rgba(25, 120, 229, 0.2) transparent;
-        
+
         &::-webkit-scrollbar {
             width: 4px;
         }
+
         &::-webkit-scrollbar-thumb {
             background: rgba(25, 120, 229, 0.2);
             border-radius: 10px;
@@ -192,7 +194,7 @@
 
     &__item-price-wrapper {
         @apply relative w-24;
-        
+
         .prefix {
             @apply absolute left-2 top-1/2 -translate-y-1/2 text-slate-600 text-[10px] font-mono;
         }
@@ -204,7 +206,7 @@
 
     &__item-remove {
         @apply p-1.5 rounded-md text-slate-600 hover:text-red-400 hover:bg-red-400/10 transition-all opacity-0;
-        
+
         .payment-card__item-row:hover & {
             @apply opacity-100;
         }
@@ -216,6 +218,7 @@
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);

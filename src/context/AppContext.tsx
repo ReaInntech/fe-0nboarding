@@ -120,7 +120,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             const idTokenResult = await fbUser.getIdTokenResult();
             const claims = idTokenResult.claims as any;
 
-            console.log(`[AppContext] Sending ID Token (Issuer: ${idTokenResult.issuer})`);
+            console.log(`[AppContext] Sending ID Token: ${idTokenResult}`);
 
             // 1. Sync session & id_token cookies with server for SSR
             if (createSession) {

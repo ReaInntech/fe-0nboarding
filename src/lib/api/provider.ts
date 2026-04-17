@@ -75,6 +75,7 @@ export async function getRevenueHistory(token: string, orgId: string): Promise<R
 
 export async function getProviderProducts(token: string, orgId: string) {
   return apiFetch('/products', { 
+    microservice: 'provider',
     token, 
     orgId 
   });
@@ -103,9 +104,10 @@ export async function getProviderProductDetailData(id: string, token?: string, o
 /**
  * Create a new product (Core API)
  */
-export async function createProduct(token: string, orgId: string, dto: CreateProductDTO) {
+export async function createProduct(token?: string, orgId?: string, dto?: CreateProductDTO) {
   return apiFetch('/products', {
     method: 'POST',
+    microservice: 'provider',
     token,
     orgId,
     body: JSON.stringify(dto),

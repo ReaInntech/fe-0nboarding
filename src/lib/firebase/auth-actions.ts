@@ -69,7 +69,10 @@ export async function getSessionUser() {
     const cookieStore = await cookies();
     const session = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
-    if (!session) return null;
+    if (!session || !adminAuth) {
+      if (!adminAuth) console.warn('[AuthAction] adminAuth not initialized. Skipping session verification.');
+      return null;
+    }
 
     const decodedClaims = await adminAuth.verifySessionCookie(session, true);
     return decodedClaims;

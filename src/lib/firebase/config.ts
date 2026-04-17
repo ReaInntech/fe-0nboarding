@@ -12,9 +12,20 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const googleProvider = new GoogleAuthProvider();
+let app;
+try {
+  app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+} catch (error) {
+  console.error('[Firebase Config] Failed to initialize Firebase App:', error);
+}
 
-export { auth, db, googleProvider };
+// Ensure these are only accessed if app is valid
+export const auth = app ? getAuth(app) : null as unknown as ReturnType<typeof getAuth>;
+export const db = app ? getFirestore(app) : null as unknown as ReturnType<typeof getFirestore>;
+export const googleProvider = new GoogleAuthProvider();
+
+if (typeof window === 'undefined' && !firebaseConfig.apiKey) {
+  console.warn('[Firebase Config] Warning: Firebase API Key is missing on the server. SSR initializations might fail.');
+}
+
+export { app };

@@ -2,7 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   const authHeader = request.headers.get('Authorization');
-  const orgId = request.headers.get('X-Org-ID');
+  const cookieToken = request.cookies.get('id_token')?.value;
+  const token = authHeader || (cookieToken ? `Bearer ${cookieToken}` : '');
+  
+  const headerOrgId = request.headers.get('X-Org-ID');
+  const sessionCookie = request.cookies.get('session')?.value;
+  
+  // Basic orgId extraction from header
+  const orgId = headerOrgId; 
+  
   const body = await request.json();
   
   const backendUrl = process.env.BACKEND_URL_PROVIDER || 'http://localhost:3003/api/v1/provider';
@@ -11,7 +19,7 @@ export async function POST(request: NextRequest) {
     const response = await fetch(`${backendUrl}/products`, {
       method: 'POST',
       headers: {
-        'Authorization': authHeader || '',
+        'Authorization': token || '',
         'Content-Type': 'application/json',
         ...(orgId ? { 'X-Org-ID': orgId } : {}),
       },

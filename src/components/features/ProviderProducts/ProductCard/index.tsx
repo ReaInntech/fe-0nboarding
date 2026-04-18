@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import Icon from '../../../shared/atoms/Icon';
 import styles from './index.module.scss';
 
@@ -18,16 +19,15 @@ export interface Product {
 
 interface ProductCardProps {
     product: Product;
-    onClick?: (product: Product) => void;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     const statusClass = styles[`product-card__status--${product.status}`];
 
     return (
-        <div 
+        <Link 
+            href={`/provider/products/${product.id}`}
             className={styles['product-card']} 
-            onClick={() => onClick?.(product)}
             style={{ 
                 '--icon-color': product.iconColor,
                 '--icon-bg': `${product.iconColor}15`
@@ -70,11 +70,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
 
             <div className={styles['product-card__footer']}>
                 <span className={styles['product-card__code']}>{product.productCode}</span>
-                <button className={styles['product-card__details-btn']}>
+                <div className={styles['product-card__details-btn']}>
                     Details <Icon name="chevron_right" />
-                </button>
+                </div>
             </div>
-        </div>
+        </Link>
     );
 };
 

@@ -68,7 +68,7 @@ export default function ProviderProductHeader({
                                 Product ID: <span>{productId}</span>
                             </p>
                             <p className={styles['provider-header__client']}>
-                                <Icon name="domain" className="text-xs" /> {clientName} 
+                                <Icon name="domain" className="text-xs" /> {clientName}
                                 <span>({clientId})</span>
                             </p>
                         </div>
@@ -77,11 +77,10 @@ export default function ProviderProductHeader({
                 <div className={styles['provider-header__actions']}>
                     <button
                         onClick={() => setIsEditing(v => !v)}
-                        className={`${styles['provider-header__edit-btn']} ${
-                            isEditing 
-                            ? styles['provider-header__edit-btn--active'] 
+                        className={`${styles['provider-header__edit-btn']} ${isEditing
+                            ? styles['provider-header__edit-btn--active']
                             : styles['provider-header__edit-btn--idle']
-                        }`}
+                            }`}
                     >
                         <Icon name={isEditing ? 'expand_less' : 'edit'} className="text-sm" />
                         {isEditing ? 'Close Editor' : 'Edit Product'}
@@ -96,11 +95,11 @@ export default function ProviderProductHeader({
                         <span>Edit Product</span>
                     </div>
 
-                    <ProviderProductForm 
+                    <ProviderProductForm
                         initialData={{
                             ...saved,
                             price: saved.price || '',
-                            billing: saved.billing || 'monthly',
+                            billing: saved.billing,
                             status: saved.status || 'inactive',
                             description: saved.description || '',
                         }}

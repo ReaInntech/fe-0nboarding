@@ -257,6 +257,34 @@ export interface RequirementField {
   required: boolean;
 }
 
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  period: string; // 'month', 'year', etc.
+  sold: number;
+  productCode: string;
+  category: string;
+  status: 'active' | 'maintenance' | 'inactive' | 'pending';
+  icon: string;
+  iconColor: string;
+}
+
+export interface ProductDTO {
+  id: string;
+  product_code: string;
+  name: string;
+  description?: string;
+  icon?: string;
+  icon_color?: string;
+  service_type?: string;
+  price?: number | string;
+  total_sold?: number;
+  category?: string;
+  status?: string;
+}
+
 export interface ProductDetailData {
   name: string;
   productCode: string;

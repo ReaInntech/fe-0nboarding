@@ -10,7 +10,7 @@ import Modal from '../../../shared/molecule/Modal';
 import Button from '../../../shared/atoms/Button';
 import ProductCard, { Product } from '../ProductCard';
 import ProviderProductForm, { ProductFormData } from '../../ProviderProductView/ProviderProductHeader/ProviderProductForm';
-import { createProduct } from '@/src/lib/api/provider';
+import { createProduct, mapBillingPeriod } from '@/src/lib/api/provider';
 import styles from './index.module.scss';
 
 interface ProviderProductsProps {
@@ -23,7 +23,7 @@ const ProviderProducts: React.FC<ProviderProductsProps> = ({ initialProducts, us
     const [products, setProducts] = useState<Product[]>(initialProducts);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterCategory, setFilterCategory] = useState('All');
-    
+
     // Modal State
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -44,11 +44,10 @@ const ProviderProducts: React.FC<ProviderProductsProps> = ({ initialProducts, us
 
     const handleCreateProduct = async (formData: ProductFormData) => {
         if (!user) return;
-        
         setIsSubmitting(true);
         try {
             const orgId = user.org_id || user.organization?.id;
-            
+
             if (!orgId) {
                 throw new Error('Organization context missing');
             }
@@ -61,22 +60,21 @@ const ProviderProducts: React.FC<ProviderProductsProps> = ({ initialProducts, us
                 icon_color: formData.color,
                 product_code: formData.name.toUpperCase().replace(/\s+/g, '_') + '_' + Math.floor(Math.random() * 1000), // Helper for mock code
                 service_type: formData.billing, // Maps Billing Model to service_type as per backend schema
-                deployment_region: 'us-east-1' // Default for now
             };
 
             const response: any = await createProduct(undefined, orgId, dto);
-            
+
             // Add to local state (assuming the response contains the new product or we map it)
             const newProduct: Product = {
                 id: response.id || `prod_${Date.now()}`,
                 name: dto.name,
                 description: dto.description || '',
                 price: Number(formData.price) || 0,
-                period: formData.billing === 'monthly' ? 'month' : 'annual',
+                period: mapBillingPeriod(formData.billing),
                 sold: 0,
                 productCode: dto.product_code,
-                category: 'General', // Default
-                status: (formData.status as any) || 'active',
+                category: 'General',
+                status: formData.status as any,
                 icon: dto.icon,
                 iconColor: dto.icon_color
             };
@@ -102,7 +100,7 @@ const ProviderProducts: React.FC<ProviderProductsProps> = ({ initialProducts, us
                     badge={{ text: "Catalog Management", icon: "inventory_2" }}
                     centered={true}
                     actions={
-                        <button 
+                        <button
                             onClick={() => setIsCreateModalOpen(true)}
                             className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-2xl shadow-blue-500/20 flex items-center gap-2.5 border-none cursor-pointer"
                         >
@@ -176,7 +174,7 @@ const ProviderProducts: React.FC<ProviderProductsProps> = ({ initialProducts, us
                 title="Create New Product"
                 size="lg"
             >
-                <ProviderProductForm 
+                <ProviderProductForm
                     initialData={{
                         name: '',
                         description: '',

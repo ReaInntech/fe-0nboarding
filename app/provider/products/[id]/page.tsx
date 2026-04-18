@@ -7,14 +7,21 @@ import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 
 interface Props {
-    params: {
+    params: Promise<{
         id: string;
-    };
+    }>;
 }
 
 export async function generateMetadata({ params }: Props) {
-    const { id } = params;
-    const apiData: any = await getProviderProductDetailData(id);
+    const { id } = await params;
+    
+    // Attempt to get token for metadata generation
+    const cookieStore = await cookies();
+    const token = cookieStore.get('id_token')?.value;
+    const sessionUser = await getSessionUser();
+    const orgId = sessionUser?.org_id;
+
+    const apiData: any = await getProviderProductDetailData(id, token, orgId);
     
     // We trust that if apiData is returned, it follows the mock strategy
     const product = apiData?.product || FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA.product;
@@ -26,7 +33,7 @@ export async function generateMetadata({ params }: Props) {
 }
 
 export default async function ProviderProductDetailPage({ params }: Props) {
-    const { id } = params;
+    const { id } = await params;
     
     // SSR Fetching
     const cookieStore = await cookies();
@@ -37,8 +44,7 @@ export default async function ProviderProductDetailPage({ params }: Props) {
     try {
         const apiData: any = await getProviderProductDetailData(id, token, orgId);
         
-        // Fallback to mock data handled by the aggregator, 
-        // but we still need to extract it safely.
+        // Extract data safely
         const product = apiData?.product;
         const onboardingSteps = apiData?.onboardingSteps;
         const requirements = apiData?.requirements;
@@ -56,19 +62,25 @@ export default async function ProviderProductDetailPage({ params }: Props) {
                 requests={requests}
             />
         );
-    } catch (error) {
+    } catch (error: any) {
         console.error('[ProviderProductDetailPage] Critical Error:', error);
-        // Fallback to minimal mock view only if in dev/preview
-        if (!token) {
-            return (
-                <ProviderProductView 
-                    product={FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA.product}
-                    onboardingSteps={FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA.onboardingSteps}
-                    requirements={FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA.requirements}
-                    requests={FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA.requests}
-                />
-            );
+        
+        // Display nice error context if possible
+        const isAuthError = error.message?.toLowerCase().includes('token') || 
+                           error.message?.toLowerCase().includes('unauthorized');
+
+        if (isAuthError && !token) {
+            console.warn('[ProviderProductDetailPage] Redirecting or showing fallback due to missing token.');
         }
-        throw error; // Let Next.js show the error page
+
+        // Fallback to minimal mock view only if no token and strategy allows
+        return (
+            <ProviderProductView 
+                product={FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA.product}
+                onboardingSteps={FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA.onboardingSteps}
+                requirements={FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA.requirements}
+                requests={FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA.requests}
+            />
+        );
     }
 }

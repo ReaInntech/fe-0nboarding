@@ -1,23 +1,43 @@
 import { apiFetch, executeWithFallback } from './config';
-import { 
-  Subscription, 
-  SubscriptionDTO, 
-  FinanceKpis, 
-  FinanceKpiDTO, 
-  RevenueDataPoint, 
+import { mapSubscription } from './dashboard';
+export { mapBillingPeriod } from '../utils/product';
+import {
+  Subscription,
+  SubscriptionDTO,
+  FinanceKpis,
+  FinanceKpiDTO,
+  RevenueDataPoint,
   RevenuePointDTO,
   CreateProductDTO,
   UpdateProductDTO,
   CreateContractingStepDTO,
-  ReorderStepsDTO
+  ReorderStepsDTO,
+  Product,
+  ProductDTO
 } from './types';
-import { 
-  FALLBACK_PROVIDER_DASHBOARD_DATA, 
-  FALLBACK_PROVIDER_FINANCE_DATA, 
+import {
+  FALLBACK_PROVIDER_DASHBOARD_DATA,
+  FALLBACK_PROVIDER_FINANCE_DATA,
   FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA,
   FALLBACK_PROVIDER_PRODUCTS_DATA
 } from './mocks';
-import { mapSubscription } from './dashboard';
+import { mapBillingPeriod } from '../utils/product';
+
+export function mapProduct(dto: ProductDTO): Product {
+  return {
+    id: dto.id,
+    name: dto.name,
+    description: dto.description || '',
+    price: Number(dto.price) || 0,
+    period: mapBillingPeriod(dto.service_type || 'monthly'),
+    sold: dto.total_sold || 0,
+    productCode: dto.product_code || '',
+    category: dto.category || 'General',
+    status: (dto.status as any) || 'active',
+    icon: dto.icon || 'rocket_launch',
+    iconColor: dto.icon_color || '#1978e5',
+  };
+}
 
 export function mapFinanceKpis(dto: FinanceKpiDTO): FinanceKpis {
   return {
@@ -39,45 +59,45 @@ export function mapRevenuePoint(dto: RevenuePointDTO): RevenueDataPoint {
 }
 
 export async function getProviderStats(token: string, orgId: string) {
-  return apiFetch('/dashboard/stats', { 
+  return apiFetch('/dashboard/stats', {
     microservice: 'provider',
-    token, 
-    orgId 
+    token,
+    orgId
   });
 }
 
 export async function getProviderSubscriptions(token: string, orgId: string): Promise<Subscription[]> {
-  const data = await apiFetch<SubscriptionDTO[]>('/dashboard/subscriptions', { 
+  const data = await apiFetch<SubscriptionDTO[]>('/dashboard/subscriptions', {
     microservice: 'provider',
-    token, 
-    orgId 
+    token,
+    orgId
   });
   return (data || []).map(mapSubscription);
 }
 
 export async function getFinanceKPIs(token: string, orgId: string): Promise<FinanceKpis> {
-  const data = await apiFetch<FinanceKpiDTO>('/finance/kpis', { 
+  const data = await apiFetch<FinanceKpiDTO>('/finance/kpis', {
     microservice: 'provider',
-    token, 
-    orgId 
+    token,
+    orgId
   });
   return mapFinanceKpis(data);
 }
 
 export async function getRevenueHistory(token: string, orgId: string): Promise<RevenueDataPoint[]> {
-  const data = await apiFetch<RevenuePointDTO[]>('/finance/revenue-history', { 
+  const data = await apiFetch<RevenuePointDTO[]>('/finance/revenue-history', {
     microservice: 'provider',
-    token, 
-    orgId 
+    token,
+    orgId
   });
   return (data || []).map(mapRevenuePoint);
 }
 
-export async function getProviderProducts(token: string, orgId: string) {
-  return apiFetch('/products', { 
-    microservice: 'provider',
-    token, 
-    orgId 
+export async function getProviderProducts(token: string, orgId: string): Promise<ProductDTO[]> {
+  return apiFetch('/products', {
+    microservice: 'core',
+    token,
+    orgId
   });
 }
 
@@ -87,17 +107,64 @@ export async function getProviderProducts(token: string, orgId: string) {
 export async function getProviderProductsInit(token: string, orgId: string) {
   return executeWithFallback(async () => {
     const data = await getProviderProducts(token, orgId);
+    const productsRaw = Array.isArray(data) ? data : (data as any).products || [];
     return {
-      products: Array.isArray(data) ? data : (data as any).products || []
+      products: productsRaw.map(mapProduct)
     };
   }, FALLBACK_PROVIDER_PRODUCTS_DATA);
 }
 
+export function mapOnboardingStep(dto: any): OnboardingStep {
+  return {
+    id: dto.id,
+    name: dto.label,
+    description: dto.description || '',
+    icon: dto.icon || 'settings',
+    type: (dto.type as any) || 'auto',
+    requests: (dto.action_requests || []).map((req: any) => ({
+      id: req.id,
+      title: req.title,
+      type: req.request_type,
+      config: req.config
+    }))
+  };
+}
+
 export async function getProviderProductDetailData(id: string, token?: string, orgId?: string) {
   return executeWithFallback(async () => {
-    // Currently mapping is handled by providing the FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA 
-    // until real endpoints are fully wired.
-    throw new Error('Not implemented');
+    // 1. Fetch Product with Steps
+    const data = await apiFetch<any>(`/products/${id}`, {
+      microservice: 'core',
+      token,
+      orgId
+    });
+
+    if (!data) return FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA;
+
+    // 2. Map Product
+    const productDTO: ProductDTO = {
+      id: data.id,
+      product_code: data.product_code,
+      name: data.name,
+      description: data.description,
+      icon: data.icon,
+      icon_color: data.icon_color,
+      service_type: data.service_type,
+      price: data.price,
+      total_sold: data.total_sold,
+      status: data.status,
+      category: data.category
+    };
+
+    // 3. Map Steps
+    const onboardingSteps = (data.contracting_steps || []).map(mapOnboardingStep);
+
+    return {
+      product: mapProduct(productDTO),
+      onboardingSteps,
+      requirements: [], // Planned for second iteration
+      requests: [] // Planned for second iteration
+    };
   }, FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA);
 }
 
@@ -107,7 +174,7 @@ export async function getProviderProductDetailData(id: string, token?: string, o
 export async function createProduct(token?: string, orgId?: string, dto?: CreateProductDTO) {
   return apiFetch('/products', {
     method: 'POST',
-    microservice: 'provider',
+    microservice: 'core',
     token,
     orgId,
     body: JSON.stringify(dto),
@@ -121,6 +188,7 @@ export async function createProduct(token?: string, orgId?: string, dto?: Create
 export async function updateProduct(id: string, token: string, orgId: string, dto: UpdateProductDTO) {
   return apiFetch(`/products/${id}`, {
     method: 'PUT',
+    microservice: 'core',
     token,
     orgId,
     body: JSON.stringify(dto),

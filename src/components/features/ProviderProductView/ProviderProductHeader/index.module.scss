@@ -84,7 +84,7 @@
         @apply flex flex-col gap-1.5;
 
         &--span-2 {
-            @apply md:col-span-2;
+            @apply md:col-span-3;
         }
     }
 
@@ -92,26 +92,6 @@
         @apply text-xs font-bold text-slate-500 uppercase tracking-wider;
     }
 
-    &__input-wrapper {
-        @apply pl-2 pr-2 relative flex items-center bg-slate-800/40 border border-slate-700/50 rounded-xl transition-all;
-
-        &:focus-within {
-            @apply ring-2 ring-[#1978e5]/40 border-[#1978e5];
-        }
-
-        span {
-            margin-right: 7px;
-
-        }
-    }
-
-    &__input {
-        @apply w-full py-2.5 pr-3.5 bg-transparent border-none text-slate-100 text-sm focus:outline-none focus:ring-0;
-
-        &--with-prefix {
-            @apply pl-0;
-        }
-    }
 
     &__select-wrapper {
         @apply relative flex items-center;
@@ -185,57 +165,5 @@
 
     &__save-btn {
         @apply bg-[#1978e5] hover:bg-[#1978e5]/90 text-white shadow-lg shadow-[#1978e5]/20 flex items-center;
-    }
-}
-
-.icon-dropdown {
-    @apply relative;
-
-    &__trigger {
-        @apply flex items-center gap-3 w-full px-3 py-2.5 bg-slate-800/60 border border-slate-700 rounded-lg hover:border-slate-600 transition-colors focus:outline-none focus:ring-1 focus:ring-[#1978e5];
-    }
-
-    &__trigger-icon {
-        @apply flex items-center justify-center rounded shrink-0;
-    }
-
-    &__trigger-text {
-        @apply flex-1 text-left text-sm text-slate-300;
-    }
-
-    &__trigger-arrow {
-        @apply text-slate-500 text-base;
-    }
-
-    &__menu {
-        @apply absolute z-50 mt-1 w-full max-h-52 overflow-y-auto bg-[#0f1523] border border-slate-700 rounded-lg shadow-xl;
-    }
-
-    &__item {
-        @apply flex items-center gap-3 w-full px-3 py-2 hover:bg-slate-800 transition-colors;
-
-        &--active {
-            @apply bg-[#1978e5]/10;
-        }
-    }
-
-    &__item-icon-box {
-        @apply flex items-center justify-center rounded shrink-0;
-    }
-
-    &__item-text {
-        @apply text-sm;
-
-        &--active {
-            @apply text-white font-semibold;
-        }
-
-        &--idle {
-            @apply text-slate-400;
-        }
-    }
-
-    &__item-check {
-        @apply ml-auto text-[#1978e5] text-sm;
     }
 }

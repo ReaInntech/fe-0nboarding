@@ -1,0 +1,42 @@
+@reference "tailwindcss";
+
+.input {
+    @apply flex flex-col gap-1.5 w-full;
+
+    &__label {
+        @apply text-xs font-bold text-slate-500 uppercase tracking-wider;
+    }
+
+    &__wrapper {
+        @apply pl-2 pr-2 relative flex items-center bg-slate-800/40 border border-slate-700/50 rounded-xl transition-all;
+
+        &:focus-within {
+            @apply ring-2 ring-[#1978e5]/40 border-[#1978e5];
+        }
+
+        &--error {
+            @apply ring-2 ring-red-500/40 border-red-500;
+        }
+
+        &--disabled {
+            @apply opacity-60 cursor-not-allowed bg-slate-800/60;
+        }
+
+        .prefix {
+            margin-right: 7px;
+            @apply text-slate-500 text-sm pointer-events-none;
+        }
+    }
+
+    &__field {
+        @apply w-full py-2.5 bg-transparent border-none text-slate-100 text-sm focus:outline-none focus:ring-0;
+
+        &--with-prefix {
+            @apply pl-0;
+        }
+    }
+
+    &__error {
+        @apply text-xs text-red-400 mt-1;
+    }
+}

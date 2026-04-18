@@ -1,0 +1,68 @@
+@reference "tailwindcss";
+
+.select {
+    @apply relative w-full;
+
+    &__label {
+        @apply text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block;
+    }
+
+    &__trigger {
+        @apply flex items-center gap-3 w-full px-3 py-2.5 bg-slate-800/60 border border-slate-700 rounded-lg hover:border-slate-600 transition-colors focus:outline-none focus:ring-1 focus:ring-[#1978e5];
+    }
+
+    &__trigger-icon {
+        @apply flex items-center justify-center rounded shrink-0;
+    }
+
+    &__trigger-text {
+        @apply flex-1 text-left text-sm text-slate-300;
+    }
+
+    &__trigger-arrow {
+        @apply text-slate-500 text-base;
+    }
+
+    &__menu {
+        @apply absolute z-50 mt-1 w-full max-h-52 overflow-y-auto bg-[#0f1523] border border-slate-700 rounded-lg shadow-xl;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(25, 120, 229, 0.2) transparent;
+
+        &::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: rgba(25, 120, 229, 0.2);
+            border-radius: 10px;
+        }
+    }
+
+    &__item {
+        @apply flex items-center gap-3 w-full px-3 py-2 hover:bg-slate-800 transition-colors;
+
+        &--active {
+            @apply bg-[#1978e5]/10;
+        }
+    }
+
+    &__item-icon-box {
+        @apply flex items-center justify-center rounded shrink-0;
+    }
+
+    &__item-text {
+        @apply text-sm;
+
+        &--active {
+            @apply text-white font-semibold;
+        }
+
+        &--idle {
+            @apply text-slate-400;
+        }
+    }
+
+    &__item-check {
+        @apply ml-auto text-[#1978e5] text-sm;
+    }
+}

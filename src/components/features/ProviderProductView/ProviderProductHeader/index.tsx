@@ -34,7 +34,7 @@ export default function ProviderProductHeader({
         color: iconColor,
         price: '',
         billing: 'monthly',
-        status: 'active',
+        status: 'inactive',
         description: '',
     });
 
@@ -101,7 +101,7 @@ export default function ProviderProductHeader({
                             ...saved,
                             price: saved.price || '',
                             billing: saved.billing || 'monthly',
-                            status: saved.status || 'active',
+                            status: saved.status || 'inactive',
                             description: saved.description || '',
                         }}
                         onSave={handleSave}

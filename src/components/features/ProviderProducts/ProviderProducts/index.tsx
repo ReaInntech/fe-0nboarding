@@ -60,7 +60,7 @@ const ProviderProducts: React.FC<ProviderProductsProps> = ({ initialProducts, us
                 icon: formData.icon,
                 icon_color: formData.color,
                 product_code: formData.name.toUpperCase().replace(/\s+/g, '_') + '_' + Math.floor(Math.random() * 1000), // Helper for mock code
-                service_type: 'custom', // Default for now
+                service_type: formData.billing, // Maps Billing Model to service_type as per backend schema
                 deployment_region: 'us-east-1' // Default for now
             };
 

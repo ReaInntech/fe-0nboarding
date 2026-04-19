@@ -56,6 +56,26 @@ export default function RequestPaymentCard({
     const [isSaving, setIsSaving] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
 
+    // Helpers for currency formatting
+    const formatCurrency = (val: number) => {
+        return new Intl.NumberFormat('en-US', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2,
+        }).format(val);
+    };
+
+    const parseCurrency = (val: string) => {
+        return Number(val.replace(/[^0-9.-]+/g, '')) || 0;
+    };
+
+    const isFormValid = 
+        config.bank.trim() !== '' &&
+        config.accountNumber.trim() !== '' &&
+        config.nit.trim() !== '' &&
+        config.dueDate.trim() !== '' &&
+        config.amount > 0 &&
+        config.instructions.trim() !== '';
+
     const handleChange = (field: keyof RequestPaymentConfig, value: any) => {
         setConfig(prev => {
             const newConfig = { ...prev, [field]: value };
@@ -66,7 +86,7 @@ export default function RequestPaymentCard({
     };
 
     const handleSave = async () => {
-        if (!onSave) return;
+        if (!onSave || !isFormValid) return;
         setIsSaving(true);
         try {
             await onSave(config);
@@ -84,7 +104,6 @@ export default function RequestPaymentCard({
         const total = newItems.reduce((sum, item) => sum + (Number(item.price) || 0), 0);
         const newConfig = { ...config, items: newItems, amount: total, isItemized: true, useProductValue: false };
         setConfig(newConfig);
-        if (onUpdate) onUpdate(newConfig);
     };
 
     const updateItem = (id: number, field: keyof PaymentItem, value: any) => {
@@ -94,7 +113,6 @@ export default function RequestPaymentCard({
         const total = newItems.reduce((sum, item) => sum + (Number(item.price) || 0), 0);
         const newConfig = { ...config, items: newItems, amount: total };
         setConfig(newConfig);
-        if (onUpdate) onUpdate(newConfig);
     };
 
     const removeItem = (id: number) => {
@@ -102,7 +120,6 @@ export default function RequestPaymentCard({
         const total = newItems.reduce((sum, item) => sum + (Number(item.price) || 0), 0);
         const newConfig = { ...config, items: newItems, amount: total };
         setConfig(newConfig);
-        if (onUpdate) onUpdate(newConfig);
     };
 
     return (
@@ -125,13 +142,14 @@ export default function RequestPaymentCard({
                     <button 
                         type="button" 
                         onClick={handleSave}
-                        disabled={isSaving}
-                        className={`${isSaving ? 'opacity-50 cursor-not-allowed' : ''} ${showSuccess ? 'hidden' : ''}`}
+                        disabled={isSaving || !isFormValid}
+                        className={`${styles['save-btn']} ${showSuccess ? 'hidden' : ''}`}
+                        title={!isFormValid ? "Fill all fields to save" : "Save changes"}
                     >
                         {isSaving ? (
                             <div className="size-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
                         ) : (
-                            <Icon name="save" style={{ fontSize: 14 }} className="text-violet-400" />
+                            <Icon name="save" style={{ fontSize: 14 }} className={isFormValid ? "text-violet-400" : "text-slate-600"} />
                         )}
                     </button>
 
@@ -258,12 +276,12 @@ export default function RequestPaymentCard({
                         )}
                     </div>
                     <div className={styles['payment-card__input-wrapper']}>
-                        <span className="prefix">$</span>
+                        <span className={styles['payment-card__prefix']}>$</span>
                         <input
-                            type="number"
+                            type="text"
                             readOnly={config.isItemized || config.useProductValue}
-                            value={config.amount}
-                            onChange={(e) => handleChange('amount', Number(e.target.value))}
+                            value={formatCurrency(config.amount)}
+                            onChange={(e) => handleChange('amount', parseCurrency(e.target.value))}
                             className={`${styles['payment-card__input']} ${styles['payment-card__input--with-prefix']} ${
                                 (config.isItemized || config.useProductValue) ? styles['payment-card__input--readonly'] : ''
                             }`}
@@ -296,11 +314,11 @@ export default function RequestPaymentCard({
                                         className={styles['payment-card__item-desc']}
                                     />
                                     <div className={styles['payment-card__item-price-wrapper']}>
-                                        <span className="prefix">$</span>
+                                        <span className={styles['payment-card__prefix']}>$</span>
                                         <input
-                                            type="number"
-                                            value={item.price}
-                                            onChange={(e) => updateItem(item.id, 'price', Number(e.target.value))}
+                                            type="text"
+                                            value={formatCurrency(item.price)}
+                                            onChange={(e) => updateItem(item.id, 'price', parseCurrency(e.target.value))}
                                             className={styles['payment-card__item-price']}
                                         />
                                     </div>

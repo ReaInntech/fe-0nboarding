@@ -24,17 +24,23 @@ export interface RequestPaymentConfig {
 }
 
 export interface RequestPaymentCardProps {
+    id: string;
     title: string;
+    description?: string;
+    initialConfig?: RequestPaymentConfig;
     onDelete?: () => void;
-    onUpdate?: (config: RequestPaymentConfig) => void;
+    onSave?: (config: RequestPaymentConfig) => Promise<void>;
 }
 
 export default function RequestPaymentCard({
+    id,
     title,
+    description,
+    initialConfig,
     onDelete,
-    onUpdate
+    onSave
 }: RequestPaymentCardProps) {
-    const [config, setConfig] = useState<RequestPaymentConfig>({
+    const [config, setConfig] = useState<RequestPaymentConfig>(initialConfig || {
         bank: '',
         accountNumber: '',
         nit: '',
@@ -43,23 +49,34 @@ export default function RequestPaymentCard({
         isItemized: false,
         items: [],
         useProductValue: false,
-        instructions: '',
+        instructions: description || '',
         certificateFile: null,
     });
 
+    const [isSaving, setIsSaving] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
+
     const handleChange = (field: keyof RequestPaymentConfig, value: any) => {
-        const newConfig = { ...config, [field]: value };
+        setConfig(prev => {
+            const newConfig = { ...prev, [field]: value };
+            if (field === 'isItemized' && value === true) newConfig.useProductValue = false;
+            if (field === 'useProductValue' && value === true) newConfig.isItemized = false;
+            return newConfig;
+        });
+    };
 
-        // Mutually exclusive logic
-        if (field === 'isItemized' && value === true) {
-            newConfig.useProductValue = false;
+    const handleSave = async () => {
+        if (!onSave) return;
+        setIsSaving(true);
+        try {
+            await onSave(config);
+            setShowSuccess(true);
+            setTimeout(() => setShowSuccess(false), 2000);
+        } catch (error) {
+            console.error('Failed to save payment request:', error);
+        } finally {
+            setIsSaving(false);
         }
-        if (field === 'useProductValue' && value === true) {
-            newConfig.isItemized = false;
-        }
-
-        setConfig(newConfig);
-        if (onUpdate) onUpdate(newConfig);
     };
 
     const addItem = () => {
@@ -99,9 +116,25 @@ export default function RequestPaymentCard({
                     <span className={styles['payment-card__title']}>{title}</span>
                 </div>
                 <div className={styles['payment-card__actions']}>
-                    <button type="button">
-                        <Icon name="settings" style={{ fontSize: 14 }} />
+                    {showSuccess && (
+                        <div className="flex items-center text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-md text-[10px] font-bold animate-in fade-in zoom-in duration-300">
+                            <Icon name="check_circle" className="mr-1.5 text-xs" /> Saved
+                        </div>
+                    )}
+
+                    <button 
+                        type="button" 
+                        onClick={handleSave}
+                        disabled={isSaving}
+                        className={`${isSaving ? 'opacity-50 cursor-not-allowed' : ''} ${showSuccess ? 'hidden' : ''}`}
+                    >
+                        {isSaving ? (
+                            <div className="size-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                        ) : (
+                            <Icon name="save" style={{ fontSize: 14 }} className="text-violet-400" />
+                        )}
                     </button>
+
                     <button
                         type="button"
                         onClick={onDelete}

@@ -9,7 +9,17 @@ import DocumentRequestCard from '../DocumentRequestCard';
 import TermsAndConditionsRequestCard from '../TermsAndConditionsRequestCard';
 import FormRequestCard from '../FormRequestCard';
 import { OnboardingStep, OnboardingRequest } from '@/src/lib/api/types';
+import Select from '../../../shared/atoms/Select';
+import Input from '../../../shared/atoms/Input';
+import Textarea from '../../../shared/atoms/Textarea';
 import styles from './index.module.scss';
+
+const ICONS = [
+    'cloud_done', 'cloud', 'hub', 'storage', 'api', 'developer_board',
+    'security', 'analytics', 'settings', 'rocket_launch', 'database',
+    'shield', 'bolt', 'code', 'dns', 'wifi',
+    'radio_button_checked', 'verified', 'lock', 'description', 'payments', 'gavel'
+];
 
 const STEP_TYPES = [
     { value: 'auto', label: 'Self-managed', icon: 'bolt', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
@@ -18,13 +28,47 @@ const STEP_TYPES = [
 
 export interface ProviderOnboardingManagerProps {
     initialSteps: OnboardingStep[];
+    onSaveStepMetadata?: (stepId: string, data: Partial<OnboardingStep>) => Promise<void>;
+    onSaveRequest?: (stepId: string, requestId: string, type: OnboardingRequest['type'], config: any) => Promise<void>;
+    onDeleteRequest?: (requestId: string) => Promise<void>;
+    onAddStep?: (data: Partial<OnboardingStep>) => Promise<void>;
+    onCancel?: () => void;
 }
 
 export default function ProviderOnboardingManager({
     initialSteps,
+    onSaveStepMetadata,
+    onSaveRequest,
+    onDeleteRequest,
+    onAddStep,
+    onCancel,
 }: ProviderOnboardingManagerProps) {
     const [steps, setSteps] = useState<OnboardingStep[]>(initialSteps);
     const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
+    const [isSavingStep, setIsSavingStep] = useState<string | null>(null);
+
+    const handleSaveStep = async (idx: number) => {
+        const step = steps[idx];
+        if (!onSaveStepMetadata) return;
+        
+        setIsSavingStep(step.id);
+        try {
+            await onSaveStepMetadata(step.id, {
+                name: step.name,
+                description: step.description,
+                icon: step.icon,
+                type: step.type
+            });
+        } finally {
+            setIsSavingStep(null);
+        }
+    };
+
+    const handleCancel = () => {
+        setSteps(initialSteps);
+        setExpandedIdx(null);
+        if (onCancel) onCancel();
+    };
 
     const updateStep = (idx: number, field: keyof OnboardingStep, value: any) => {
         const newSteps = [...steps];
@@ -53,10 +97,19 @@ export default function ProviderOnboardingManager({
         setSteps(newSteps);
     };
 
-    const deleteRequest = (stepIdx: number, reqId: string) => {
+    const handleDeleteRequest = async (stepIdx: number, reqId: string) => {
+        if (onDeleteRequest) {
+            await onDeleteRequest(reqId);
+        }
         const newSteps = [...steps];
         newSteps[stepIdx].requests = newSteps[stepIdx].requests.filter(r => r.id !== reqId);
         setSteps(newSteps);
+    };
+
+    const handleSaveRequest = async (stepId: string, reqId: string, type: OnboardingRequest['type'], config: any) => {
+        if (onSaveRequest) {
+            await onSaveRequest(stepId, reqId, type, config);
+        }
     };
 
     const addStep = () => {
@@ -131,40 +184,26 @@ export default function ProviderOnboardingManager({
                             {isExpanded && (
                                 <div className={styles['onboarding-manager__step-body']}>
                                     <div className={styles['onboarding-manager__config-grid']}>
-                                        <div className={styles['onboarding-manager__field']}>
-                                            <label className={styles['onboarding-manager__label']}>Step Name</label>
-                                            <input
-                                                type="text"
-                                                value={step.name}
-                                                onChange={(e) => updateStep(idx, 'name', e.target.value)}
-                                                placeholder="e.g. Identity Verification"
-                                                className={styles['onboarding-manager__input']}
-                                            />
-                                        </div>
-                                        <div className={styles['onboarding-manager__field']}>
-                                            <label className={`${styles['onboarding-manager__label']} ${styles['onboarding-manager__label--secondary']}`}>Icon (Material Name)</label>
-                                            <div className={styles['onboarding-manager__icon-field']}>
-                                                <div className={styles['onboarding-manager__icon-preview']}>
-                                                    <Icon name={step.icon || 'radio_button_checked'} />
-                                                </div>
-                                                <input
-                                                    type="text"
-                                                    value={step.icon}
-                                                    onChange={(e) => updateStep(idx, 'icon', e.target.value)}
-                                                    className={styles['onboarding-manager__input']}
-                                                    placeholder="e.g. cloud, lock, check"
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className={styles['onboarding-manager__field']}>
-                                            <label className={styles['onboarding-manager__label']}>Description</label>
-                                            <textarea
-                                                rows={1}
-                                                value={step.description}
-                                                onChange={(e) => updateStep(idx, 'description', e.target.value)}
-                                                className={styles['onboarding-manager__textarea']}
-                                            />
-                                        </div>
+                                        <Input
+                                            label="Step Name"
+                                            value={step.name}
+                                            onChange={(e) => updateStep(idx, 'name', e.target.value)}
+                                            placeholder="e.g. Identity Verification"
+                                        />
+                                        <Select
+                                            label="Step Icon"
+                                            value={step.icon}
+                                            onChange={(val) => updateStep(idx, 'icon', val)}
+                                            options={ICONS.map(i => ({ value: i, label: i }))}
+                                            type="icon"
+                                            activeColor="#1978e5"
+                                        />
+                                        <Textarea
+                                            label="Description"
+                                            rows={1}
+                                            value={step.description}
+                                            onChange={(e) => updateStep(idx, 'description', e.target.value)}
+                                        />
                                         <div className={styles['onboarding-manager__field']}>
                                             <label className={`${styles['onboarding-manager__label']} ${styles['onboarding-manager__label--secondary']}`}>Management Type</label>
                                             <div className={styles['onboarding-manager__type-grid']}>
@@ -187,6 +226,31 @@ export default function ProviderOnboardingManager({
                                         </div>
                                     </div>
 
+                                    <div className={styles['onboarding-manager__step-actions-bar']}>
+                                        <Button 
+                                            variant="ghost" 
+                                            size="sm" 
+                                            onClick={handleCancel} 
+                                            className="text-slate-500 hover:text-white"
+                                            disabled={!!isSavingStep}
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button 
+                                            variant="primary" 
+                                            size="sm" 
+                                            onClick={() => handleSaveStep(idx)} 
+                                            className={styles['onboarding-manager__save-btn']}
+                                            disabled={!!isSavingStep}
+                                        >
+                                            {isSavingStep === step.id ? (
+                                                <div className="size-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                                            ) : (
+                                                <><Icon name="save" className="mr-2 text-xs" /> Save Changes</>
+                                            )}
+                                        </Button>
+                                    </div>
+
                                     {/* Requests */}
                                     <div className={styles['onboarding-manager__requests-section']}>
                                         <div className={styles['onboarding-manager__requests-header']}>
@@ -198,32 +262,39 @@ export default function ProviderOnboardingManager({
 
                                         <div className={styles['onboarding-manager__requests-grid']}>
                                             {step.requests?.map(req => {
+                                                const sharedProps = {
+                                                    id: req.id,
+                                                    initialConfig: req.config,
+                                                    onDelete: () => handleDeleteRequest(idx, req.id),
+                                                    onSave: (config: any) => handleSaveRequest(step.id, req.id, req.type, config)
+                                                };
+
                                                 if (req.type === 'form') return (
                                                     <FormRequestCard
                                                         key={req.id}
                                                         title={req.title}
-                                                        onDelete={() => deleteRequest(idx, req.id)}
+                                                        {...sharedProps}
                                                     />
                                                 );
                                                 if (req.type === 'terms') return (
                                                     <TermsAndConditionsRequestCard
                                                         key={req.id}
                                                         title={req.title}
-                                                        onDelete={() => deleteRequest(idx, req.id)}
+                                                        {...sharedProps}
                                                     />
                                                 );
                                                 if (req.type === 'document') return (
                                                     <DocumentRequestCard
                                                         key={req.id}
                                                         title={req.title}
-                                                        onDelete={() => deleteRequest(idx, req.id)}
+                                                        {...sharedProps}
                                                     />
                                                 );
                                                 return (
                                                     <RequestPaymentCard
                                                         key={req.id}
                                                         title={req.title}
-                                                        onDelete={() => deleteRequest(idx, req.id)}
+                                                        {...sharedProps}
                                                     />
                                                 );
                                             })}

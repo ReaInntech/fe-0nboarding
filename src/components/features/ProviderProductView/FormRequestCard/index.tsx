@@ -18,28 +18,49 @@ export interface FormRequestConfig {
 }
 
 export interface FormRequestCardProps {
+    id: string;
     title: string;
+    description?: string;
+    initialConfig?: FormRequestConfig;
     onDelete?: () => void;
-    onUpdate?: (config: FormRequestConfig) => void;
+    onSave?: (config: FormRequestConfig) => Promise<void>;
 }
 
 const FIELD_TYPES = ['string', 'number', 'email', 'tel', 'textarea'];
 
 export default function FormRequestCard({
+    id,
     title,
+    description,
+    initialConfig,
     onDelete,
-    onUpdate
+    onSave
 }: FormRequestCardProps) {
-    const [config, setConfig] = useState<FormRequestConfig>({
-        formTitle: '',
-        instructions: '',
+    const [config, setConfig] = useState<FormRequestConfig>(initialConfig || {
+        formTitle: title || '',
+        instructions: description || '',
         fields: []
     });
 
+    const [isSaving, setIsSaving] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
+
     const handleChange = (field: keyof FormRequestConfig, value: any) => {
-        const newConfig = { ...config, [field]: value };
-        setConfig(newConfig);
-        if (onUpdate) onUpdate(newConfig);
+        setConfig(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleSave = async () => {
+        if (!onSave) return;
+        setIsSaving(true);
+        try {
+            await onSave(config);
+            setShowSuccess(true);
+            setTimeout(() => setShowSuccess(false), 2000);
+        } catch (error) {
+            console.error('Failed to save form request:', error);
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     const addField = () => {
@@ -70,9 +91,25 @@ export default function FormRequestCard({
                     <span className={styles['form-card__title']}>{title}</span>
                 </div>
                 <div className={styles['form-card__actions']}>
-                    <button type="button">
-                        <Icon name="settings" style={{ fontSize: 14 }} />
+                    {showSuccess && (
+                        <div className="flex items-center text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-md text-[10px] font-bold animate-in fade-in zoom-in duration-300">
+                            <Icon name="check_circle" className="mr-1.5 text-xs" /> Saved
+                        </div>
+                    )}
+                    
+                    <button 
+                        type="button" 
+                        onClick={handleSave}
+                        disabled={isSaving}
+                        className={`${isSaving ? 'opacity-50 cursor-not-allowed' : ''} ${showSuccess ? 'hidden' : ''}`}
+                    >
+                        {isSaving ? (
+                            <div className="size-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                        ) : (
+                            <Icon name="save" style={{ fontSize: 14 }} className="text-violet-400" />
+                        )}
                     </button>
+
                     <button
                         type="button"
                         onClick={onDelete}

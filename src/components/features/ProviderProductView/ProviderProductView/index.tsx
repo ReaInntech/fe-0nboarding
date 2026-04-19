@@ -8,7 +8,9 @@ import ProviderProductHeader from '../ProviderProductHeader';
 import ProviderOnboardingManager from '../ProviderOnboardingManager';
 import ProviderRequestsManager from '../ProviderRequestsManager';
 import ProviderRequirementsManager from '../ProviderRequirementsManager';
-import { OnboardingStep, ClientRequest, RequirementField } from '@/src/lib/api/types';
+import { OnboardingStep, ClientRequest, RequirementField, OnboardingRequest } from '@/src/lib/api/types';
+import * as api from '@/src/lib/api/provider';
+import { auth } from '@/src/lib/firebase/config';
 import styles from './index.module.scss';
 
 export interface ProductData {
@@ -34,7 +36,70 @@ export default function ProviderProductView({
     requests,
     userProfile
 }: ProviderProductViewProps) {
-    const { user } = useApp();
+    const { user, currentOrg } = useApp();
+    const orgId = currentOrg?.id || '';
+
+    const getFreshToken = async () => {
+        const currentUser = auth.currentUser;
+        if (!currentUser) return '';
+        return await currentUser.getIdToken();
+    };
+
+    const handleSaveStepMetadata = async (stepId: string, data: Partial<OnboardingStep>) => {
+        if (!product?.productCode) return;
+        const freshToken = await getFreshToken();
+        const isNew = stepId.startsWith('step_');
+
+        // Note: Backend DTO uses 'label', but Frontend state uses 'name'
+        const stepLabel = data.name || 'New Step';
+
+        if (isNew) {
+            await api.createProductStep(product.productCode, freshToken, orgId, {
+                label: stepLabel,
+                description: data.description || '',
+                icon: data.icon || 'Plus',
+                type: data.type || 'form',
+                sort_order: onboardingSteps.length // Append to end
+            });
+        } else {
+            await api.updateProductStepMetadata(product.productCode, stepId, freshToken, orgId, {
+                label: stepLabel,
+                description: data.description,
+                icon: data.icon,
+                type: data.type
+            });
+        }
+    };
+
+    const handleSaveRequest = async (stepId: string, requestId: string, type: OnboardingRequest['type'], config: any) => {
+        if (!product?.productCode) return;
+        const freshToken = await getFreshToken();
+        
+        const isNew = requestId.startsWith('req_'); // Locally generated ID
+
+        if (isNew) {
+            await api.createActionRequest(product.productCode, stepId, freshToken, orgId, {
+                request_type: type,
+                title: config.formTitle || config.documentTitle || 'New Request',
+                description: config.instructions || config.content || '',
+                config
+            });
+        } else {
+            await api.updateActionRequest(requestId, freshToken, orgId, {
+                title: config.formTitle || config.documentTitle,
+                description: config.instructions || config.content,
+                config
+            });
+        }
+    };
+
+    const handleDeleteRequest = async (requestId: string) => {
+        const freshToken = await getFreshToken();
+        const isNew = requestId.startsWith('req_');
+        if (!isNew) {
+            await api.deleteActionRequest(requestId, freshToken, orgId);
+        }
+    };
 
     return (
         <div className={styles['provider-view']}>
@@ -54,7 +119,15 @@ export default function ProviderProductView({
                 </div>
 
                 {/* Onboarding - full width */}
-                <ProviderOnboardingManager initialSteps={onboardingSteps} />
+                <ProviderOnboardingManager 
+                    initialSteps={onboardingSteps} 
+                    onSaveStepMetadata={handleSaveStepMetadata}
+                    onSaveRequest={handleSaveRequest}
+                    onDeleteRequest={handleDeleteRequest}
+                    onCancel={() => {
+                        console.log('[ProviderProductView] Cancelled onboarding changes');
+                    }}
+                />
 
                 {/* Requirements - full width */}
                 <ProviderRequirementsManager initialRequirements={requirements} />

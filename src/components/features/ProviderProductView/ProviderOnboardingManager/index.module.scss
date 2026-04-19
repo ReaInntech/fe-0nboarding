@@ -138,6 +138,14 @@
         }
     }
 
+    &__step-actions-bar {
+        @apply flex items-center justify-end gap-3 mt-8 pt-6 border-t border-slate-800/50;
+    }
+
+    &__save-btn {
+        @apply bg-[#1978e5] hover:bg-[#1978e5]/90 text-white shadow-lg shadow-[#1978e5]/20 flex items-center;
+    }
+
     &__requests-section {
         @apply mt-8 pt-6 border-t border-slate-800/50;
     }

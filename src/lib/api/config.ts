@@ -22,6 +22,7 @@ interface ApiOptions extends RequestInit {
   microservice?: 'core' | 'payments' | 'provider';
   token?: string;
   orgId?: string;
+  context?: string; // Format: modulo:page:service
 }
 
 // Global listener for 401 Unauthorized errors
@@ -51,17 +52,24 @@ export function getMockStrategy(): MockStrategy {
  * Standardized Fetching Wrapper
  */
 export async function apiFetch<T>(endpoint: string, options: ApiOptions = {}): Promise<T> {
-  const { microservice = 'core', token, orgId, ...fetchOptions } = options;
+  const { microservice = 'core', token, orgId, context, ...fetchOptions } = options;
   const baseUrl = getBaseUrl(microservice);
   
   const headers = new Headers(fetchOptions.headers);
   
   if (token) {
+    console.debug(`[apiFetch] Injecting Authorization header for ${endpoint} | Token present: true`);
     headers.set('Authorization', `Bearer ${token}`);
+  } else {
+    console.warn(`[apiFetch] No token provided for ${endpoint}`);
   }
   
   if (orgId) {
     headers.set('X-Org-ID', orgId);
+  }
+
+  if (context) {
+    headers.set('X-BFF-Context', context);
   }
 
   const response = await fetch(`${baseUrl}${endpoint}`, {

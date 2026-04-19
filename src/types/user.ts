@@ -8,6 +8,7 @@ export interface UserProfile {
     org_id: string;
     avatar_url?: string | null;
     firebasePhotoUrl?: string;
+    accessToken?: string; // Critical for client-side API calls
     organization?: {
         id: string;
         legal_name: string;

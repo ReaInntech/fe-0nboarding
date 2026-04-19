@@ -12,27 +12,48 @@ export interface DocumentRequestConfig {
 }
 
 export interface DocumentRequestCardProps {
+    id: string;
     title: string;
+    description?: string;
+    initialConfig?: DocumentRequestConfig;
     onDelete?: () => void;
-    onUpdate?: (config: DocumentRequestConfig) => void;
+    onSave?: (config: DocumentRequestConfig) => Promise<void>;
 }
 
 export default function DocumentRequestCard({
+    id,
     title,
+    description,
+    initialConfig,
     onDelete,
-    onUpdate
+    onSave
 }: DocumentRequestCardProps) {
-    const [config, setConfig] = useState<DocumentRequestConfig>({
-        documentTitle: '',
-        instructions: '',
+    const [config, setConfig] = useState<DocumentRequestConfig>(initialConfig || {
+        documentTitle: title || '',
+        instructions: description || '',
         allowedFormats: [],
         templateFile: null,
     });
 
+    const [isSaving, setIsSaving] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
+
     const handleChange = (field: keyof DocumentRequestConfig, value: any) => {
-        const newConfig = { ...config, [field]: value };
-        setConfig(newConfig);
-        if (onUpdate) onUpdate(newConfig);
+        setConfig(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleSave = async () => {
+        if (!onSave) return;
+        setIsSaving(true);
+        try {
+            await onSave(config);
+            setShowSuccess(true);
+            setTimeout(() => setShowSuccess(false), 2000);
+        } catch (error) {
+            console.error('Failed to save document request:', error);
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     const toggleFormat = (format: string) => {
@@ -53,9 +74,25 @@ export default function DocumentRequestCard({
                     <span className={styles['document-card__title']}>{title}</span>
                 </div>
                 <div className={styles['document-card__actions']}>
-                    <button type="button">
-                        <Icon name="settings" style={{ fontSize: 14 }} />
+                    {showSuccess && (
+                        <div className="flex items-center text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-md text-[10px] font-bold animate-in fade-in zoom-in duration-300">
+                            <Icon name="check_circle" className="mr-1.5 text-xs" /> Saved
+                        </div>
+                    )}
+
+                    <button 
+                        type="button" 
+                        onClick={handleSave}
+                        disabled={isSaving}
+                        className={`${isSaving ? 'opacity-50 cursor-not-allowed' : ''} ${showSuccess ? 'hidden' : ''}`}
+                    >
+                        {isSaving ? (
+                            <div className="size-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                        ) : (
+                            <Icon name="save" style={{ fontSize: 14 }} className="text-violet-400" />
+                        )}
                     </button>
+
                     <button
                         type="button"
                         onClick={onDelete}

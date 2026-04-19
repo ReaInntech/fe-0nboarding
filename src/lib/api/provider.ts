@@ -202,10 +202,70 @@ export async function updateProduct(id: string, token: string, orgId: string, dt
 export async function createProductStep(productId: string, token: string, orgId: string, dto: CreateContractingStepDTO) {
   return apiFetch(`/products/${productId}/steps`, {
     method: 'POST',
+    microservice: 'core',
     token,
     orgId,
+    context: 'provider:productDetail:addStep',
     body: JSON.stringify(dto),
     headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+/**
+ * Update step metadata (Core API)
+ */
+export async function updateProductStepMetadata(productId: string, stepId: string, token: string, orgId: string, data: any) {
+  return apiFetch(`/products/${productId}/steps/${stepId}`, {
+    method: 'PUT',
+    microservice: 'core',
+    token,
+    orgId,
+    context: 'provider:productDetail:updateStep',
+    body: JSON.stringify(data),
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+/**
+ * Create a new action request within a step
+ */
+export async function createActionRequest(productId: string, stepId: string, token: string, orgId: string, data: any) {
+  return apiFetch(`/products/${productId}/steps/${stepId}/action-requests`, {
+    method: 'POST',
+    microservice: 'core',
+    token,
+    orgId,
+    context: 'provider:productDetail:createActionRequest',
+    body: JSON.stringify(data),
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+/**
+ * Update an existing action request
+ */
+export async function updateActionRequest(requestId: string, token: string, orgId: string, data: any) {
+  return apiFetch(`/action-requests/${requestId}`, {
+    method: 'PUT',
+    microservice: 'core',
+    token,
+    orgId,
+    context: 'provider:productDetail:updateActionRequest',
+    body: JSON.stringify(data),
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+/**
+ * Delete an action request
+ */
+export async function deleteActionRequest(requestId: string, token: string, orgId: string) {
+  return apiFetch(`/action-requests/${requestId}`, {
+    method: 'DELETE',
+    microservice: 'core',
+    token,
+    orgId,
+    context: 'provider:productDetail:deleteActionRequest'
   });
 }
 

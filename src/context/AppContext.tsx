@@ -139,6 +139,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
                   role_name: claims.role_name,
                   org_id: claims.org_id,
                   firebasePhotoUrl: fbUser.photoURL || undefined,
+                  accessToken: token, // Store token for client-side API requests
                   organization: {
                     id: claims.org_id,
                     legal_name: claims.org_name || 'Organization',
@@ -153,6 +154,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               fetchProfile(fbUser.uid, token).then(profile => {
                 if (profile) {
                   profile.firebasePhotoUrl = fbUser.photoURL || undefined;
+                  profile.accessToken = token; // Ensure token is preserved
                   setState(prev => ({ ...prev, user: profile }));
                 }
               });
@@ -175,6 +177,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
             if (profile) {
               profile.firebasePhotoUrl = fbUser.photoURL || undefined;
+              profile.accessToken = token; // Store token for client-side API requests
               setState({ user: profile, isLoading: false, error: null });
             } else {
               console.error('[AppContext] Could not resolve user profile after registration attempt');

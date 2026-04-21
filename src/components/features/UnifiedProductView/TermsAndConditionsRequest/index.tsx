@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import Icon from '../../../shared/atoms/Icon';
 import Button from '../../../shared/atoms/Button';
 import Badge from '../../../shared/atoms/Badge';
+import Modal from '../../../shared/molecule/Modal';
+import { useApp } from '../../../../context/AppContext';
+import { auth } from '../../../../lib/firebase/config';
 import styles from './index.module.scss';
 
 export interface TermsCheckbox {
@@ -14,6 +17,7 @@ export interface TermsAndConditionsRequestProps {
     content: string;
     checkboxes: TermsCheckbox[];
     status: 'pending' | 'accepted';
+    templateFile?: string | null;
     acceptDate?: string;
     onAccept?: () => void;
     className?: string;
@@ -24,11 +28,18 @@ export default function TermsAndConditionsRequest({
     content,
     checkboxes,
     status,
+    templateFile,
     acceptDate,
     onAccept,
     className = ''
 }: TermsAndConditionsRequestProps) {
     const isAccepted = status === 'accepted';
+    const { user } = useApp();
+
+    // Document Viewer state
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [isLoadingPreview, setIsLoadingPreview] = useState(false);
 
     // Track which checkboxes are checked
     const [checkedState, setCheckedState] = useState<Record<string, boolean>>(
@@ -48,12 +59,54 @@ export default function TermsAndConditionsRequest({
         }
     };
 
+    const handleViewDocument = async () => {
+        if (!templateFile || !user) return;
+        
+        setIsLoadingPreview(true);
+        setIsModalOpen(true);
+        setPreviewUrl(null);
+
+        try {
+            // Get fresh token
+            const freshToken = await (auth.currentUser?.getIdToken() || Promise.resolve(user.accessToken));
+            if (!freshToken) throw new Error("No authentication token available");
+
+            const baseUrl = process.env.NEXT_PUBLIC_CORE_API_URL || 'http://localhost:3001/api/v1/core';
+            const response = await fetch(`${baseUrl}/storage/download-url?key=${encodeURIComponent(templateFile)}`, {
+                headers: { Authorization: `Bearer ${freshToken}` }
+            });
+
+            if (response.ok) {
+                const body = await response.json();
+                const url = body.data?.url || body.url;
+                setPreviewUrl(url);
+            } else {
+                throw new Error("Failed to get preview URL");
+            }
+        } catch (error) {
+            console.error("Preview failed:", error);
+            setIsModalOpen(false);
+        } finally {
+            setIsLoadingPreview(false);
+        }
+    };
+
     return (
         <div className={`${styles['terms-request']} ${className}`}>
             <div className={styles['terms-request__header']}>
-                <h3 className={styles['terms-request__title-box']}>
-                    <Icon name="gavel" className="text-emerald-500" /> Terms & Conditions
-                </h3>
+                <div className="flex items-center gap-2">
+                    <h3 className={styles['terms-request__title-box']}>
+                        <Icon name="gavel" className="text-emerald-500" /> Terms & Conditions
+                    </h3>
+                    {templateFile && (
+                        <button 
+                            onClick={handleViewDocument}
+                            className="bg-emerald-500/10 text-emerald-500 text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded flex items-center gap-1 hover:bg-emerald-500/20 transition-colors"
+                        >
+                            <Icon name="picture_as_pdf" style={{ fontSize: 10 }} /> View PDF
+                        </button>
+                    )}
+                </div>
                 {isAccepted ? (
                     <Badge variant="success">Accepted</Badge>
                 ) : (
@@ -138,6 +191,30 @@ export default function TermsAndConditionsRequest({
                     </div>
                 )}
             </div>
+
+            <Modal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title={documentTitle || "Términos y Condiciones (PDF)"}
+                size="lg"
+            >
+                <div className="bg-surface rounded-xl overflow-hidden w-full h-[65vh] flex justify-center items-center">
+                    {isLoadingPreview ? (
+                        <div className="flex flex-col items-center text-slate-400">
+                            <div className="size-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin mb-4" />
+                            <p className="text-sm">Abriendo documento seguro...</p>
+                        </div>
+                    ) : previewUrl ? (
+                        <iframe 
+                            src={previewUrl} 
+                            className="w-full h-full border-0" 
+                            title="PDF Preview"
+                        />
+                    ) : (
+                        <p className="text-rose-400">No se pudo cargar la vista previa del documento.</p>
+                    )}
+                </div>
+            </Modal>
         </div>
     );
 }

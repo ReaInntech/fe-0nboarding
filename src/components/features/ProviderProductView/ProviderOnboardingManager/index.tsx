@@ -108,7 +108,30 @@ export default function ProviderOnboardingManager({
 
     const handleSaveRequest = async (stepId: string, reqId: string, type: OnboardingRequest['type'], config: any) => {
         if (onSaveRequest) {
-            await onSaveRequest(stepId, reqId, type, config);
+            const result: any = await onSaveRequest(stepId, reqId, type, config);
+            
+            // If it was a new request, we MUST update the local ID with the real DB ID
+            // otherwise subsequent deletes/updates will use the wrong ID
+            if (reqId.startsWith('req_') && result?.id) {
+                setSteps(prevSteps => {
+                    const newSteps = [...prevSteps];
+                    const stepIdx = newSteps.findIndex(s => s.id === stepId);
+                    if (stepIdx === -1) return prevSteps;
+
+                    const newRequests = [...(newSteps[stepIdx].requests || [])];
+                    const reqIdx = newRequests.findIndex(r => r.id === reqId);
+                    if (reqIdx === -1) return prevSteps;
+
+                    newRequests[reqIdx] = { 
+                        ...newRequests[reqIdx], 
+                        id: result.id,
+                        config: config // Also sync latest config
+                    };
+                    
+                    newSteps[stepIdx] = { ...newSteps[stepIdx], requests: newRequests };
+                    return newSteps;
+                });
+            }
         }
     };
 

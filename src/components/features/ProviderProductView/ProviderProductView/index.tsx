@@ -78,14 +78,14 @@ export default function ProviderProductView({
         const isNew = requestId.startsWith('req_'); // Locally generated ID
 
         if (isNew) {
-            await api.createActionRequest(product.productCode, stepId, freshToken, orgId, {
+            return await api.createActionRequest(product.productCode, stepId, freshToken, orgId, {
                 request_type: type,
                 title: config.formTitle || config.documentTitle || 'New Request',
                 description: config.instructions || config.content || '',
                 config
             });
         } else {
-            await api.updateActionRequest(requestId, freshToken, orgId, {
+            return await api.updateActionRequest(requestId, freshToken, orgId, {
                 title: config.formTitle || config.documentTitle,
                 description: config.instructions || config.content,
                 config
@@ -98,6 +98,8 @@ export default function ProviderProductView({
         const isNew = requestId.startsWith('req_');
         if (!isNew) {
             await api.deleteActionRequest(requestId, freshToken, orgId);
+            // Optional: for complete safety, reload or ensure steps refetch
+            // window.location.reload(); 
         }
     };
 

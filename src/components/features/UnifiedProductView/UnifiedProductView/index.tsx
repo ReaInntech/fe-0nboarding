@@ -76,16 +76,19 @@ export default function UnifiedProductView({
                         </div>
 
                         <div className={styles['unified-product-view__right-col']}>
-                            {showRequests && requestsProps?.requests?.map((req, index) => {
+                            {showRequests && requestsProps?.requests?.map((req: any, index) => {
+                                // Flatten config into the top-level props for the components
+                                const componentProps = { ...req, ...req.config };
+                                
                                 switch (req.type) {
                                     case 'payment':
-                                        return <PaymentRequest key={index} {...req} />;
+                                        return <PaymentRequest key={index} {...componentProps} />;
                                     case 'document':
-                                        return <DocumentRequest key={index} {...req} />;
+                                        return <DocumentRequest key={index} {...componentProps} />;
                                     case 'form':
-                                        return <FormRequest key={index} {...req} />;
+                                        return <FormRequest key={index} {...componentProps} />;
                                     case 'terms':
-                                        return <TermsAndConditionsRequest key={index} {...req} />;
+                                        return <TermsAndConditionsRequest key={index} {...componentProps} />;
                                     default:
                                         return null;
                                 }

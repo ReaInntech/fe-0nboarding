@@ -29,7 +29,7 @@ const STEP_TYPES = [
 export interface ProviderOnboardingManagerProps {
     initialSteps: OnboardingStep[];
     onSaveStepMetadata?: (stepId: string, data: Partial<OnboardingStep>) => Promise<void>;
-    onSaveRequest?: (stepId: string, requestId: string, type: OnboardingRequest['type'], config: any) => Promise<void>;
+    onSaveRequest?: (stepId: string, requestId: string, type: OnboardingRequest['type'], config: Record<string, any>) => Promise<any>;
     onDeleteRequest?: (requestId: string) => Promise<void>;
     onAddStep?: (data: Partial<OnboardingStep>) => Promise<void>;
     onCancel?: () => void;

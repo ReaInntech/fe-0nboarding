@@ -13,7 +13,8 @@ import {
   CreateContractingStepDTO,
   ReorderStepsDTO,
   Product,
-  ProductDTO
+  ProductDTO,
+  OnboardingStep
 } from './types';
 import {
   FALLBACK_PROVIDER_DASHBOARD_DATA,

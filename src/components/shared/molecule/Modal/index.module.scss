@@ -11,6 +11,7 @@
     &--md { @apply w-full max-w-lg; }
     &--lg { @apply w-full max-w-2xl; }
     &--xl { @apply w-full max-w-4xl; }
+    &--2xl { @apply w-[80%] max-w-[1600px]; }
 }
 
 .modal-header {

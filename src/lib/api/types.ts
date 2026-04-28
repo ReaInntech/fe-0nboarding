@@ -212,6 +212,8 @@ export interface CreateContractingStepDTO {
   label: string;
   icon?: string;
   sort_order?: number;
+  description?: string;
+  type?: string;
 }
 
 export interface StepOrderItemDTO {

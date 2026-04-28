@@ -8,7 +8,7 @@ import ProviderProductHeader from '../ProviderProductHeader';
 import ProviderOnboardingManager from '../ProviderOnboardingManager';
 import ProviderRequestsManager from '../ProviderRequestsManager';
 import ProviderRequirementsManager from '../ProviderRequirementsManager';
-import { OnboardingStep, ClientRequest, RequirementField, OnboardingRequest } from '@/src/lib/api/types';
+import { OnboardingStep, ClientRequest, RequirementField, OnboardingRequest, UserProfile } from '@/src/lib/api/types';
 import * as api from '@/src/lib/api/provider';
 import { auth } from '@/src/lib/firebase/config';
 import styles from './index.module.scss';
@@ -26,18 +26,18 @@ export interface ProviderProductViewProps {
     onboardingSteps: OnboardingStep[];
     requirements: RequirementField[];
     requests: ClientRequest[];
-    userProfile?: any;
+    userProfile?: UserProfile;
 }
 
-export default function ProviderProductView({ 
-    product, 
-    onboardingSteps, 
-    requirements, 
+export default function ProviderProductView({
+    product,
+    onboardingSteps,
+    requirements,
     requests,
     userProfile
 }: ProviderProductViewProps) {
-    const { user, currentOrg } = useApp();
-    const orgId = currentOrg?.id || '';
+    const { user } = useApp();
+    const orgId = user?.organization?.id || '';
 
     const getFreshToken = async () => {
         const currentUser = auth.currentUser;
@@ -71,10 +71,11 @@ export default function ProviderProductView({
         }
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleSaveRequest = async (stepId: string, requestId: string, type: OnboardingRequest['type'], config: any) => {
         if (!product?.productCode) return;
         const freshToken = await getFreshToken();
-        
+
         const isNew = requestId.startsWith('req_'); // Locally generated ID
 
         if (isNew) {
@@ -108,7 +109,7 @@ export default function ProviderProductView({
             <ProviderTopNavigation activeTab="Products" userProfile={userProfile} />
             <main className={styles['provider-view__main']}>
                 <div className={styles['provider-view__header-section']}>
-                    <ProviderProductHeader 
+                    <ProviderProductHeader
                         title={product?.name}
                         productId={product?.productCode}
                         icon={product?.icon}
@@ -121,8 +122,8 @@ export default function ProviderProductView({
                 </div>
 
                 {/* Onboarding - full width */}
-                <ProviderOnboardingManager 
-                    initialSteps={onboardingSteps} 
+                <ProviderOnboardingManager
+                    initialSteps={onboardingSteps}
                     onSaveStepMetadata={handleSaveStepMetadata}
                     onSaveRequest={handleSaveRequest}
                     onDeleteRequest={handleDeleteRequest}
@@ -136,7 +137,7 @@ export default function ProviderProductView({
 
                 {/* Requests - full width */}
                 <ProviderRequestsManager requests={requests} />
-                
+
                 {/* Activity Log Placeholder */}
                 <div className={styles['provider-view__activity-log']}>
                     <h4>Usage Activity Log</h4>

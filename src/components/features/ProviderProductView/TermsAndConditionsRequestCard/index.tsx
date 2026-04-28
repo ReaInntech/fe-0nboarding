@@ -153,6 +153,7 @@ export default function TermsAndConditionsRequestCard({
     };
 
     return (
+        <>
         <div className={styles['terms-card']}>
             {/* Header */}
             <div className={styles['terms-card__header']}>
@@ -329,12 +330,13 @@ export default function TermsAndConditionsRequestCard({
                     ))}
                 </div>
             </div>
+        </div>
 
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 title="Términos y Condiciones (PDF)"
-                size="lg"
+                size="2xl"
             >
                 <div className="bg-surface rounded-xl overflow-hidden w-full h-[65vh] flex justify-center items-center">
                     {isLoadingPreview ? (
@@ -353,6 +355,6 @@ export default function TermsAndConditionsRequestCard({
                     )}
                 </div>
             </Modal>
-        </div>
+        </>
     );
 }

@@ -7,41 +7,41 @@ import Button from '../../../shared/atoms/Button';
 import { RequirementField } from '@/src/lib/api/types';
 import styles from './index.module.scss';
 
-export interface ProviderRequirementsManagerProps {
+export interface ProviderDetailsProductProps {
     initialRequirements: RequirementField[];
 }
 
-export default function ProviderRequirementsManager({
+export default function ProviderDetailsProduct({
     initialRequirements,
-}: ProviderRequirementsManagerProps) {
+}: ProviderDetailsProductProps) {
     const [requirements, setRequirements] = useState<RequirementField[]>(initialRequirements);
 
     return (
         <Card className="bg-slate-900/50 border-slate-800">
-            <div className={styles['requirements-manager__header']}>
-                <h3 className={styles['requirements-manager__title']}>
-                    <Icon name="assignment_turned_in" className="text-[#1978e5]" /> Service Requirements
+            <div className={styles['details-product__header']}>
+                <h3 className={styles['details-product__title']}>
+                    <Icon name="assignment_turned_in" className="text-[#1978e5]" /> Details Product
                 </h3>
-                <Button variant="ghost" size="sm" className={styles['requirements-manager__add-btn']}>
+                <Button variant="ghost" size="sm" className={styles['details-product__add-btn']}>
                     <Icon name="add" className="mr-1" /> Add Field
                 </Button>
             </div>
 
-            <div className={styles['requirements-manager__list']}>
+            <div className={styles['details-product__list']}>
                 {requirements.map((req) => (
-                    <div key={req.id} className={styles['requirements-manager__item']}>
-                        <div className={styles['requirements-manager__item-left']}>
-                            <div className={styles['requirements-manager__drag-handle']}>
+                    <div key={req.id} className={styles['details-product__item']}>
+                        <div className={styles['details-product__item-left']}>
+                            <div className={styles['details-product__drag-handle']}>
                                 <Icon name="drag_indicator" className="cursor-grab" />
                             </div>
                             <div>
-                                <span className={styles['requirements-manager__label']}>
-                                    {req.label} {req.required && <span className={styles['requirements-manager__label--required']}>*</span>}
+                                <span className={styles['details-product__label']}>
+                                    {req.label} {req.required && <span className={styles['details-product__label--required']}>*</span>}
                                 </span>
-                                <span className={styles['requirements-manager__value']}>{req.value}</span>
+                                <span className={styles['details-product__value']}>{req.value}</span>
                             </div>
                         </div>
-                        <div className={styles['requirements-manager__actions']}>
+                        <div className={styles['details-product__actions']}>
                             <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-400 hover:text-white">
                                 <Icon name="edit" className="text-sm" />
                             </Button>
@@ -53,10 +53,10 @@ export default function ProviderRequirementsManager({
                 ))}
             </div>
 
-            <div className={styles['requirements-manager__info-box']}>
-                <p className={styles['requirements-manager__info-text']}>
+            <div className={styles['details-product__info-box']}>
+                <p className={styles['details-product__info-text']}>
                     <Icon name="info" className="text-sm mr-1 inline-block" />
-                    These requirements are defined in the product template. Changes made here will only affect <strong>this specific client's</strong> instance.
+                    Specify the required and optional fields that your product requires for onboarding.
                 </p>
             </div>
         </Card>

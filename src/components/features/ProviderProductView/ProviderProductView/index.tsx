@@ -7,7 +7,7 @@ import Footer from '../../../shared/molecule/Footer';
 import ProviderProductHeader from '../ProviderProductHeader';
 import ProviderOnboardingManager from '../ProviderOnboardingManager';
 import ProviderRequestsManager from '../ProviderRequestsManager';
-import ProviderRequirementsManager from '../ProviderRequirementsManager';
+import ProviderDetailsProduct from '../ProviderDetailsProduct';
 import { OnboardingStep, ClientRequest, RequirementField, OnboardingRequest, UserProfile } from '@/src/lib/api/types';
 import * as api from '@/src/lib/api/provider';
 import { auth } from '@/src/lib/firebase/config';
@@ -121,6 +121,10 @@ export default function ProviderProductView({
                     />
                 </div>
 
+                {/* Requirements - full width */}
+                <ProviderDetailsProduct initialRequirements={requirements} />
+
+
                 {/* Onboarding - full width */}
                 <ProviderOnboardingManager
                     initialSteps={onboardingSteps}
@@ -132,8 +136,6 @@ export default function ProviderProductView({
                     }}
                 />
 
-                {/* Requirements - full width */}
-                <ProviderRequirementsManager initialRequirements={requirements} />
 
                 {/* Requests - full width */}
                 <ProviderRequestsManager requests={requests} />

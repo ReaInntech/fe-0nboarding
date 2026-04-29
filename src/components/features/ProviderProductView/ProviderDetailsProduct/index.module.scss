@@ -10,7 +10,7 @@
     }
 
     &__add-btn {
-        @apply text-[#1978e5] text-xs;
+        @apply text-[#1978e5] text-xs font-bold transition-colors hover:bg-blue-500/10;
     }
 
     &__list {
@@ -26,34 +26,50 @@
     }
 
     &__item-left {
-        @apply flex items-center gap-4;
-    }
-
-    &__drag-handle {
-        @apply p-2 rounded bg-slate-800 text-slate-500 transition-colors;
-        
-        .details-product__item:hover & {
-            @apply text-[#1978e5];
-        }
+        @apply flex items-center gap-4 w-full pr-4;
     }
 
     &__label {
-        @apply block text-xs font-bold text-slate-500 uppercase tracking-widest leading-none mb-1;
+        @apply block text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-2;
+    }
+
+    &__input {
+        @apply w-full bg-slate-900/50 border border-slate-700/50 rounded-md px-3 py-2 text-sm text-slate-200 outline-none transition-all placeholder:text-slate-600;
         
-        &--required {
-            @apply text-red-500;
+        &:focus {
+            @apply border-[#1978e5]/50 bg-slate-900 ring-1 ring-[#1978e5]/20;
         }
     }
 
-    &__value {
-        @apply text-sm font-semibold text-slate-200;
+    &__actions {
+        @apply flex items-center justify-center;
     }
 
-    &__actions {
-        @apply flex items-center gap-2 transition-opacity;
+    &__checkbox-label {
+        @apply flex items-center gap-2 cursor-pointer select-none;
+    }
+
+    &__checkbox-custom {
+        @apply w-4 h-4 rounded-md flex items-center justify-center transition-colors;
         
-        .details-product__item:not(:hover) & {
-            @apply opacity-0;
+        &--checked {
+            @apply bg-[#1978e5] border-[#1978e5];
+        }
+        
+        &--idle {
+            @apply bg-slate-900 border border-slate-700;
+        }
+    }
+
+    &__checkbox-text {
+        @apply text-xs font-bold transition-colors;
+        
+        &--active {
+            @apply text-[#1978e5];
+        }
+        
+        &--idle {
+            @apply text-slate-500;
         }
     }
 

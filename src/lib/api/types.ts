@@ -202,6 +202,9 @@ export interface CreateProductDTO {
   icon?: string;
   icon_color?: string;
   description?: string;
+  base_price?: number;
+  billing_model?: string;
+  status?: string;
   service_type?: string;
   deployment_region?: string;
 }
@@ -281,6 +284,8 @@ export interface ProductDTO {
   icon?: string;
   icon_color?: string;
   service_type?: string;
+  base_price?: number;
+  billing_model?: string;
   price?: number | string;
   total_sold?: number;
   category?: string;

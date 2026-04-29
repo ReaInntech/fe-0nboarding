@@ -8,7 +8,7 @@ import ProviderProductHeader from '../ProviderProductHeader';
 import ProviderOnboardingManager from '../ProviderOnboardingManager';
 import ProviderRequestsManager from '../ProviderRequestsManager';
 import ProviderDetailsProduct from '../ProviderDetailsProduct';
-import { OnboardingStep, ClientRequest, RequirementField, OnboardingRequest, UserProfile } from '@/src/lib/api/types';
+import { OnboardingStep, ClientRequest, OnboardingRequest, UserProfile } from '@/src/lib/api/types';
 import * as api from '@/src/lib/api/provider';
 import { auth } from '@/src/lib/firebase/config';
 import styles from './index.module.scss';
@@ -24,7 +24,7 @@ export interface ProductData {
 export interface ProviderProductViewProps {
     product: ProductData;
     onboardingSteps: OnboardingStep[];
-    requirements: RequirementField[];
+    metadata?: Record<string, any>;
     requests: ClientRequest[];
     userProfile?: UserProfile;
 }
@@ -32,7 +32,7 @@ export interface ProviderProductViewProps {
 export default function ProviderProductView({
     product,
     onboardingSteps,
-    requirements,
+    metadata = {},
     requests,
     userProfile
 }: ProviderProductViewProps) {
@@ -43,6 +43,26 @@ export default function ProviderProductView({
         const currentUser = auth.currentUser;
         if (!currentUser) return '';
         return await currentUser.getIdToken();
+    };
+
+    const handleSaveMetadata = async (newMetadata: Record<string, any>) => {
+        if (!product?.productCode) return;
+        const freshToken = await getFreshToken();
+        await api.updateProductMetadata(product.productCode, freshToken, orgId, newMetadata);
+    };
+
+    const handleSaveProductHeader = async (data: any) => {
+        if (!product?.productCode) return;
+        const freshToken = await getFreshToken();
+        await api.updateProduct(product.productCode, freshToken, orgId, {
+            name: data.name,
+            description: data.description,
+            icon: data.icon,
+            icon_color: data.color,
+            base_price: data.price ? Number(data.price) : undefined,
+            billing_model: data.billing,
+            status: data.status,
+        });
     };
 
     const handleSaveStepMetadata = async (stepId: string, data: Partial<OnboardingStep>) => {
@@ -118,11 +138,15 @@ export default function ProviderProductView({
                         badgeVariant={product?.status === 'active' ? 'success' : 'warning'}
                         clientName="Example Client Corp"
                         clientId="CL-9482"
+                        onSaveProduct={handleSaveProductHeader}
                     />
                 </div>
 
                 {/* Requirements - full width */}
-                <ProviderDetailsProduct initialRequirements={requirements} />
+                <ProviderDetailsProduct 
+                    initialMetadata={metadata} 
+                    onSave={handleSaveMetadata}
+                />
 
 
                 {/* Onboarding - full width */}

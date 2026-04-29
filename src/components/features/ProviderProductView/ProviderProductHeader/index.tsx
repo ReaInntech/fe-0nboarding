@@ -15,6 +15,7 @@ export interface ProviderProductHeaderProps {
     productId: string;
     clientName: string;
     clientId: string;
+    onSaveProduct?: (data: any) => Promise<void>;
 }
 
 export default function ProviderProductHeader({
@@ -26,8 +27,10 @@ export default function ProviderProductHeader({
     productId,
     clientName,
     clientId,
+    onSaveProduct,
 }: ProviderProductHeaderProps) {
     const [isEditing, setIsEditing] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
     const [saved, setSaved] = useState({
         name: title,
         icon: icon,
@@ -38,10 +41,20 @@ export default function ProviderProductHeader({
         description: '',
     });
 
-    const handleSave = (newData: any) => {
-        setSaved({ ...newData });
-        setIsEditing(false);
-        // In a real scenario, we might call an API here to update the product
+    const handleSave = async (newData: any) => {
+        setIsSaving(true);
+        try {
+            if (onSaveProduct) {
+                await onSaveProduct(newData);
+            }
+            setSaved({ ...newData });
+            setIsEditing(false);
+        } catch (error) {
+            console.error('Failed to save product details', error);
+            // Optionally, we could show a toast or error state here
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     const handleCancel = () => {
@@ -105,6 +118,7 @@ export default function ProviderProductHeader({
                         }}
                         onSave={handleSave}
                         onCancel={handleCancel}
+                        isSubmitting={isSaving}
                     />
                 </div>
             )}

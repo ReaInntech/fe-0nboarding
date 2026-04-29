@@ -29,8 +29,8 @@ export function mapProduct(dto: ProductDTO): Product {
     id: dto.id,
     name: dto.name,
     description: dto.description || '',
-    price: Number(dto.price) || 0,
-    period: mapBillingPeriod(dto.service_type || 'monthly'),
+    price: Number(dto.base_price ?? dto.price) || 0,
+    period: mapBillingPeriod(dto.billing_model || dto.service_type || 'monthly'),
     sold: dto.total_sold || 0,
     productCode: dto.product_code || '',
     category: dto.category || 'General',
@@ -151,6 +151,8 @@ export async function getProviderProductDetailData(id: string, token?: string, o
       icon: data.icon,
       icon_color: data.icon_color,
       service_type: data.service_type,
+      base_price: data.base_price,
+      billing_model: data.billing_model,
       price: data.price,
       total_sold: data.total_sold,
       status: data.status,
@@ -160,10 +162,13 @@ export async function getProviderProductDetailData(id: string, token?: string, o
     // 3. Map Steps
     const onboardingSteps = (data.contracting_steps || []).map(mapOnboardingStep);
 
+    // 4. Extract Metadata
+    const metadata = data.metadata?.custom_attributes || {};
+
     return {
       product: mapProduct(productDTO),
       onboardingSteps,
-      requirements: [], // Planned for second iteration
+      metadata,
       requests: [] // Planned for second iteration
     };
   }, FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA);
@@ -193,6 +198,21 @@ export async function updateProduct(id: string, token: string, orgId: string, dt
     token,
     orgId,
     body: JSON.stringify(dto),
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+/**
+ * Update product metadata (Core API)
+ */
+export async function updateProductMetadata(productId: string, token: string, orgId: string, customAttributes: Record<string, any>) {
+  return apiFetch(`/products/${productId}/metadata`, {
+    method: 'PUT',
+    microservice: 'core',
+    token,
+    orgId,
+    context: 'provider:productDetail:updateMetadata',
+    body: JSON.stringify({ custom_attributes: customAttributes }),
     headers: { 'Content-Type': 'application/json' }
   });
 }

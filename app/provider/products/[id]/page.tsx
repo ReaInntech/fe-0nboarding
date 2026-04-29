@@ -47,7 +47,7 @@ export default async function ProviderProductDetailPage({ params }: Props) {
         // Extract data safely
         const product = apiData?.product;
         const onboardingSteps = apiData?.onboardingSteps;
-        const requirements = apiData?.requirements;
+        const metadata = apiData?.metadata;
         const requests = apiData?.requests;
 
         if (!product) {
@@ -58,7 +58,7 @@ export default async function ProviderProductDetailPage({ params }: Props) {
             <ProviderProductView 
                 product={product}
                 onboardingSteps={onboardingSteps}
-                requirements={requirements}
+                metadata={metadata}
                 requests={requests}
             />
         );
@@ -78,7 +78,7 @@ export default async function ProviderProductDetailPage({ params }: Props) {
             <ProviderProductView 
                 product={FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA.product}
                 onboardingSteps={FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA.onboardingSteps}
-                requirements={FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA.requirements}
+                metadata={{}}
                 requests={FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA.requests}
             />
         );

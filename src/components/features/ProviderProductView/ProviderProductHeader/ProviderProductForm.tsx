@@ -78,7 +78,13 @@ export default function ProviderProductForm({
     const setField = (key: keyof ProductFormData, val: string) => setForm(f => ({ ...f, [key]: val }));
 
     const handleSave = () => {
-        onSave(form);
+        // Convert formatted price back to number before saving
+        const dataToSave = { ...form };
+        if (typeof dataToSave.price === 'string') {
+            const numericPrice = parseFloat(dataToSave.price.replace(/,/g, ''));
+            dataToSave.price = isNaN(numericPrice) ? 0 : numericPrice;
+        }
+        onSave(dataToSave);
     };
 
     const iconOptions = ICONS.map(i => ({ value: i, label: i }));
@@ -99,7 +105,7 @@ export default function ProviderProductForm({
                     <Input
                         label="Price"
                         prefix="$"
-                        type="number"
+                        type="currency"
                         value={form.price}
                         onChange={e => setField('price', e.target.value)}
                         placeholder="0.00"

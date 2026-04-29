@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Icon from '../../../shared/atoms/Icon';
 import Badge from '../../../shared/atoms/Badge';
 import ProviderProductForm from './ProviderProductForm';
@@ -10,11 +10,14 @@ export interface ProviderProductHeaderProps {
     icon: string;
     iconColor: string;
     title: string;
+    description?: string;
+    price?: number | string;
+    billing?: string;
+    status?: string;
     badgeText: string;
     badgeVariant?: 'default' | 'success' | 'warning' | 'primary' | 'info' | 'error' | 'neutral';
     productId: string;
-    clientName: string;
-    clientId: string;
+    sold?: number;
     onSaveProduct?: (data: any) => Promise<void>;
 }
 
@@ -22,11 +25,14 @@ export default function ProviderProductHeader({
     icon,
     iconColor,
     title,
+    description = '',
+    price = '',
+    billing = 'monthly',
+    status = 'inactive',
     badgeText,
     badgeVariant = 'info',
     productId,
-    clientName,
-    clientId,
+    sold = 0,
     onSaveProduct,
 }: ProviderProductHeaderProps) {
     const [isEditing, setIsEditing] = useState(false);
@@ -35,11 +41,25 @@ export default function ProviderProductHeader({
         name: title,
         icon: icon,
         color: iconColor,
-        price: '',
-        billing: 'monthly',
-        status: 'inactive',
-        description: '',
+        price: price,
+        billing: billing,
+        status: status,
+        description: description,
     });
+
+    useEffect(() => {
+        if (!isEditing) {
+            setSaved({
+                name: title,
+                icon: icon,
+                color: iconColor,
+                price: price,
+                billing: billing,
+                status: status,
+                description: description,
+            });
+        }
+    }, [title, icon, iconColor, price, billing, status, description]);
 
     const handleSave = async (newData: any) => {
         setIsSaving(true);
@@ -80,9 +100,18 @@ export default function ProviderProductHeader({
                             <p className={styles['provider-header__id']}>
                                 Product ID: <span>{productId}</span>
                             </p>
-                            <p className={styles['provider-header__client']}>
-                                <Icon name="domain" className="text-xs" /> {clientName}
-                                <span>({clientId})</span>
+                            <p className="flex items-center gap-1.5 text-slate-400 text-sm">
+                                <Icon name="payments" className="text-xs" /> 
+                                <span>${Number(saved.price || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                                <span className="text-xs opacity-70">/{saved.billing}</span>
+                            </p>
+                            <p className="flex items-center gap-1.5 text-slate-400 text-sm">
+                                <Icon name="shopping_cart" className="text-xs" /> 
+                                <span>{sold} ventas</span>
+                            </p>
+                            <p className="flex items-center gap-1.5 text-emerald-400 font-medium text-sm">
+                                <Icon name="account_balance_wallet" className="text-xs" /> 
+                                <span>${(sold * Number(saved.price || 0)).toLocaleString('en-US', { minimumFractionDigits: 2 })} recaudo</span>
                             </p>
                         </div>
                     </div>

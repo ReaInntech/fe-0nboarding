@@ -59,6 +59,7 @@ interface ProviderProductFormProps {
     submitLabel?: string;
     cancelLabel?: string;
     showFooter?: boolean;
+    isSuccess?: boolean;
 }
 
 export default function ProviderProductForm({
@@ -69,6 +70,7 @@ export default function ProviderProductForm({
     submitLabel = 'Save Changes',
     cancelLabel = 'Cancel',
     showFooter = true,
+    isSuccess = false,
 }: ProviderProductFormProps) {
     const [form, setForm] = useState<ProductFormData>({ 
         ...initialData,
@@ -181,8 +183,17 @@ export default function ProviderProductForm({
                     <Button variant="ghost" onClick={onCancel} className="text-slate-400 hover:text-white" disabled={isSubmitting}>
                         {cancelLabel}
                     </Button>
-                    <Button variant="primary" onClick={handleSave} className={styles['provider-header__save-btn']} disabled={isSubmitting}>
-                        <Icon name="save" className="mr-2 text-sm" /> {submitLabel}
+                    <Button 
+                        variant="primary" 
+                        onClick={handleSave} 
+                        className={`${styles['provider-header__save-btn']} ${isSuccess ? '!bg-emerald-500 !hover:bg-emerald-600 !border-emerald-500 !text-white' : ''}`} 
+                        disabled={isSubmitting || isSuccess}
+                    >
+                        {isSuccess ? (
+                            <><Icon name="check_circle" className="mr-2 text-sm" /> ¡Guardado!</>
+                        ) : (
+                            <><Icon name="save" className="mr-2 text-sm" /> {submitLabel}</>
+                        )}
                     </Button>
                 </div>
             )}

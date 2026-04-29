@@ -24,9 +24,9 @@ const ProviderProducts: React.FC<ProviderProductsProps> = ({ initialProducts, us
     const [searchTerm, setSearchTerm] = useState('');
     const [filterCategory, setFilterCategory] = useState('All');
 
-    // Modal State
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
 
     const categories = ['All', ...Array.from(new Set(products.map(p => p.category)))];
 
@@ -80,8 +80,11 @@ const ProviderProducts: React.FC<ProviderProductsProps> = ({ initialProducts, us
             };
 
             setProducts([newProduct, ...products]);
-            setIsCreateModalOpen(false);
-            alert('Product created successfully!');
+            setIsSuccess(true);
+            setTimeout(() => {
+                setIsCreateModalOpen(false);
+                setIsSuccess(false);
+            }, 2000);
         } catch (error: any) {
             console.error('Error creating product:', error);
             alert(`Failed to create product: ${error.message}`);
@@ -101,7 +104,10 @@ const ProviderProducts: React.FC<ProviderProductsProps> = ({ initialProducts, us
                     centered={true}
                     actions={
                         <button
-                            onClick={() => setIsCreateModalOpen(true)}
+                            onClick={() => {
+                                setIsCreateModalOpen(true);
+                                setIsSuccess(false);
+                            }}
                             className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-2xl shadow-blue-500/20 flex items-center gap-2.5 border-none cursor-pointer"
                         >
                             <Icon name="add" className="text-xl" />
@@ -187,6 +193,7 @@ const ProviderProducts: React.FC<ProviderProductsProps> = ({ initialProducts, us
                     onSave={handleCreateProduct}
                     onCancel={() => setIsCreateModalOpen(false)}
                     isSubmitting={isSubmitting}
+                    isSuccess={isSuccess}
                     submitLabel="Guardar"
                     cancelLabel="Cerrar"
                 />

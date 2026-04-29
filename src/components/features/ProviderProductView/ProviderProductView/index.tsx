@@ -8,21 +8,13 @@ import ProviderProductHeader from '../ProviderProductHeader';
 import ProviderOnboardingManager from '../ProviderOnboardingManager';
 import ProviderRequestsManager from '../ProviderRequestsManager';
 import ProviderDetailsProduct from '../ProviderDetailsProduct';
-import { OnboardingStep, ClientRequest, OnboardingRequest, UserProfile } from '@/src/lib/api/types';
+import { OnboardingStep, ClientRequest, OnboardingRequest, UserProfile, Product } from '@/src/lib/api/types';
 import * as api from '@/src/lib/api/provider';
 import { auth } from '@/src/lib/firebase/config';
 import styles from './index.module.scss';
 
-export interface ProductData {
-    name: string;
-    productCode: string;
-    icon: string;
-    iconColor: string;
-    status: 'active' | 'pending' | string;
-}
-
 export interface ProviderProductViewProps {
-    product: ProductData;
+    product: Product;
     onboardingSteps: OnboardingStep[];
     metadata?: Record<string, any>;
     requests: ClientRequest[];
@@ -131,13 +123,16 @@ export default function ProviderProductView({
                 <div className={styles['provider-view__header-section']}>
                     <ProviderProductHeader
                         title={product?.name}
+                        description={product?.description}
+                        price={product?.price}
+                        billing={product?.period}
+                        status={product?.status}
                         productId={product?.productCode}
                         icon={product?.icon}
                         iconColor={product?.iconColor}
                         badgeText={product?.status === 'active' ? 'Fully Provisioned' : 'Setup in Progress'}
                         badgeVariant={product?.status === 'active' ? 'success' : 'warning'}
-                        clientName="Example Client Corp"
-                        clientId="CL-9482"
+                        sold={product?.sold || 0}
                         onSaveProduct={handleSaveProductHeader}
                     />
                 </div>

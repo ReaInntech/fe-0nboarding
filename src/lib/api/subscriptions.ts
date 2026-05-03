@@ -1,7 +1,30 @@
 import { apiFetch, executeWithFallback } from './config';
 import { Subscription, SubscriptionDTO } from './types';
 import { FALLBACK_SUBSCRIPTION_DETAIL_DATA } from './mocks';
-import { UnifiedProductViewProps } from '../components/features/UnifiedProductView/UnifiedProductView';
+import { UnifiedProductViewProps } from '@/src/components/features/UnifiedProductView/UnifiedProductView';
+
+/**
+ * Helper to map product metadata and its overrides to UI fields.
+ */
+export function mapProductMetadataToFields(overrides: Record<string, any>, productMetadata?: any): any[] {
+    const customAttrs = productMetadata?.custom_attributes || {};
+    const overrideValues = overrides || {};
+
+    return Object.entries(customAttrs).map(([key, config]: [string, any]) => {
+        // Label priority: Config label > Formatted key
+        const label = config?.label || key.split('_').map((s: string) => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
+
+        // Value priority: Subscription Override > Product Default Value > N/A
+        const rawValue = overrideValues[key] !== undefined ? overrideValues[key] : config?.value;
+        const value = rawValue !== null && rawValue !== undefined ? String(rawValue) : 'N/A';
+
+        return {
+            icon: config?.icon || 'label',
+            label: label,
+            value: value,
+        };
+    });
+}
 
 /**
  * Maps raw Subscription data from the backend to the props expected by UnifiedProductView.
@@ -39,12 +62,12 @@ export function mapSubscriptionToUnifiedView(sub: any): UnifiedProductViewProps 
                 { label: 'Support', icon: 'support_agent', variant: 'secondary' },
             ],
         },
-        showContractingProgress: !!sub.steps?.length,
+        showContractingProgress: !!(sub.contracting_steps || sub.steps)?.length,
         contractingProgressProps: {
             currentPhase: sub.progress_label || 'In Progress',
-            steps: (sub.steps || []).map((step: any) => ({
-                label: step.name || step.label,
-                status: step.status || 'pending',
+            steps: (sub.contracting_steps || sub.steps || []).map((step: any) => ({
+                label: step.label || step.name,
+                status: (step.is_current ? 'active' : step.status || 'pending') as 'completed' | 'active' | 'pending',
                 icon: step.icon || 'circle',
             })),
         },
@@ -58,6 +81,8 @@ export function mapSubscriptionToUnifiedView(sub: any): UnifiedProductViewProps 
                 { icon: 'info', label: 'Service Type', value: sub.product?.name || 'N/A' },
                 { icon: 'payments', label: 'Billing Model', value: sub.product?.billing_model || 'N/A' },
                 { icon: 'event', label: 'Next Renewal', value: sub.next_renewal ? new Date(sub.next_renewal).toLocaleDateString('en-US') : 'N/A' },
+                // Map product metadata using the helper
+                ...mapProductMetadataToFields(sub.product_metadata_override, sub.product?.metadata),
             ],
         },
         supportAccessProps: {

@@ -1,4 +1,5 @@
 import { Notification, Subscription, OnboardingStep, ClientRequest, RequirementField } from "./types";
+import { UnifiedProductViewProps } from "@/src/components/features/UnifiedProductView/UnifiedProductView";
 
 export const FALLBACK_DASHBOARD_DATA: { notifications: Notification[], subscriptions: Subscription[] } = {
     notifications: [
@@ -225,7 +226,7 @@ export const FALLBACK_PROVIDER_PRODUCTS_DATA = {
     ]
 };
 
-export const FALLBACK_SUBSCRIPTION_DETAIL_DATA = {
+export const FALLBACK_SUBSCRIPTION_DETAIL_DATA: UnifiedProductViewProps = {
     headerProps: {
         icon: 'lightbulb',
         iconColor: '#7ED957',

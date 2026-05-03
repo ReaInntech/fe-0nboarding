@@ -1,5 +1,6 @@
 import UnifiedBilling from '@/src/components/features/UnifiedBilling/UnifiedBilling';
 import { getBillingInit } from '@/src/lib/api/payments';
+import { getMockStrategy } from '@/src/lib/api/config';
 import { FALLBACK_BILLING_DATA } from '@/src/lib/api/mocks';
 import { Transaction, PaymentMethod } from '@/src/lib/api/types';
 import { getSessionUser } from '@/src/lib/firebase/auth-actions';
@@ -19,6 +20,8 @@ export default async function BillingPage() {
     // Use org_id from custom claims if available
     const orgId = sessionUser?.org_id;
 
+    const strategy = getMockStrategy();
+
     let transactions: Transaction[] = [];
     let methods: PaymentMethod[] = [];
 
@@ -28,12 +31,14 @@ export default async function BillingPage() {
             transactions = data.transactions;
             methods = data.methods;
         } catch (error) {
-            console.error('[BillingPage] API failed and no fallback allowed:', error);
+            console.error('[BillingPage] API failed:', error);
         }
     }
 
-    // Default to mock data if no token (preview mode)
-    if (!token && !transactions.length) {
+    // Default to mock data only if strategy allows
+    const hasNoData = !transactions.length && !methods.length;
+    if (hasNoData && (strategy === 'always' || (strategy === 'fallback' && (!token || process.env.NODE_ENV === 'development')))) {
+        console.log(`[BillingPage] Using fallback mock data (Strategy: ${strategy})`);
         transactions = FALLBACK_BILLING_DATA.transactions;
         methods = FALLBACK_BILLING_DATA.methods;
     }

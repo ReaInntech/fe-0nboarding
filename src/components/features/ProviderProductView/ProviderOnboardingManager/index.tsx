@@ -301,17 +301,25 @@ export default function ProviderOnboardingManager({
 
                                         <div className={styles['onboarding-manager__requests-grid']}>
                                             {step.requests?.map(req => {
+                                                const isStepLocal = step.id.startsWith('step_');
                                                 const sharedProps = {
                                                     id: req.id,
                                                     initialConfig: req.config,
                                                     onDelete: () => handleDeleteRequest(idx, req.id),
-                                                    onSave: (config: any) => handleSaveRequest(step.id, req.id, req.type, config)
+                                                    onSave: async (config: any) => {
+                                                        if (isStepLocal) {
+                                                            alert('You must save the step changes (Save Changes) before configuring its components.');
+                                                            return;
+                                                        }
+                                                        return handleSaveRequest(step.id, req.id, req.type, config);
+                                                    }
                                                 };
 
                                                 if (req.type === 'form') return (
                                                     <FormRequestCard
                                                         key={req.id}
                                                         title={req.title}
+                                                        disabled={isStepLocal}
                                                         {...sharedProps}
                                                     />
                                                 );
@@ -319,6 +327,7 @@ export default function ProviderOnboardingManager({
                                                     <TermsAndConditionsRequestCard
                                                         key={req.id}
                                                         title={req.title}
+                                                        disabled={isStepLocal}
                                                         {...sharedProps}
                                                     />
                                                 );
@@ -326,6 +335,7 @@ export default function ProviderOnboardingManager({
                                                     <DocumentRequestCard
                                                         key={req.id}
                                                         title={req.title}
+                                                        disabled={isStepLocal}
                                                         {...sharedProps}
                                                     />
                                                 );
@@ -334,6 +344,7 @@ export default function ProviderOnboardingManager({
                                                         key={req.id}
                                                         title={req.title}
                                                         productPrice={productPrice}
+                                                        disabled={isStepLocal}
                                                         {...sharedProps}
                                                     />
                                                 );
@@ -416,10 +427,10 @@ export default function ProviderOnboardingManager({
                     if (expandedIdx === idx) setExpandedIdx(null);
                     setDeleteTarget(null);
                 }}
-                title="Eliminar Step"
-                message={`¿Estás seguro de que deseas eliminar "${deleteTarget?.step.name || ''}"? Se eliminarán también todos sus componentes y requests asociados.`}
-                confirmLabel="Eliminar"
-                cancelLabel="Cancelar"
+                title="Delete Step"
+                message={`Are you sure you want to delete "${deleteTarget?.step.name || ''}"? All its components and associated requests will also be deleted.`}
+                confirmLabel="Delete"
+                cancelLabel="Cancel"
                 variant="danger"
                 icon="delete_forever"
             />

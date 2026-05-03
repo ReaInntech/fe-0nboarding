@@ -129,24 +129,22 @@ export interface NotificationDTO {
 
 export interface SubscriptionDTO {
   id: string;
-  name: string; // Added fields missing from mapping logic
   status: string;
-  tier_name: string;
-  icon_slug: string; // Added
-  current_milestone: string; // Added
-  progress_percentage: number; // Added
-  monthly_price: number;
+  price: number;
   progress_pct: number;
+  progress_label?: string;
+  progress_value?: string;
+  next_renewal?: string;
+  provisioned_at?: string;
+  created_at: string;
   product: {
+    id: string;
     name: string;
     icon: string;
     icon_color: string;
+    product_code: string;
+    billing_model: string;
   };
-  has_action_request?: boolean;
-  current_step?: number;
-  total_steps?: number;
-  progress_label?: string;
-  progress_value?: string;
 }
 
 export interface TransactionDTO {

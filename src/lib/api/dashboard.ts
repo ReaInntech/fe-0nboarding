@@ -20,15 +20,20 @@ export function mapNotification(dto: NotificationDTO): Notification {
 export function mapSubscription(dto: SubscriptionDTO): Subscription {
   return {
     id: dto.id,
-    name: dto.name,
-    tier: dto.tier_name,
-    icon: dto.icon_slug,
+    name: dto.product?.name || 'Service',
+    tier: dto.progress_label || 'Default Plan',
+    icon: dto.product?.icon || 'hub',
     status: dto.status as Subscription['status'],
-    progressLabel: "Current Stage",
-    progressValue: dto.current_milestone,
-    progressPct: dto.progress_percentage,
-    price: dto.monthly_price ? `$${(dto.monthly_price / 100).toFixed(2)}` : undefined,
+    progressLabel: dto.progress_label || "Current Stage",
+    progressValue: dto.progress_value || "Processing",
+    progressPct: dto.progress_pct || 0,
+    price: dto.price ? `$${dto.price}` : undefined,
     pricePeriod: "/mo",
+    product: {
+      name: dto.product?.name || '',
+      icon: dto.product?.icon || '',
+      iconColor: dto.product?.icon_color || '',
+    }
   };
 }
 

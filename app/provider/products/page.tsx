@@ -1,4 +1,5 @@
 import { getProviderProductsInit } from '@/src/lib/api/provider';
+import { getMockStrategy } from '@/src/lib/api/config';
 import { FALLBACK_PROVIDER_PRODUCTS_DATA } from '@/src/lib/api/mocks';
 import { getSessionUser } from '@/src/lib/firebase/auth-actions';
 import { cookies } from 'next/headers';
@@ -15,6 +16,7 @@ export default async function ProviderProductsPage() {
     const token = cookieStore.get('id_token')?.value;
     const sessionUser = await getSessionUser();
     const orgId = sessionUser?.org_id;
+    const strategy = getMockStrategy();
 
     let products = [];
 
@@ -23,12 +25,14 @@ export default async function ProviderProductsPage() {
             const data = await getProviderProductsInit(token, orgId);
             products = data.products;
         } catch (error) {
-            console.error('[ProviderProductsPage] API fetch failed and no fallback allowed:', error);
+            console.error('[ProviderProductsPage] API fetch failed:', error);
         }
     }
 
-    // Default to mock data if in preview/dev and no products
-    if (!token && !products.length) {
+    // Default to mock data only if strategy allows
+    const hasNoData = !products.length;
+    if (hasNoData && (strategy === 'always' || (strategy === 'fallback' && (!token || process.env.NODE_ENV === 'development')))) {
+        console.log(`[ProviderProductsPage] Using fallback mock data (Strategy: ${strategy})`);
         products = FALLBACK_PROVIDER_PRODUCTS_DATA.products;
     }
 

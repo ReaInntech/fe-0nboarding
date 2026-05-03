@@ -1,5 +1,6 @@
 import Dashboard from '@/src/components/features/Dashboard/Dashboard';
 import { getDashboardInit } from '@/src/lib/api/dashboard';
+import { getMockStrategy } from '@/src/lib/api/config';
 import { FALLBACK_DASHBOARD_DATA } from '@/src/lib/api/mocks';
 import { Notification, Subscription } from '@/src/lib/api/types';
 import { getSessionUser } from '@/src/lib/firebase/auth-actions';
@@ -22,19 +23,28 @@ export default async function DashboardPage() {
     let notifications: Notification[] = [];
     let subscriptions: Subscription[] = [];
 
+    console.log('[DashboardPage] Auth Check:', { hasToken: !!token, hasOrgId: !!orgId, userId: sessionUser?.uid });
+
     if (token && orgId) {
         try {
             const data = await getDashboardInit(token, orgId);
             notifications = data.notifications;
             subscriptions = data.subscriptions;
+            console.log(`[DashboardPage] Fetched ${subscriptions.length} subscriptions`);
         } catch (error) {
-            console.error('[DashboardPage] API failed and no fallback allowed:', error);
-            // In a real app, you might redirect to an error page or show a toast
+            console.error('[DashboardPage] API failed:', error);
         }
     }
 
-    // Default to empty arrays if data is missing
-    if (!notifications.length && !subscriptions.length && !token) {
+    // Use strategy-aware mock logic
+    const strategy = getMockStrategy();
+    const hasData = notifications.length > 0 || subscriptions.length > 0;
+    
+    // Only show mocks if:
+    // 1. Strategy is 'always'
+    // 2. Strategy is 'fallback' AND we have no data AND (we are in dev or have no token)
+    if (strategy === 'always' || (strategy === 'fallback' && !hasData && (process.env.NODE_ENV === 'development' || !token))) {
+        console.log(`[DashboardPage] Using fallback mock data (Strategy: ${strategy})`);
         notifications = FALLBACK_DASHBOARD_DATA.notifications;
         subscriptions = FALLBACK_DASHBOARD_DATA.subscriptions;
     }

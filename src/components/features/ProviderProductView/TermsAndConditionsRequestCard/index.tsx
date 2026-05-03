@@ -27,6 +27,7 @@ export interface TermsAndConditionsRequestCardProps {
     initialConfig?: TermsRequestConfig;
     onDelete?: () => void;
     onSave?: (config: TermsRequestConfig) => Promise<void>;
+    disabled?: boolean;
 }
 
 export default function TermsAndConditionsRequestCard({
@@ -35,7 +36,8 @@ export default function TermsAndConditionsRequestCard({
     description,
     initialConfig,
     onDelete,
-    onSave
+    onSave,
+    disabled = false
 }: TermsAndConditionsRequestCardProps) {
     const [config, setConfig] = useState<TermsRequestConfig>({
         documentTitle: initialConfig?.documentTitle || title || '',
@@ -111,7 +113,7 @@ export default function TermsAndConditionsRequestCard({
             await handleSave(newConfig);
         } catch (error) {
             console.error('Upload failed', error);
-            alert('Falló la subida del documento. Inténtalo más tarde.');
+            alert('Document upload failed. Please try again later.');
         } finally {
             if (fileInputRef.current) fileInputRef.current.value = '';
         }
@@ -145,7 +147,7 @@ export default function TermsAndConditionsRequestCard({
             }
         } catch (error: any) {
             console.error("Preview failed:", error);
-            alert(`Error al abrir el documento: ${error.message}`);
+            alert(`Error opening the document: ${error.message}`);
             setIsModalOpen(false);
         } finally {
             setIsLoadingPreview(false);
@@ -173,8 +175,8 @@ export default function TermsAndConditionsRequestCard({
                     <button 
                         type="button" 
                         onClick={handleSave}
-                        disabled={isSaving}
-                        className={`${isSaving ? 'opacity-50 cursor-not-allowed' : ''} ${showSuccess ? 'hidden' : ''}`}
+                        disabled={isSaving || disabled}
+                        className={`${isSaving || disabled ? 'opacity-50 cursor-not-allowed' : ''} ${showSuccess ? 'hidden' : ''}`}
                     >
                         {isSaving ? (
                             <div className="size-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
@@ -186,7 +188,8 @@ export default function TermsAndConditionsRequestCard({
                     <button
                         type="button"
                         onClick={onDelete}
-                        className={styles['delete-btn']}
+                        disabled={disabled}
+                        className={`${styles['delete-btn']} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                         <Icon name="delete" style={{ fontSize: 14 }} />
                     </button>
@@ -196,9 +199,9 @@ export default function TermsAndConditionsRequestCard({
             <div className={styles['terms-card__body']}>
                 {/* Document Upload */}
                 <div 
-                    className={`${styles['terms-card__upload-zone']} ${isUploading ? 'opacity-50 pointer-events-none' : ''} ${config.templateFile ? 'bg-emerald-500/5 border-emerald-500/20' : ''}`}
-                    onClick={() => !isUploading && !config.templateFile && fileInputRef.current?.click()}
-                    style={{ cursor: (!isUploading && !config.templateFile) ? 'pointer' : 'default' }}
+                    className={`${styles['terms-card__upload-zone']} ${isUploading || disabled ? 'opacity-50 pointer-events-none' : ''} ${config.templateFile ? 'bg-emerald-500/5 border-emerald-500/20' : ''}`}
+                    onClick={() => !isUploading && !disabled && !config.templateFile && fileInputRef.current?.click()}
+                    style={{ cursor: (!isUploading && !disabled && !config.templateFile) ? 'pointer' : 'default' }}
                 >
                     <input 
                         type="file" 
@@ -211,14 +214,14 @@ export default function TermsAndConditionsRequestCard({
                     {isUploading ? (
                         <>
                             <div className="size-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin mb-2 mx-auto" />
-                            <p className={styles['terms-card__upload-zone-text']}>Subiendo Documento...</p>
+                            <p className={styles['terms-card__upload-zone-text']}>Uploading Document...</p>
                         </>
                     ) : config.templateFile ? (
                         <>
                             <div className={`${styles['terms-card__upload-zone-icon']} text-emerald-400 bg-emerald-400/10`}>
                                 <Icon name="task" style={{ fontSize: 16 }} />
                             </div>
-                            <p className="text-emerald-400 text-sm font-semibold mt-2">Documento Subido (PDF)</p>
+                            <p className="text-emerald-400 text-sm font-semibold mt-2">Document Uploaded (PDF)</p>
                             
                             <div className="mt-3 flex gap-2 justify-center">
                                 <button 
@@ -226,7 +229,7 @@ export default function TermsAndConditionsRequestCard({
                                     className="text-xs font-semibold text-primary hover:underline px-3 py-1 flex items-center justify-center gap-1 bg-primary/10 rounded-full"
                                     onClick={(e) => { e.stopPropagation(); handleViewDocument(); }}
                                 >
-                                    <Icon name="visibility" style={{ fontSize: 12 }} /> Ver Documento
+                                    <Icon name="visibility" style={{ fontSize: 12 }} /> View Document
                                 </button>
                                 <button 
                                     type="button" 
@@ -237,7 +240,7 @@ export default function TermsAndConditionsRequestCard({
                                         await handleSave(newConfig);
                                     }}
                                 >
-                                    Reemplazar
+                                    Replace
                                 </button>
                             </div>
                         </>
@@ -258,9 +261,10 @@ export default function TermsAndConditionsRequestCard({
                     <input
                         type="text"
                         value={config.documentTitle}
+                        disabled={disabled}
                         onChange={(e) => handleChange('documentTitle', e.target.value)}
                         placeholder="e.g. Service Level Agreement"
-                        className={styles['terms-card__input']}
+                        className={`${styles['terms-card__input']} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                     />
                 </div>
 
@@ -282,10 +286,11 @@ export default function TermsAndConditionsRequestCard({
                         {/* Area */}
                         <textarea
                             value={config.content}
+                            disabled={disabled}
                             onChange={(e) => handleChange('content', e.target.value)}
                             placeholder="Type T&C body content here..."
                             rows={4}
-                            className={styles['terms-card__editor-textarea']}
+                            className={`${styles['terms-card__editor-textarea']} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                         />
                     </div>
                 </div>
@@ -296,7 +301,8 @@ export default function TermsAndConditionsRequestCard({
                     <button
                         type="button"
                         onClick={addCheckbox}
-                        className={styles['terms-card__add-cb-btn']}
+                        disabled={disabled}
+                        className={`${styles['terms-card__add-cb-btn']} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                         <Icon name="add_circle" style={{ fontSize: 12 }} /> Add checkbox
                     </button>
@@ -335,14 +341,14 @@ export default function TermsAndConditionsRequestCard({
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                title="Términos y Condiciones (PDF)"
+                title="Terms & Conditions (PDF)"
                 size="2xl"
             >
                 <div className="bg-surface rounded-xl overflow-hidden w-full h-[65vh] flex justify-center items-center">
                     {isLoadingPreview ? (
                         <div className="flex flex-col items-center text-slate-400">
                             <div className="size-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin mb-4" />
-                            <p className="text-sm">Abriendo documento seguro...</p>
+                            <p className="text-sm">Opening secure document...</p>
                         </div>
                     ) : previewUrl ? (
                         <iframe 
@@ -351,7 +357,7 @@ export default function TermsAndConditionsRequestCard({
                             title="PDF Preview"
                         />
                     ) : (
-                        <p className="text-rose-400">No se pudo cargar la vista previa del documento.</p>
+                        <p className="text-rose-400">The document preview could not be loaded.</p>
                     )}
                 </div>
             </Modal>

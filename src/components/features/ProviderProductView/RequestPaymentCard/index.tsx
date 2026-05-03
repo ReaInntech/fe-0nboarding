@@ -35,6 +35,7 @@ export interface RequestPaymentCardProps {
     productPrice?: number;
     onDelete?: () => void;
     onSave?: (config: RequestPaymentConfig) => Promise<void>;
+    disabled?: boolean;
 }
 
 export default function RequestPaymentCard({
@@ -44,7 +45,8 @@ export default function RequestPaymentCard({
     initialConfig,
     productPrice,
     onDelete,
-    onSave
+    onSave,
+    disabled = false
 }: RequestPaymentCardProps) {
     const [config, setConfig] = useState<RequestPaymentConfig>(initialConfig || {
         bank: '',
@@ -110,7 +112,7 @@ export default function RequestPaymentCard({
     };
 
     const handleSave = async (configToSave = config) => {
-        if (!onSave || !isFormValid) return;
+        if (!onSave || !isFormValid || disabled) return;
         setIsSaving(true);
         try {
             await onSave(configToSave);
@@ -143,7 +145,7 @@ export default function RequestPaymentCard({
             }
         } catch (error) {
             console.error('Upload failed', error);
-            alert('Falló la subida del documento. Inténtalo más tarde.');
+            alert('Document upload failed. Please try again later.');
         } finally {
             if (fileInputRef.current) fileInputRef.current.value = '';
         }
@@ -175,7 +177,7 @@ export default function RequestPaymentCard({
             }
         } catch (error: any) {
             console.error("Preview failed:", error);
-            alert(`Error al abrir el documento: ${error.message}`);
+            alert(`Error opening the document: ${error.message}`);
             setIsModalOpen(false);
         } finally {
             setIsLoadingPreview(false);
@@ -226,9 +228,9 @@ export default function RequestPaymentCard({
                     <button 
                         type="button" 
                         onClick={() => handleSave(config)}
-                        disabled={isSaving || !isFormValid}
-                        className={`${isSaving || !isFormValid ? 'opacity-50 cursor-not-allowed' : ''} ${showSuccess ? 'hidden' : ''} ${styles['save-btn']}`}
-                        title={!isFormValid ? "Fill required fields to save" : "Save changes"}
+                        disabled={isSaving || !isFormValid || disabled}
+                        className={`${(isSaving || !isFormValid || disabled) ? 'opacity-50 cursor-not-allowed' : ''} ${showSuccess ? 'hidden' : ''} ${styles['save-btn']}`}
+                        title={disabled ? "Save the step first to enable" : !isFormValid ? "Fill required fields to save" : "Save changes"}
                     >
                         {isSaving ? (
                             <div className="size-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
@@ -267,14 +269,14 @@ export default function RequestPaymentCard({
                     {isUploading ? (
                         <>
                             <div className="size-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin mb-2 mx-auto" />
-                            <p className={styles['payment-card__upload-zone-text']}>Subiendo Documento...</p>
+                            <p className={styles['payment-card__upload-zone-text']}>Uploading Document...</p>
                         </>
                     ) : config.certificateFile ? (
                         <>
                             <div className={`${styles['payment-card__upload-zone-icon']} text-emerald-400 bg-emerald-400/10`}>
                                 <Icon name="task" style={{ fontSize: 16 }} />
                             </div>
-                            <p className="text-emerald-400 text-sm font-semibold mt-2">Certificado Subido</p>
+                            <p className="text-emerald-400 text-sm font-semibold mt-2">Certificate Uploaded</p>
                             
                             <div className="mt-3 flex gap-2 justify-center">
                                 <button 
@@ -282,7 +284,7 @@ export default function RequestPaymentCard({
                                     className="text-xs font-semibold text-primary hover:underline px-3 py-1 flex items-center justify-center gap-1 bg-primary/10 rounded-full"
                                     onClick={(e) => { e.stopPropagation(); handleViewDocument(); }}
                                 >
-                                    <Icon name="visibility" style={{ fontSize: 12 }} /> Ver Certificado
+                                    <Icon name="visibility" style={{ fontSize: 12 }} /> View Certificate
                                 </button>
                                 <button 
                                     type="button" 
@@ -294,7 +296,7 @@ export default function RequestPaymentCard({
                                         await handleSave(newConfig);
                                     }}
                                 >
-                                    Reemplazar
+                                    Replace
                                 </button>
                             </div>
                         </>
@@ -481,14 +483,14 @@ export default function RequestPaymentCard({
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                title="Visualización de Certificado"
+                title="Certificate Viewer"
                 size="2xl"
             >
                 <div className="bg-surface rounded-xl overflow-hidden w-full h-[65vh] flex justify-center items-center">
                     {isLoadingPreview ? (
                         <div className="flex flex-col items-center text-slate-400">
                             <div className="size-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin mb-4" />
-                            <p className="text-sm">Abriendo documento seguro...</p>
+                            <p className="text-sm">Opening secure document...</p>
                         </div>
                     ) : previewUrl ? (
                         <iframe 
@@ -497,7 +499,7 @@ export default function RequestPaymentCard({
                             title="Certificate Preview"
                         />
                     ) : (
-                        <p className="text-rose-400">No se pudo cargar la vista previa del documento.</p>
+                        <p className="text-rose-400">The document preview could not be loaded.</p>
                     )}
                 </div>
             </Modal>

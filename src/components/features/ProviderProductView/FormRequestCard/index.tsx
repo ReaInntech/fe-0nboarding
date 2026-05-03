@@ -24,6 +24,7 @@ export interface FormRequestCardProps {
     initialConfig?: FormRequestConfig;
     onDelete?: () => void;
     onSave?: (config: FormRequestConfig) => Promise<void>;
+    disabled?: boolean;
 }
 
 const FIELD_TYPES = ['string', 'number', 'email', 'tel', 'textarea'];
@@ -34,7 +35,8 @@ export default function FormRequestCard({
     description,
     initialConfig,
     onDelete,
-    onSave
+    onSave,
+    disabled = false
 }: FormRequestCardProps) {
     const [config, setConfig] = useState<FormRequestConfig>(initialConfig || {
         formTitle: title || '',
@@ -100,8 +102,8 @@ export default function FormRequestCard({
                     <button 
                         type="button" 
                         onClick={handleSave}
-                        disabled={isSaving}
-                        className={`${isSaving ? 'opacity-50 cursor-not-allowed' : ''} ${showSuccess ? 'hidden' : ''}`}
+                        disabled={isSaving || disabled}
+                        className={`${isSaving || disabled ? 'opacity-50 cursor-not-allowed' : ''} ${showSuccess ? 'hidden' : ''}`}
                     >
                         {isSaving ? (
                             <div className="size-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
@@ -113,7 +115,8 @@ export default function FormRequestCard({
                     <button
                         type="button"
                         onClick={onDelete}
-                        className={styles['delete-btn']}
+                        disabled={disabled}
+                        className={`${styles['delete-btn']} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                         <Icon name="delete" style={{ fontSize: 14 }} />
                     </button>
@@ -127,19 +130,21 @@ export default function FormRequestCard({
                     <input
                         type="text"
                         value={config.formTitle}
+                        disabled={disabled}
                         onChange={(e) => handleChange('formTitle', e.target.value)}
                         placeholder="e.g. Technical Requirements Survey"
-                        className={styles['form-card__input']}
+                        className={`${styles['form-card__input']} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                     />
                 </div>
                 <div className={styles['form-card__field-group']}>
                     <label className={styles['form-card__label']}>Instructions</label>
                     <textarea
                         value={config.instructions}
+                        disabled={disabled}
                         onChange={(e) => handleChange('instructions', e.target.value)}
                         placeholder="Briefly explain what information we are gathering..."
                         rows={2}
-                        className={styles['form-card__textarea']}
+                        className={`${styles['form-card__textarea']} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                     />
                 </div>
 
@@ -149,7 +154,8 @@ export default function FormRequestCard({
                     <button
                         type="button"
                         onClick={addField}
-                        className={styles['form-card__add-btn']}
+                        disabled={disabled}
+                        className={`${styles['form-card__add-btn']} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                         <Icon name="add_circle" style={{ fontSize: 12 }} /> Add Field
                     </button>

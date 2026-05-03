@@ -224,3 +224,114 @@ export const FALLBACK_PROVIDER_PRODUCTS_DATA = {
         }
     ]
 };
+
+export const FALLBACK_SUBSCRIPTION_DETAIL_DATA = {
+    headerProps: {
+        icon: 'lightbulb',
+        iconColor: '#7ED957',
+        title: 'Consultoría en Innovación',
+        badgeText: 'En Diagnóstico',
+        badgeVariant: 'info',
+        productId: 'RI-CONS-2024-001',
+        meta: [
+            { icon: 'calendar_today', text: 'Iniciado Mar 15, 2026' },
+            { icon: 'business', text: 'Real Innovation Tech' },
+            { icon: 'location_on', text: 'Remoto / Híbrido' },
+        ],
+        actions: [
+            { label: 'Agendar Sesión', icon: 'event', variant: 'primary' },
+            { label: 'Contactar Consultor', icon: 'chat', variant: 'secondary' }
+        ],
+    },
+    showContractingProgress: true,
+    contractingProgressProps: {
+        currentPhase: 'Diagnóstico',
+        steps: [
+            { label: 'Discovery', status: 'completed', icon: 'search' },
+            { label: 'Diagnóstico', status: 'active', icon: 'monitor_heart' },
+            { label: 'Prototipado', status: 'pending', icon: 'design_services' },
+            { label: 'Desarrollo', status: 'pending', icon: 'developer_mode' },
+            { label: 'Impacto', status: 'pending', icon: 'trending_up' },
+        ]
+    },
+    serviceDetailsProps: {
+        title: 'Detalles de la Consultoría',
+        titleIcon: 'psychology',
+        titleIconColor: '#7ED957',
+        totalAmount: 10000000,
+        paidAmount: 4300000,
+        fields: [
+            { icon: 'info', label: 'Tipo de Servicio', value: 'Consultoría en Innovación' },
+            { icon: 'groups', label: 'Consultor', value: 'Daniel Bernal' },
+            { icon: 'speed', label: 'Enfoque', value: 'Optimización de Procesos y Automatización' },
+            { icon: 'account_balance_wallet', label: 'Pago mensual', value: '$1.000.000' },
+        ],
+    },
+    supportAccessProps: {
+        title: 'Soporte Real Innovation',
+        subtitle: 'Lunes a Viernes: 8:00 AM – 6:00 PM',
+        buttonLabel: 'Contactar Soporte',
+        icon: 'support_agent',
+        accentColor: '#7ED957',
+    },
+    legalDocumentsProps: {
+        showModificationLink: true,
+        documents: [
+            {
+                icon: 'gavel',
+                name: 'Acuerdo de Confidencialidad (NDA)',
+                description: 'Protección de propiedad intelectual y datos sensibles compartidos durante la consultoría.',
+                createdAt: 'Mar 10, 2026',
+                approvedAt: 'Mar 10, 2026',
+                step: 'Discovery',
+                format: 'PDF',
+            },
+            {
+                icon: 'description',
+                name: 'Contrato de Consultoría Estratégica',
+                description: 'Definición de alcances, entregables y cronograma de la implementación de IA.',
+                createdAt: 'Mar 12, 2026',
+                approvedAt: 'Pendiente',
+                step: 'Contratación',
+                format: 'DOCX',
+            }
+        ]
+    },
+    showRequests: true,
+    requestsProps: {
+        requests: [
+            {
+                type: 'terms',
+                documentTitle: 'Términos y Condiciones',
+                content: 'He leído y acepto los términos y condiciones del servicio de consultoría...',
+                status: 'pending',
+                checkboxes: [{ id: '1', text: 'He leído y acepto los términos y condiciones del servicio de consultoría.' }]
+            }
+        ]
+    },
+    showPaymentHistory: true,
+    paymentHistoryProps: {
+        title: 'Historial de Pagos',
+        showDownloadAll: true,
+        payments: [
+            {
+                date: 'Mar 15, 2025',
+                description: 'Anticipo - Consultoría en Innovación Potenciada con IA',
+                amount: '$2,500.00',
+                status: 'Paid',
+            },
+            {
+                date: 'Mar 28, 2025',
+                description: 'Hito 1 - Diagnóstico y Roadmap Estratégico',
+                amount: '$1,800.00',
+                status: 'Paid',
+            },
+            {
+                date: 'Abr 05, 2025',
+                description: 'Suscripción Mensual - Acompañamiento IA',
+                amount: '$450.00',
+                status: 'Paid',
+            }
+        ]
+    },
+};

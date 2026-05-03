@@ -71,17 +71,17 @@ export default function LegalDocuments({
                                 <div className={styles['legal-documents__meta']}>
                                     <div className={styles['legal-documents__meta-item']}>
                                         <Icon name="add_circle_outline" className="text-[10px]" />
-                                        <span>Creado: {doc.createdAt || 'N/A'}</span>
+                                        <span>Created: {doc.createdAt || 'N/A'}</span>
                                     </div>
                                     <div className={`${styles['legal-documents__meta-item']} ${styles['legal-documents__meta-item--approved']}`}>
                                         <Icon name="verified" className="text-[10px]" />
-                                        <span>Aprobado: {doc.approvedAt || 'Pendiente'}</span>
+                                        <span>Approved: {doc.approvedAt || 'Pending'}</span>
                                     </div>
                                 </div>
                                 <Button
                                     variant="ghost"
                                     className={styles['legal-documents__action']}
-                                    title="Ver documento"
+                                    title="View document"
                                 >
                                     <Icon name="visibility" className="text-xl" />
                                 </Button>

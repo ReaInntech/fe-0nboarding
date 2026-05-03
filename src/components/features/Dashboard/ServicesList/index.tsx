@@ -91,7 +91,7 @@ export default function ServicesList({ subscriptions, className }: ServicesListP
                                         {sub.price}<span className={styles['services-list__cost-period']}>{sub.pricePeriod}</span>
                                     </span>
                                 </div>
-                                <a href={`/dashboard/${sub.id}`} className={styles['services-list__manage-btn']}>
+                                <a href={`/subscriptions/${sub.id}`} className={styles['services-list__manage-btn']}>
                                     Manage <Icon name="chevron_right" className={styles['services-list__manage-icon']} />
                                 </a>
                             </div>

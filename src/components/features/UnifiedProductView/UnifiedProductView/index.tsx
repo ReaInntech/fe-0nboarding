@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import TopNavigation from '../../../shared/molecule/TopNavigation';
 import Footer from '../../../shared/molecule/Footer';

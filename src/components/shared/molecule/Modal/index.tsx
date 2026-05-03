@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect } from 'react';
 import Icon from '../../atoms/Icon';
 import styles from './index.module.scss';

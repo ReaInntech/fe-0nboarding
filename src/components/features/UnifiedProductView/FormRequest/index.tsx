@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import Icon from '../../../shared/atoms/Icon';
 import Button from '../../../shared/atoms/Button';

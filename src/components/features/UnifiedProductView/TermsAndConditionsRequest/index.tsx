@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import Icon from '../../../shared/atoms/Icon';
 import Button from '../../../shared/atoms/Button';
@@ -195,14 +197,14 @@ export default function TermsAndConditionsRequest({
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                title={documentTitle || "Términos y Condiciones (PDF)"}
+                title={documentTitle || "Terms & Conditions (PDF)"}
                 size="lg"
             >
                 <div className="bg-surface rounded-xl overflow-hidden w-full h-[65vh] flex justify-center items-center">
                     {isLoadingPreview ? (
                         <div className="flex flex-col items-center text-slate-400">
                             <div className="size-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin mb-4" />
-                            <p className="text-sm">Abriendo documento seguro...</p>
+                            <p className="text-sm">Opening secure document...</p>
                         </div>
                     ) : previewUrl ? (
                         <iframe 
@@ -211,7 +213,7 @@ export default function TermsAndConditionsRequest({
                             title="PDF Preview"
                         />
                     ) : (
-                        <p className="text-rose-400">No se pudo cargar la vista previa del documento.</p>
+                        <p className="text-rose-400">Could not load document preview.</p>
                     )}
                 </div>
             </Modal>

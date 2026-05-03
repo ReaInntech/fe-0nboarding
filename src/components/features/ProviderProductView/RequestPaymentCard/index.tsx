@@ -32,6 +32,7 @@ export interface RequestPaymentCardProps {
     title: string;
     description?: string;
     initialConfig?: RequestPaymentConfig;
+    productPrice?: number;
     onDelete?: () => void;
     onSave?: (config: RequestPaymentConfig) => Promise<void>;
 }
@@ -41,6 +42,7 @@ export default function RequestPaymentCard({
     title,
     description,
     initialConfig,
+    productPrice,
     onDelete,
     onSave
 }: RequestPaymentCardProps) {
@@ -87,11 +89,22 @@ export default function RequestPaymentCard({
         config.accountNumber.trim() !== '' &&
         config.amount > 0;
 
+    React.useEffect(() => {
+        if (config.useProductValue && productPrice !== undefined && config.amount !== productPrice) {
+            setConfig(prev => ({ ...prev, amount: productPrice }));
+        }
+    }, [config.useProductValue, productPrice]);
+
     const handleChange = (field: keyof RequestPaymentConfig, value: any) => {
         setConfig(prev => {
             const newConfig = { ...prev, [field]: value };
             if (field === 'isItemized' && value === true) newConfig.useProductValue = false;
-            if (field === 'useProductValue' && value === true) newConfig.isItemized = false;
+            if (field === 'useProductValue' && value === true) {
+                newConfig.isItemized = false;
+                if (productPrice !== undefined) {
+                    newConfig.amount = productPrice;
+                }
+            }
             return newConfig;
         });
     };

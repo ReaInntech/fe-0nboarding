@@ -26,7 +26,7 @@ export class ProxyManager {
 
     // 2. Build target URL
     const targetBaseUrl = this.getTargetBaseUrl(microservice);
-    const targetUrl = `${targetBaseUrl}/${path}`;
+    const targetUrl = `${targetBaseUrl}/${path}${request.nextUrl.search || ''}`;
 
     // 3. Authorization Hook
     if (strategy.authorize) {

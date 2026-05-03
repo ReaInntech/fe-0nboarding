@@ -304,6 +304,18 @@ export async function reorderProductSteps(productId: string, token: string, orgI
 }
 
 /**
+ * Delete a contracting step from a product (Core API)
+ */
+export async function deleteProductStep(productId: string, stepId: string, token: string, orgId: string) {
+  return apiFetch(`/products/${productId}/steps/${stepId}`, {
+    method: 'DELETE',
+    microservice: 'core',
+    token,
+    orgId,
+  });
+}
+
+/**
  * BFF Aggregator for Provider Dashboard Initial State
  */
 export async function getProviderDashboardInit(token: string, orgId: string) {
@@ -335,4 +347,52 @@ export async function getProviderFinanceInit(token: string, orgId: string) {
       revenueHistory,
     };
   }, FALLBACK_PROVIDER_FINANCE_DATA);
+}
+
+/**
+ * Check if an email exists
+ */
+export async function checkEmail(email: string, token: string, orgId: string) {
+  return apiFetch(`/users/check-email?email=${encodeURIComponent(email)}`, {
+    microservice: 'core',
+    token,
+    orgId
+  });
+}
+
+/**
+ * Create Subscription for a Client
+ */
+export async function createSubscription(token: string, orgId: string, data: any) {
+  return apiFetch(`/subscriptions`, {
+    method: 'POST',
+    microservice: 'core',
+    token,
+    orgId,
+    body: JSON.stringify(data),
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+/**
+ * Create a new client Organization (when email not found in platform)
+ */
+export async function createClientOrganization(token: string, orgId: string, data: {
+  legal_name: string;
+  email: string;
+  client_type?: string;
+}) {
+  return apiFetch(`/organizations`, {
+    method: 'POST',
+    microservice: 'core',
+    token,
+    orgId,
+    body: JSON.stringify({
+      client_type: data.client_type || 'legal_entity',
+      dominio: data.email.split('@')[1] || 'unknown',
+      legal_name: data.legal_name,
+      email: data.email,
+    }),
+    headers: { 'Content-Type': 'application/json' }
+  });
 }

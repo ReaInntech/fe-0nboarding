@@ -142,6 +142,10 @@
         @apply flex items-center justify-end gap-3 mt-8 pt-6 border-t border-slate-800/50;
     }
 
+    &__delete-btn {
+        @apply text-red-400/70 hover:text-red-300 hover:bg-red-500/10;
+    }
+
     &__save-btn {
         @apply bg-[#1978e5] hover:bg-[#1978e5]/90 text-white shadow-lg shadow-[#1978e5]/20 flex items-center;
     }

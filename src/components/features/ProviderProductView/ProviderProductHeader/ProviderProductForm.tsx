@@ -67,12 +67,12 @@ export default function ProviderProductForm({
     onSave,
     onCancel,
     isSubmitting = false,
-    submitLabel = 'Save Changes',
+    submitLabel = 'Save',
     cancelLabel = 'Cancel',
     showFooter = true,
     isSuccess = false,
 }: ProviderProductFormProps) {
-    const [form, setForm] = useState<ProductFormData>({ 
+    const [form, setForm] = useState<ProductFormData>({
         ...initialData,
         status: initialData.status || 'inactive'
     });
@@ -183,10 +183,10 @@ export default function ProviderProductForm({
                     <Button variant="ghost" onClick={onCancel} className="text-slate-400 hover:text-white" disabled={isSubmitting}>
                         {cancelLabel}
                     </Button>
-                    <Button 
-                        variant="primary" 
-                        onClick={handleSave} 
-                        className={`${styles['provider-header__save-btn']} ${isSuccess ? '!bg-emerald-500 !hover:bg-emerald-600 !border-emerald-500 !text-white' : ''}`} 
+                    <Button
+                        variant="primary"
+                        onClick={handleSave}
+                        className={`${styles['provider-header__save-btn']} ${isSuccess ? '!bg-emerald-500 !hover:bg-emerald-600 !border-emerald-500 !text-white' : ''}`}
                         disabled={isSubmitting || isSuccess}
                     >
                         {isSuccess ? (

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Icon from '../../../shared/atoms/Icon';
 import Card from '../../../shared/atoms/Card';
 import Button from '../../../shared/atoms/Button';
+import ConfirmDialog from '../../../shared/molecule/ConfirmDialog';
 import RequestPaymentCard from '../RequestPaymentCard';
 import DocumentRequestCard from '../DocumentRequestCard';
 import TermsAndConditionsRequestCard from '../TermsAndConditionsRequestCard';
@@ -28,29 +29,35 @@ const STEP_TYPES = [
 
 export interface ProviderOnboardingManagerProps {
     initialSteps: OnboardingStep[];
+    productPrice?: number;
     onSaveStepMetadata?: (stepId: string, data: Partial<OnboardingStep>) => Promise<void>;
     onSaveRequest?: (stepId: string, requestId: string, type: OnboardingRequest['type'], config: Record<string, any>) => Promise<any>;
     onDeleteRequest?: (requestId: string) => Promise<void>;
+    onDeleteStep?: (stepId: string) => Promise<void>;
     onAddStep?: (data: Partial<OnboardingStep>) => Promise<void>;
     onCancel?: () => void;
 }
 
 export default function ProviderOnboardingManager({
     initialSteps,
+    productPrice,
     onSaveStepMetadata,
     onSaveRequest,
     onDeleteRequest,
+    onDeleteStep,
     onAddStep,
     onCancel,
 }: ProviderOnboardingManagerProps) {
     const [steps, setSteps] = useState<OnboardingStep[]>(initialSteps);
     const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
+    const [deleteTarget, setDeleteTarget] = useState<{ idx: number; step: OnboardingStep } | null>(null);
+    const [isDeletingStep, setIsDeletingStep] = useState(false);
     const [isSavingStep, setIsSavingStep] = useState<string | null>(null);
 
     const handleSaveStep = async (idx: number) => {
         const step = steps[idx];
         if (!onSaveStepMetadata) return;
-        
+
         setIsSavingStep(step.id);
         try {
             await onSaveStepMetadata(step.id, {
@@ -109,7 +116,7 @@ export default function ProviderOnboardingManager({
     const handleSaveRequest = async (stepId: string, reqId: string, type: OnboardingRequest['type'], config: any) => {
         if (onSaveRequest) {
             const result: any = await onSaveRequest(stepId, reqId, type, config);
-            
+
             // If it was a new request, we MUST update the local ID with the real DB ID
             // otherwise subsequent deletes/updates will use the wrong ID
             if (reqId.startsWith('req_') && result?.id) {
@@ -122,12 +129,12 @@ export default function ProviderOnboardingManager({
                     const reqIdx = newRequests.findIndex(r => r.id === reqId);
                     if (reqIdx === -1) return prevSteps;
 
-                    newRequests[reqIdx] = { 
-                        ...newRequests[reqIdx], 
+                    newRequests[reqIdx] = {
+                        ...newRequests[reqIdx],
                         id: result.id,
                         config: config // Also sync latest config
                     };
-                    
+
                     newSteps[stepIdx] = { ...newSteps[stepIdx], requests: newRequests };
                     return newSteps;
                 });
@@ -154,9 +161,6 @@ export default function ProviderOnboardingManager({
                 <h3 className={styles['onboarding-manager__title']}>
                     <Icon name="rule" className="text-[#1978e5]" /> Onboarding Steps
                 </h3>
-                <Button variant="outline" size="sm" className="border-slate-700 text-xs text-slate-400">
-                    <Icon name="settings" className="mr-1 text-xs" /> Config
-                </Button>
             </div>
 
             <div className={styles['onboarding-manager__steps-list']}>
@@ -235,11 +239,10 @@ export default function ProviderOnboardingManager({
                                                         key={type.value}
                                                         type="button"
                                                         onClick={() => updateStep(idx, 'type', type.value)}
-                                                        className={`${styles['onboarding-manager__type-btn']} ${
-                                                            step.type === type.value
-                                                            ? `${type.bg} ${type.color} ${styles['onboarding-manager__type-btn--active']}`
-                                                            : styles['onboarding-manager__type-btn--idle']
-                                                        }`}
+                                                        className={`${styles['onboarding-manager__type-btn']} ${step.type === type.value
+                                                                ? `${type.bg} ${type.color} ${styles['onboarding-manager__type-btn--active']}`
+                                                                : styles['onboarding-manager__type-btn--idle']
+                                                            }`}
                                                     >
                                                         <Icon name={type.icon} style={{ fontSize: 14 }} />
                                                         {type.label}
@@ -250,19 +253,32 @@ export default function ProviderOnboardingManager({
                                     </div>
 
                                     <div className={styles['onboarding-manager__step-actions-bar']}>
-                                        <Button 
-                                            variant="ghost" 
-                                            size="sm" 
-                                            onClick={handleCancel} 
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setDeleteTarget({ idx, step });
+                                            }}
+                                            className={styles['onboarding-manager__delete-btn']}
+                                            disabled={!!isSavingStep}
+                                        >
+                                            <Icon name="delete" className="text-xs" /> Delete
+                                        </Button>
+                                        <div className="flex-1" />
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={handleCancel}
                                             className="text-slate-500 hover:text-white"
                                             disabled={!!isSavingStep}
                                         >
                                             Cancel
                                         </Button>
-                                        <Button 
-                                            variant="primary" 
-                                            size="sm" 
-                                            onClick={() => handleSaveStep(idx)} 
+                                        <Button
+                                            variant="primary"
+                                            size="sm"
+                                            onClick={() => handleSaveStep(idx)}
                                             className={styles['onboarding-manager__save-btn']}
                                             disabled={!!isSavingStep}
                                         >
@@ -317,6 +333,7 @@ export default function ProviderOnboardingManager({
                                                     <RequestPaymentCard
                                                         key={req.id}
                                                         title={req.title}
+                                                        productPrice={productPrice}
                                                         {...sharedProps}
                                                     />
                                                 );
@@ -382,6 +399,30 @@ export default function ProviderOnboardingManager({
                     <Icon name="add" className="mr-2" /> Add Step
                 </Button>
             </div>
+
+            <ConfirmDialog
+                isOpen={!!deleteTarget}
+                onClose={() => setDeleteTarget(null)}
+                onConfirm={async () => {
+                    if (!deleteTarget) return;
+                    const { idx, step } = deleteTarget;
+                    const isLocal = step.id.startsWith('step_');
+
+                    if (!isLocal && onDeleteStep) {
+                        await onDeleteStep(step.id);
+                    }
+
+                    setSteps(prev => prev.filter((_, i) => i !== idx));
+                    if (expandedIdx === idx) setExpandedIdx(null);
+                    setDeleteTarget(null);
+                }}
+                title="Eliminar Step"
+                message={`¿Estás seguro de que deseas eliminar "${deleteTarget?.step.name || ''}"? Se eliminarán también todos sus componentes y requests asociados.`}
+                confirmLabel="Eliminar"
+                cancelLabel="Cancelar"
+                variant="danger"
+                icon="delete_forever"
+            />
         </Card>
     );
 }

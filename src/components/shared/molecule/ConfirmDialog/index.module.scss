@@ -1,0 +1,47 @@
+@reference "tailwindcss";
+
+.confirm-dialog {
+    &__body {
+        @apply flex flex-col items-center text-center gap-4 py-4;
+    }
+
+    &__icon-circle {
+        @apply size-16 rounded-full flex items-center justify-center ring-4 ring-offset-0;
+        animation: iconPop 300ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    &__icon {
+        font-size: 28px !important;
+    }
+
+    &__message {
+        @apply text-sm text-slate-400 leading-relaxed max-w-xs;
+    }
+
+    &__error {
+        @apply flex items-center gap-2 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 w-full text-left;
+    }
+
+    &__footer {
+        @apply flex items-center justify-end gap-3 w-full;
+    }
+
+    &__cancel-btn {
+        @apply px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all disabled:opacity-50 cursor-pointer;
+    }
+
+    &__confirm-btn {
+        @apply px-4 py-2 rounded-lg text-sm font-bold text-white transition-all flex items-center gap-2 disabled:opacity-50 shadow-lg cursor-pointer;
+    }
+}
+
+@keyframes iconPop {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

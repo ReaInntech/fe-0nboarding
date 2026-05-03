@@ -48,7 +48,7 @@
     }
 
     &__actions {
-        @apply flex gap-3;
+        @apply flex flex-col items-end gap-3;
     }
 
     &__edit-btn {

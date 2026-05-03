@@ -116,6 +116,12 @@ export default function ProviderProductView({
         }
     };
 
+    const handleDeleteStep = async (stepId: string) => {
+        if (!product?.productCode) return;
+        const freshToken = await getFreshToken();
+        await api.deleteProductStep(product.productCode, stepId, freshToken, orgId);
+    };
+
     return (
         <div className={styles['provider-view']}>
             <ProviderTopNavigation activeTab="Products" userProfile={userProfile} />
@@ -128,12 +134,14 @@ export default function ProviderProductView({
                         billing={product?.period}
                         status={product?.status}
                         productId={product?.productCode}
+                        productUuid={product?.id}
                         icon={product?.icon}
                         iconColor={product?.iconColor}
                         badgeText={product?.status === 'active' ? 'Fully Provisioned' : 'Setup in Progress'}
                         badgeVariant={product?.status === 'active' ? 'success' : 'warning'}
                         sold={product?.sold || 0}
                         onSaveProduct={handleSaveProductHeader}
+                        productMetadata={metadata}
                     />
                 </div>
 
@@ -147,9 +155,11 @@ export default function ProviderProductView({
                 {/* Onboarding - full width */}
                 <ProviderOnboardingManager
                     initialSteps={onboardingSteps}
+                    productPrice={product?.price || 0}
                     onSaveStepMetadata={handleSaveStepMetadata}
                     onSaveRequest={handleSaveRequest}
                     onDeleteRequest={handleDeleteRequest}
+                    onDeleteStep={handleDeleteStep}
                     onCancel={() => {
                         console.log('[ProviderProductView] Cancelled onboarding changes');
                     }}

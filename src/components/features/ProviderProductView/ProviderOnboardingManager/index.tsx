@@ -9,7 +9,6 @@ import RequestPaymentCard from '../RequestPaymentCard';
 import DocumentRequestCard from '../DocumentRequestCard';
 import TermsAndConditionsRequestCard from '../TermsAndConditionsRequestCard';
 import FormRequestCard from '../FormRequestCard';
-import ComponentRenderCard from '../ComponentRenderCard';
 import { OnboardingStep, OnboardingRequest } from '@/src/lib/api/types';
 import Select from '../../../shared/atoms/Select';
 import Input from '../../../shared/atoms/Input';
@@ -94,8 +93,7 @@ export default function ProviderOnboardingManager({
             payment: 'Payment Request',
             document: 'Document Request',
             terms: 'Terms & Conditions',
-            form: 'Form Request',
-            component_render: 'Dynamic Component'
+            form: 'Form Request'
         };
         const newRequest: OnboardingRequest = {
             id: `req_${Date.now()}`,
@@ -341,22 +339,6 @@ export default function ProviderOnboardingManager({
                                                         {...sharedProps}
                                                     />
                                                 );
-                                                if (req.type === 'component_render') return (
-                                                    <ComponentRenderCard
-                                                        key={req.id}
-                                                        title={req.title}
-                                                        disabled={isStepLocal}
-                                                        {...sharedProps}
-                                                        onSave={async (config: any) => {
-                                                            // We need to special handle the structure for action_request
-                                                            const payload = {
-                                                                template_file: config.templateFile,
-                                                                config: config.props
-                                                            };
-                                                            return handleSaveRequest(step.id, req.id, req.type, payload);
-                                                        }}
-                                                    />
-                                                );
                                                 return (
                                                     <RequestPaymentCard
                                                         key={req.id}
@@ -411,18 +393,6 @@ export default function ProviderOnboardingManager({
                                                             <Icon name="assignment" style={{ fontSize: 16 }} />
                                                         </div>
                                                         <span className={styles['onboarding-manager__add-card-label']}>Form</span>
-                                                    </button>
-                                                </div>
-                                                <div className={styles['onboarding-manager__add-row']}>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => addRequest(idx, 'component_render')}
-                                                        className={`${styles['onboarding-manager__add-card']} ${styles['onboarding-manager__add-card--dynamic']}`}
-                                                    >
-                                                        <div className={styles['onboarding-manager__add-card-icon']}>
-                                                            <Icon name="extension" style={{ fontSize: 16 }} />
-                                                        </div>
-                                                        <span className={styles['onboarding-manager__add-card-label']}>Dynamic UI</span>
                                                     </button>
                                                 </div>
                                             </div>

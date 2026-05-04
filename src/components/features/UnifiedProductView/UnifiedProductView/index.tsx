@@ -13,15 +13,13 @@ import PaymentRequest, { PaymentRequestProps } from '../PaymentRequest';
 import DocumentRequest, { DocumentRequestProps } from '../DocumentRequest';
 import FormRequest, { FormRequestProps } from '../FormRequest';
 import TermsAndConditionsRequest, { TermsAndConditionsRequestProps } from '../TermsAndConditionsRequest';
-import DynamicComponent from '../DynamicComponent';
 import styles from './index.module.scss';
 
 export type RequestType =
     | ({ type: 'payment' } & PaymentRequestProps)
     | ({ type: 'document' } & DocumentRequestProps)
     | ({ type: 'form' } & FormRequestProps)
-    | ({ type: 'terms' } & TermsAndConditionsRequestProps)
-    | ({ type: 'component_render' } & any); // Generic for dynamic components
+    | ({ type: 'terms' } & TermsAndConditionsRequestProps);
 
 export interface UnifiedProductViewProps {
     headerProps: ProductHeaderProps;
@@ -93,8 +91,6 @@ export default function UnifiedProductView({
                                             return <FormRequest key={index} {...componentProps} />;
                                         case 'terms':
                                             return <TermsAndConditionsRequest key={index} {...componentProps} />;
-                                        case 'component_render':
-                                            return <DynamicComponent key={index} {...componentProps} />;
                                         default:
                                             return null;
                                     }

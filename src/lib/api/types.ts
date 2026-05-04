@@ -231,7 +231,7 @@ export interface ReorderStepsDTO {
 export interface OnboardingRequest {
   id: string;
   title: string;
-  type: 'payment' | 'document' | 'terms' | 'form' | 'component_render';
+  type: 'payment' | 'document' | 'terms' | 'form';
   config?: any;
 }
 

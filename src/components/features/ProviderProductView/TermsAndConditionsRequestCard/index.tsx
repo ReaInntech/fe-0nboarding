@@ -48,7 +48,7 @@ export default function TermsAndConditionsRequestCard({
 
     const [isSaving, setIsSaving] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
-    
+
     // File Upload hooks & state
     const { user } = useApp();
     const { uploadFile, isUploading } = useFileUpload();
@@ -106,7 +106,7 @@ export default function TermsAndConditionsRequestCard({
             if (!freshToken) throw new Error("No authentication token available");
 
             const uploadedKey = await uploadFile(file, 'documents', freshToken);
-            
+
             // Update local state AND trigger save immediately for persistence
             const newConfig = { ...config, templateFile: uploadedKey };
             setConfig(newConfig);
@@ -121,7 +121,7 @@ export default function TermsAndConditionsRequestCard({
 
     const handleViewDocument = async () => {
         if (!config.templateFile || !user) return;
-        
+
         setIsLoadingPreview(true);
         setIsModalOpen(true);
         setPreviewUrl(null);
@@ -156,187 +156,188 @@ export default function TermsAndConditionsRequestCard({
 
     return (
         <>
-        <div className={styles['terms-card']}>
-            {/* Header */}
-            <div className={styles['terms-card__header']}>
-                <div className={styles['terms-card__title-box']}>
-                    <div className={styles['terms-card__icon-wrapper']}>
-                        <Icon name="gavel" style={{ fontSize: 16 }} />
+            <div className={styles['terms-card']}>
+                {/* Header */}
+                <div className={styles['terms-card__header']}>
+                    <div className={styles['terms-card__title-box']}>
+                        <div className={styles['terms-card__icon-wrapper']}>
+                            <Icon name="gavel" style={{ fontSize: 16 }} />
+                        </div>
+                        <span className={styles['terms-card__title']}>{title}</span>
                     </div>
-                    <span className={styles['terms-card__title']}>{title}</span>
-                </div>
-                <div className={styles['terms-card__actions']}>
-                    {showSuccess && (
-                        <div className="flex items-center text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-md text-[10px] font-bold animate-in fade-in zoom-in duration-300">
-                            <Icon name="check_circle" className="mr-1.5 text-xs" /> Saved
-                        </div>
-                    )}
-
-                    <button 
-                        type="button" 
-                        onClick={handleSave}
-                        disabled={isSaving || disabled}
-                        className={`${isSaving || disabled ? 'opacity-50 cursor-not-allowed' : ''} ${showSuccess ? 'hidden' : ''}`}
-                    >
-                        {isSaving ? (
-                            <div className="size-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                        ) : (
-                            <Icon name="save" style={{ fontSize: 14 }} className="text-emerald-400" />
+                    <div className={styles['terms-card__actions']}>
+                        {showSuccess && (
+                            <div className="flex items-center text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-md text-[10px] font-bold animate-in fade-in zoom-in duration-300">
+                                <Icon name="check_circle" className="mr-1.5 text-xs" /> Saved
+                            </div>
                         )}
-                    </button>
 
-                    <button
-                        type="button"
-                        onClick={onDelete}
-                        disabled={disabled}
-                        className={`${styles['delete-btn']} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    >
-                        <Icon name="delete" style={{ fontSize: 14 }} />
-                    </button>
-                </div>
-            </div>
+                        <button
+                            type="button"
+                            onClick={() => handleSave()}
+                            disabled={isSaving || disabled}
+                            className={`${isSaving || disabled ? 'opacity-50 cursor-not-allowed' : ''} ${showSuccess ? 'hidden' : ''}`}
+                        >
+                            {isSaving ? (
+                                <div className="size-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                            ) : (
+                                <Icon name="save" style={{ fontSize: 14 }} className="text-emerald-400" />
+                            )}
+                        </button>
 
-            <div className={styles['terms-card__body']}>
-                {/* Document Upload */}
-                <div 
-                    className={`${styles['terms-card__upload-zone']} ${isUploading || disabled ? 'opacity-50 pointer-events-none' : ''} ${config.templateFile ? 'bg-emerald-500/5 border-emerald-500/20' : ''}`}
-                    onClick={() => !isUploading && !disabled && !config.templateFile && fileInputRef.current?.click()}
-                    style={{ cursor: (!isUploading && !disabled && !config.templateFile) ? 'pointer' : 'default' }}
-                >
-                    <input 
-                        type="file" 
-                        ref={fileInputRef} 
-                        onChange={handleFileChange} 
-                        accept="application/pdf" 
-                        className="hidden" 
-                    />
-                    
-                    {isUploading ? (
-                        <>
-                            <div className="size-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin mb-2 mx-auto" />
-                            <p className={styles['terms-card__upload-zone-text']}>Uploading Document...</p>
-                        </>
-                    ) : config.templateFile ? (
-                        <>
-                            <div className={`${styles['terms-card__upload-zone-icon']} text-emerald-400 bg-emerald-400/10`}>
-                                <Icon name="task" style={{ fontSize: 16 }} />
-                            </div>
-                            <p className="text-emerald-400 text-sm font-semibold mt-2">Document Uploaded (PDF)</p>
-                            
-                            <div className="mt-3 flex gap-2 justify-center">
-                                <button 
-                                    type="button" 
-                                    className="text-xs font-semibold text-primary hover:underline px-3 py-1 flex items-center justify-center gap-1 bg-primary/10 rounded-full"
-                                    onClick={(e) => { e.stopPropagation(); handleViewDocument(); }}
-                                >
-                                    <Icon name="visibility" style={{ fontSize: 12 }} /> View Document
-                                </button>
-                                <button 
-                                    type="button" 
-                                    className="text-xs font-semibold text-rose-400 hover:text-rose-300 px-3 py-1 flex items-center justify-center gap-1 rounded-full border border-rose-500/20"
-                                    onClick={async (e) => { 
-                                        e.stopPropagation(); 
-                                        const newConfig = handleChange('templateFile', null); 
-                                        await handleSave(newConfig);
-                                    }}
-                                >
-                                    Replace
-                                </button>
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                            <div className={styles['terms-card__upload-zone-icon']}>
-                                <Icon name="upload_file" style={{ fontSize: 16 }} />
-                            </div>
-                            <p className={styles['terms-card__upload-zone-text']}>Upload T&C Document</p>
-                            <p className={styles['terms-card__upload-zone-subtext']}>Upload the full legal PDF version</p>
-                        </>
-                    )}
-                </div>
-
-                {/* Title */}
-                <div className={styles['terms-card__field-group']}>
-                    <label className={styles['terms-card__label']}>Legal Title</label>
-                    <input
-                        type="text"
-                        value={config.documentTitle}
-                        disabled={disabled}
-                        onChange={(e) => handleChange('documentTitle', e.target.value)}
-                        placeholder="e.g. Service Level Agreement"
-                        className={`${styles['terms-card__input']} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    />
-                </div>
-
-                {/* Editor Area */}
-                <div className={styles['terms-card__field-group']}>
-                    <label className={styles['terms-card__label']}>
-                        Content Editor
-                        <span>Notion Style</span>
-                    </label>
-                    <div className={styles['terms-card__editor-wrapper']}>
-                        {/* Toolbar */}
-                        <div className={styles['terms-card__editor-toolbar']}>
-                            {['format_bold', 'format_italic', 'format_list_bulleted', 'format_quote', 'link'].map(icon => (
-                                <button key={icon} type="button">
-                                    <Icon name={icon} style={{ fontSize: 12 }} />
-                                </button>
-                            ))}
-                        </div>
-                        {/* Area */}
-                        <textarea
-                            value={config.content}
+                        <button
+                            type="button"
+                            onClick={onDelete}
                             disabled={disabled}
-                            onChange={(e) => handleChange('content', e.target.value)}
-                            placeholder="Type T&C body content here..."
-                            rows={4}
-                            className={`${styles['terms-card__editor-textarea']} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`${styles['delete-btn']} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                            <Icon name="delete" style={{ fontSize: 14 }} />
+                        </button>
+                    </div>
+                </div>
+
+                <div className={styles['terms-card__body']}>
+                    {/* Title */}
+                    <div className={styles['terms-card__field-group']}>
+                        <label className={styles['terms-card__label']}>Legal Title</label>
+                        <input
+                            type="text"
+                            value={config.documentTitle}
+                            disabled={disabled}
+                            onChange={(e) => handleChange('documentTitle', e.target.value)}
+                            placeholder="e.g. Service Level Agreement"
+                            className={`${styles['terms-card__input']} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                         />
                     </div>
-                </div>
 
-                {/* Acceptance Checkboxes */}
-                <div className={styles['terms-card__checkboxes-header']}>
-                    <label className={styles['terms-card__label']}>Acceptance Checkboxes ({config.checkboxes.length})</label>
-                    <button
-                        type="button"
-                        onClick={addCheckbox}
-                        disabled={disabled}
-                        className={`${styles['terms-card__add-cb-btn']} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    {/* Document Upload */}
+                    <div
+                        className={`${styles['terms-card__upload-zone']} ${isUploading || disabled ? 'opacity-50 pointer-events-none' : ''} ${config.templateFile ? 'bg-emerald-500/5 border-emerald-500/20' : ''}`}
+                        onClick={() => !isUploading && !disabled && !config.templateFile && fileInputRef.current?.click()}
+                        style={{ cursor: (!isUploading && !disabled && !config.templateFile) ? 'pointer' : 'default' }}
                     >
-                        <Icon name="add_circle" style={{ fontSize: 12 }} /> Add checkbox
-                    </button>
-                </div>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                            accept="application/pdf"
+                            className="hidden"
+                        />
 
-                <div className={styles['terms-card__checkboxes-list']}>
-                    {config.checkboxes.map((cb) => (
-                        <div key={cb.id} className={styles['terms-card__cb-row']}>
-                            <div className={styles['terms-card__cb-input-wrapper']}>
-                                <div className={styles['terms-card__cb-input-prefix']}>
-                                    <div className={styles['terms-card__cb-prefix-box']}>
-                                        <div className="dot"></div>
-                                    </div>
+                        {isUploading ? (
+                            <>
+                                <div className="size-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin mb-2 mx-auto" />
+                                <p className={styles['terms-card__upload-zone-text']}>Uploading Document...</p>
+                            </>
+                        ) : config.templateFile ? (
+                            <>
+                                <div className={`${styles['terms-card__upload-zone-icon']} text-emerald-400 bg-emerald-400/10`}>
+                                    <Icon name="task" style={{ fontSize: 16 }} />
                                 </div>
-                                <input
-                                    type="text"
-                                    value={cb.text}
-                                    onChange={(e) => updateCheckbox(cb.id, e.target.value)}
-                                    placeholder="e.g. I have read and accept the privacy policy"
-                                    className={styles['terms-card__cb-input']}
-                                />
+                                <p className="text-emerald-400 text-sm font-semibold mt-2">Document Uploaded (PDF)</p>
+
+                                <div className="mt-3 flex gap-2 justify-center">
+                                    <button
+                                        type="button"
+                                        className="text-xs font-semibold text-primary hover:underline px-3 py-1 flex items-center justify-center gap-1 bg-primary/10 rounded-full"
+                                        onClick={(e) => { e.stopPropagation(); handleViewDocument(); }}
+                                    >
+                                        <Icon name="visibility" style={{ fontSize: 12 }} /> View Document
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="text-xs font-semibold text-rose-400 hover:text-rose-300 px-3 py-1 flex items-center justify-center gap-1 rounded-full border border-rose-500/20"
+                                        onClick={async (e) => {
+                                            e.stopPropagation();
+                                            const newConfig = handleChange('templateFile', null);
+                                            await handleSave(newConfig);
+                                        }}
+                                    >
+                                        Replace
+                                    </button>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <div className={styles['terms-card__upload-zone-icon']}>
+                                    <Icon name="upload_file" style={{ fontSize: 16 }} />
+                                </div>
+                                <p className={styles['terms-card__upload-zone-text']}>Upload T&C Document</p>
+                                <p className={styles['terms-card__upload-zone-subtext']}>Upload the full legal PDF version</p>
+                            </>
+                        )}
+                    </div>
+
+
+
+                    {/* Editor Area     
+                    <div className={styles['terms-card__field-group']}>
+                        <label className={styles['terms-card__label']}>
+                            Content Editor
+                            <span>Notion Style</span>
+                        </label>
+                        <div className={styles['terms-card__editor-wrapper']}>
+                            <div className={styles['terms-card__editor-toolbar']}>
+                                {['format_bold', 'format_italic', 'format_list_bulleted', 'format_quote', 'link'].map(icon => (
+                                    <button key={icon} type="button">
+                                        <Icon name={icon} style={{ fontSize: 12 }} />
+                                    </button>
+                                ))}
                             </div>
-                            <button
-                                type="button"
-                                onClick={() => removeCheckbox(cb.id)}
-                                className={styles['terms-card__cb-remove']}
-                            >
-                                <Icon name="remove_circle_outline" style={{ fontSize: 14 }} />
-                            </button>
+                            <textarea
+                                value={config.content}
+                                disabled={disabled}
+                                onChange={(e) => handleChange('content', e.target.value)}
+                                placeholder="Type T&C body content here..."
+                                rows={4}
+                                className={`${styles['terms-card__editor-textarea']} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            />
                         </div>
-                    ))}
+                    </div>
+                    */}
+
+                    {/* Acceptance Checkboxes */}
+                    <div className={styles['terms-card__checkboxes-header']}>
+                        <label className={styles['terms-card__label']}>Acceptance Checkboxes ({config.checkboxes.length})</label>
+                        <button
+                            type="button"
+                            onClick={addCheckbox}
+                            disabled={disabled}
+                            className={`${styles['terms-card__add-cb-btn']} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                            <Icon name="add_circle" style={{ fontSize: 12 }} /> Add checkbox
+                        </button>
+                    </div>
+
+                    <div className={styles['terms-card__checkboxes-list']}>
+                        {config.checkboxes.map((cb) => (
+                            <div key={cb.id} className={styles['terms-card__cb-row']}>
+                                <div className={styles['terms-card__cb-input-wrapper']}>
+                                    <div className={styles['terms-card__cb-input-prefix']}>
+                                        <div className={styles['terms-card__cb-prefix-box']}>
+                                            <div className="dot"></div>
+                                        </div>
+                                    </div>
+                                    <input
+                                        type="text"
+                                        value={cb.text}
+                                        onChange={(e) => updateCheckbox(cb.id, e.target.value)}
+                                        placeholder="e.g. I have read and accept the privacy policy"
+                                        className={styles['terms-card__cb-input']}
+                                    />
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => removeCheckbox(cb.id)}
+                                    className={styles['terms-card__cb-remove']}
+                                >
+                                    <Icon name="remove_circle_outline" style={{ fontSize: 14 }} />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
-        </div>
 
             <Modal
                 isOpen={isModalOpen}
@@ -351,9 +352,9 @@ export default function TermsAndConditionsRequestCard({
                             <p className="text-sm">Opening secure document...</p>
                         </div>
                     ) : previewUrl ? (
-                        <iframe 
-                            src={previewUrl} 
-                            className="w-full h-full border-0" 
+                        <iframe
+                            src={previewUrl}
+                            className="w-full h-full border-0"
                             title="PDF Preview"
                         />
                     ) : (

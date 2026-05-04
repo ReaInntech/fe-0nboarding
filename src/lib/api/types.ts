@@ -204,7 +204,6 @@ export interface CreateProductDTO {
   billing_model?: string;
   status?: string;
   service_type?: string;
-  deployment_region?: string;
 }
 
 export interface UpdateProductDTO extends Partial<CreateProductDTO> {}
@@ -232,7 +231,7 @@ export interface ReorderStepsDTO {
 export interface OnboardingRequest {
   id: string;
   title: string;
-  type: 'payment' | 'document' | 'terms' | 'form';
+  type: 'payment' | 'document' | 'terms' | 'form' | 'component_render';
   config?: any;
 }
 

@@ -28,8 +28,18 @@ export function mapProductMetadataToFields(overrides: Record<string, any>, produ
 
 /**
  * Maps raw Subscription data from the backend to the props expected by UnifiedProductView.
+ * This function now expects an aggregated object containing sub-resources.
  */
-export function mapSubscriptionToUnifiedView(sub: any): UnifiedProductViewProps {
+export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps {
+    const sub = data.subscription || data;
+    const statusRequests = data.requests || [];
+    const resolvedRequests = data.resolvedRequests || [];
+    const documentsRaw = data.documents || sub.documents || [];
+    const payments = data.payments || sub.payments || [];
+
+    // Merge both types of requests for the UI
+    const allRequestsRaw = [...statusRequests, ...resolvedRequests];
+
     const formatCurrency = (amt: number) => {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
@@ -39,7 +49,6 @@ export function mapSubscriptionToUnifiedView(sub: any): UnifiedProductViewProps 
     };
 
     // Calculate Payment Metrics
-    const payments = sub.payments || [];
     const totalAmount = sub.price || 0;
     const paidAmount = payments
         .filter((p: any) => p.status === 'Paid')
@@ -93,7 +102,7 @@ export function mapSubscriptionToUnifiedView(sub: any): UnifiedProductViewProps 
             accentColor: sub.product?.icon_color || '#1978e5',
         },
         legalDocumentsProps: {
-            documents: (sub.documents || []).map((doc: any) => ({
+            documents: documentsRaw.map((doc: any) => ({
                 icon: 'description',
                 name: doc.name || 'Document',
                 description: doc.description || 'Service related document',
@@ -103,13 +112,23 @@ export function mapSubscriptionToUnifiedView(sub: any): UnifiedProductViewProps 
                 format: doc.file_type || 'PDF',
             })),
         },
-        showRequests: !!sub.requests?.length,
+        showRequests: !!allRequestsRaw.length,
         requestsProps: {
-            requests: (sub.requests || []).map((req: any) => ({
-                ...req,
-                type: req.type || 'document',
-                config: req.config || {},
-            })),
+            requests: allRequestsRaw.map((req: any) => {
+                const action = req.action_request || {};
+                return {
+                    id: req.id,
+                    type: action.request_type || 'document',
+                    status: req.status || 'pending',
+                    title: action.title || 'Action Request',
+                    documentTitle: action.title || 'Document Request', // Fallback for specific components
+                    content: action.config?.content || '',
+                    config: action.config || {},
+                    templateFile: action.template_file,
+                    checkboxes: action.config?.checkboxes || [],
+                    data: req.data, // Instance data for resolved requests
+                };
+            }),
         },
         showPaymentHistory: !!payments.length,
         paymentHistoryProps: {
@@ -129,12 +148,37 @@ export async function getSubscriptionDetail(id: string, token: string, orgId: st
     return apiFetch(`/subscriptions/${id}`, { token, orgId });
 }
 
+export async function getSubscriptionRequests(id: string, token: string, orgId: string): Promise<any[]> {
+    return apiFetch(`/subscriptions/${id}/status-requests`, { token, orgId });
+}
+
+export async function getSubscriptionDocuments(id: string, token: string, orgId: string): Promise<any[]> {
+    return apiFetch(`/subscriptions/${id}/legal-documents`, { token, orgId });
+}
+
+export async function getSubscriptionResolvedRequests(id: string, token: string, orgId: string): Promise<any[]> {
+    return apiFetch(`/subscriptions/${id}/resolved-requests`, { token, orgId });
+}
+
 /**
  * BFF Aggregator for Subscription Detail
+ * Aggregates main subscription data with sub-resources (requests, documents, etc.)
  */
 export async function getSubscriptionDetailInit(id: string, token: string, orgId: string): Promise<UnifiedProductViewProps> {
     return executeWithFallback(async () => {
-        const data = await getSubscriptionDetail(id, token, orgId);
-        return mapSubscriptionToUnifiedView(data);
+        const [subscription, statusRequests, resolvedRequests, documents] = await Promise.all([
+            getSubscriptionDetail(id, token, orgId),
+            getSubscriptionRequests(id, token, orgId),
+            getSubscriptionResolvedRequests(id, token, orgId),
+            getSubscriptionDocuments(id, token, orgId)
+        ]);
+        console.log('requests', statusRequests, resolvedRequests);
+        return mapSubscriptionToUnifiedView({
+            subscription,
+            requests: statusRequests,
+            resolvedRequests: resolvedRequests,
+            documents,
+            payments: subscription.payments || [] // Currently payments are in findOne
+        });
     }, FALLBACK_SUBSCRIPTION_DETAIL_DATA);
 }

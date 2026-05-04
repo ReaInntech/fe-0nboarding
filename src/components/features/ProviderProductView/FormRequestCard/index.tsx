@@ -101,7 +101,7 @@ export default function FormRequestCard({
                     
                     <button 
                         type="button" 
-                        onClick={handleSave}
+                        onClick={() => handleSave()}
                         disabled={isSaving || disabled}
                         className={`${isSaving || disabled ? 'opacity-50 cursor-not-allowed' : ''} ${showSuccess ? 'hidden' : ''}`}
                     >

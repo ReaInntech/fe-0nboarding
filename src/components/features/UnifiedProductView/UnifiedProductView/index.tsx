@@ -13,13 +13,15 @@ import PaymentRequest, { PaymentRequestProps } from '../PaymentRequest';
 import DocumentRequest, { DocumentRequestProps } from '../DocumentRequest';
 import FormRequest, { FormRequestProps } from '../FormRequest';
 import TermsAndConditionsRequest, { TermsAndConditionsRequestProps } from '../TermsAndConditionsRequest';
+import DynamicComponent from '../DynamicComponent';
 import styles from './index.module.scss';
 
-export type RequestType = 
+export type RequestType =
     | ({ type: 'payment' } & PaymentRequestProps)
     | ({ type: 'document' } & DocumentRequestProps)
     | ({ type: 'form' } & FormRequestProps)
-    | ({ type: 'terms' } & TermsAndConditionsRequestProps);
+    | ({ type: 'terms' } & TermsAndConditionsRequestProps)
+    | ({ type: 'component_render' } & any); // Generic for dynamic components
 
 export interface UnifiedProductViewProps {
     headerProps: ProductHeaderProps;
@@ -58,7 +60,7 @@ export default function UnifiedProductView({
 
             <main className={styles['unified-product-view__main']}>
                 <ProductHeader {...headerProps} />
-                
+
                 {showContractingProgress && contractingProgressProps && (
                     <ContractingProgress {...contractingProgressProps} />
                 )}
@@ -69,32 +71,34 @@ export default function UnifiedProductView({
                     <div className={styles['unified-product-view__grid']}>
                         <div className={styles['unified-product-view__left-col']}>
                             <ServiceDetails {...serviceDetailsProps} />
-                            
+
                             {showSupportAccess && supportAccessProps && (
                                 <SupportAccess {...supportAccessProps} />
                             )}
-                            
+
                             <LegalDocuments {...legalDocumentsProps} />
                         </div>
-
                         <div className={styles['unified-product-view__right-col']}>
-                            {showRequests && requestsProps?.requests?.map((req: any, index) => {
-                                // Flatten config into the top-level props for the components
-                                const componentProps = { ...req, ...req.config };
-                                
-                                switch (req.type) {
-                                    case 'payment':
-                                        return <PaymentRequest key={index} {...componentProps} />;
-                                    case 'document':
-                                        return <DocumentRequest key={index} {...componentProps} />;
-                                    case 'form':
-                                        return <FormRequest key={index} {...componentProps} />;
-                                    case 'terms':
-                                        return <TermsAndConditionsRequest key={index} {...componentProps} />;
-                                    default:
-                                        return null;
-                                }
-                            })}
+                            {
+                                showRequests && requestsProps?.requests?.map((req: any, index) => {
+                                    // Flatten config into the top-level props for the components
+                                    const componentProps = { ...req, ...req.config };
+
+                                    switch (req.type) {
+                                        case 'payment':
+                                            return <PaymentRequest key={index} {...componentProps} />;
+                                        case 'document':
+                                            return <DocumentRequest key={index} {...componentProps} />;
+                                        case 'form':
+                                            return <FormRequest key={index} {...componentProps} />;
+                                        case 'terms':
+                                            return <TermsAndConditionsRequest key={index} {...componentProps} />;
+                                        case 'component_render':
+                                            return <DynamicComponent key={index} {...componentProps} />;
+                                        default:
+                                            return null;
+                                    }
+                                })}
                         </div>
 
                         {showPaymentHistory && paymentHistoryProps && (

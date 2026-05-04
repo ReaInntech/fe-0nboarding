@@ -1,0 +1,61 @@
+@reference "tailwindcss";
+
+.dynamic-card {
+    @apply flex flex-col bg-slate-950/40 border border-slate-800 rounded-xl overflow-hidden transition-all hover:border-slate-700/50;
+
+    &__header {
+        @apply flex items-center justify-between px-4 py-3 bg-slate-900/40 border-b border-slate-800/50;
+    }
+
+    &__title-box {
+        @apply flex items-center gap-3;
+    }
+
+    &__icon-wrapper {
+        @apply size-7 rounded-lg bg-pink-500/10 flex items-center justify-center text-pink-400;
+    }
+
+    &__title {
+        @apply text-xs font-bold text-white;
+    }
+
+    &__actions {
+        @apply flex items-center gap-2;
+    }
+
+    &__body {
+        @apply p-4 space-y-4;
+    }
+
+    &__field {
+        @apply flex flex-col gap-1.5;
+
+        label {
+            @apply text-[10px] font-bold text-slate-500 uppercase tracking-wider;
+        }
+    }
+
+    &__input {
+        @apply w-full bg-slate-900/50 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-pink-500/50 transition-all;
+    }
+
+    &__textarea {
+        @apply w-full bg-slate-900/50 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-pink-300 focus:outline-none focus:ring-1 focus:ring-pink-500/50 transition-all resize-none;
+    }
+
+    &__info-box {
+        @apply mt-2 p-3 bg-blue-500/5 border border-blue-500/10 rounded-lg flex gap-3;
+        
+        p {
+            @apply text-[10px] text-slate-400 leading-relaxed;
+        }
+    }
+}
+
+.save-btn {
+    @apply size-7 rounded-lg bg-slate-800 flex items-center justify-center transition-all hover:bg-slate-700;
+}
+
+.delete-btn {
+    @apply size-7 rounded-lg bg-slate-800 flex items-center justify-center text-slate-500 transition-all hover:bg-red-500/10 hover:text-red-400;
+}

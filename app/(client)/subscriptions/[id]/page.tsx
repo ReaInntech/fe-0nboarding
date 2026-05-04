@@ -46,6 +46,7 @@ export default async function SubscriptionPage({ params }: SubscriptionPageProps
             </div>
         );
     }
+    console.log('detailData', detailData);
     return (
         <UnifiedProductView
             {...detailData}

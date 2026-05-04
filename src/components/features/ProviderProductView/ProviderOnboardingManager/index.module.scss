@@ -185,6 +185,7 @@
         &--document:hover { @apply bg-amber-400/5 border-amber-400/40; }
         &--terms:hover { @apply bg-emerald-400/5 border-emerald-400/40; }
         &--form:hover { @apply bg-violet-400/5 border-violet-400/40; }
+        &--dynamic:hover { @apply bg-pink-400/5 border-pink-400/40; }
     }
 
     &__add-card-icon {
@@ -194,6 +195,7 @@
         .onboarding-manager__add-card--document:hover & { @apply text-amber-400; }
         .onboarding-manager__add-card--terms:hover & { @apply text-emerald-400; }
         .onboarding-manager__add-card--form:hover & { @apply text-violet-400; }
+        .onboarding-manager__add-card--dynamic:hover & { @apply text-pink-400; }
     }
 
     &__add-card-label {

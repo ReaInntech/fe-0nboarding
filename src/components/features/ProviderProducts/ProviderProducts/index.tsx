@@ -60,6 +60,9 @@ const ProviderProducts: React.FC<ProviderProductsProps> = ({ initialProducts, us
                 icon_color: formData.color,
                 product_code: formData.name.toUpperCase().replace(/\s+/g, '_') + '_' + Math.floor(Math.random() * 1000), // Helper for mock code
                 service_type: formData.billing, // Maps Billing Model to service_type as per backend schema
+                base_price: Number(formData.price) || 0,
+                billing_model: formData.billing,
+                status: formData.status
             };
 
             const response: any = await createProduct(undefined, orgId, dto);
@@ -188,7 +191,7 @@ const ProviderProducts: React.FC<ProviderProductsProps> = ({ initialProducts, us
                         color: '#1978e5',
                         price: '',
                         billing: 'monthly',
-                        status: 'active'
+                        status: 'inactive'
                     }}
                     onSave={handleCreateProduct}
                     onCancel={() => setIsCreateModalOpen(false)}

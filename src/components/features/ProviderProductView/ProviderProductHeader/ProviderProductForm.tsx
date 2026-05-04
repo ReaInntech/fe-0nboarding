@@ -83,7 +83,9 @@ export default function ProviderProductForm({
         // Convert formatted price back to number before saving
         const dataToSave = { ...form };
         if (typeof dataToSave.price === 'string') {
-            const numericPrice = parseFloat(dataToSave.price.replace(/,/g, ''));
+            // Remove everything except numbers and decimal point
+            const numericString = dataToSave.price.replace(/[^\d.-]/g, '');
+            const numericPrice = parseFloat(numericString);
             dataToSave.price = isNaN(numericPrice) ? 0 : numericPrice;
         }
         onSave(dataToSave);

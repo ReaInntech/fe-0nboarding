@@ -66,7 +66,7 @@ export default function ProviderProductView({
         const stepLabel = data.name || 'New Step';
 
         if (isNew) {
-            await api.createProductStep(product.productCode, freshToken, orgId, {
+            return await api.createProductStep(product.productCode, freshToken, orgId, {
                 label: stepLabel,
                 description: data.description || '',
                 icon: data.icon || 'Plus',
@@ -74,7 +74,7 @@ export default function ProviderProductView({
                 sort_order: onboardingSteps.length // Append to end
             });
         } else {
-            await api.updateProductStepMetadata(product.productCode, stepId, freshToken, orgId, {
+            return await api.updateProductStepMetadata(product.productCode, stepId, freshToken, orgId, {
                 label: stepLabel,
                 description: data.description,
                 icon: data.icon,

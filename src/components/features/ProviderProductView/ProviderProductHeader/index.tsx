@@ -178,18 +178,15 @@ export default function ProviderProductHeader({
             <section className="flex items-center gap-3 mt-6">
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className={`${styles['provider-header__edit-btn']} ${styles['provider-header__edit-btn--idle']}`}
+                    disabled={saved.status === 'inactive'}
+                    className={`${styles['provider-header__edit-btn']} ${saved.status === 'inactive' ? 'opacity-50 cursor-not-allowed' : styles['provider-header__edit-btn--idle']}`}
                 >
                     <Icon name="person" className="text-sm" />
                     Add Clients
                 </button>
                 <button
                     disabled
-                    onClick={() => setIsEditing(v => !v)}
-                    className={`${styles['provider-header__edit-btn']} opacity-50 cursor-not-allowed ${isEditing
-                        ? styles['provider-header__edit-btn--active']
-                        : styles['provider-header__edit-btn--idle']
-                        }`}
+                    className={`${styles['provider-header__edit-btn']} opacity-50 cursor-not-allowed ${styles['provider-header__edit-btn--idle']}`}
                 >
                     <Icon name="group" className="text-sm" />
                     Massive Add Clients

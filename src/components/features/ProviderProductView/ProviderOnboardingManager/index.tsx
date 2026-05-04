@@ -55,17 +55,27 @@ export default function ProviderOnboardingManager({
     const [isSavingStep, setIsSavingStep] = useState<string | null>(null);
 
     const handleSaveStep = async (idx: number) => {
+        if (isSavingStep) return;
         const step = steps[idx];
         if (!onSaveStepMetadata) return;
 
         setIsSavingStep(step.id);
         try {
-            await onSaveStepMetadata(step.id, {
+            const result: any = await onSaveStepMetadata(step.id, {
                 name: step.name,
                 description: step.description,
                 icon: step.icon,
                 type: step.type
             });
+
+            // If it was a new step, update the ID to the real one from DB
+            if (step.id.startsWith('step_') && result?.id) {
+                setSteps(prev => {
+                    const next = [...prev];
+                    next[idx] = { ...next[idx], id: result.id };
+                    return next;
+                });
+            }
         } finally {
             setIsSavingStep(null);
         }
@@ -240,8 +250,8 @@ export default function ProviderOnboardingManager({
                                                         type="button"
                                                         onClick={() => updateStep(idx, 'type', type.value)}
                                                         className={`${styles['onboarding-manager__type-btn']} ${step.type === type.value
-                                                                ? `${type.bg} ${type.color} ${styles['onboarding-manager__type-btn--active']}`
-                                                                : styles['onboarding-manager__type-btn--idle']
+                                                            ? `${type.bg} ${type.color} ${styles['onboarding-manager__type-btn--active']}`
+                                                            : styles['onboarding-manager__type-btn--idle']
                                                             }`}
                                                     >
                                                         <Icon name={type.icon} style={{ fontSize: 14 }} />
@@ -289,115 +299,123 @@ export default function ProviderOnboardingManager({
                                             )}
                                         </Button>
                                     </div>
+                                    <hr className="border-slate-700 mt-5" />
 
-                                    {/* Requests */}
-                                    <div className={styles['onboarding-manager__requests-section']}>
-                                        <div className={styles['onboarding-manager__requests-header']}>
-                                            <h4>
-                                                <Icon name="component_exchange" className="text-[#1978e5]" /> Component Requests
-                                            </h4>
-                                            <button type="button" className="text-[10px] text-[#1978e5] font-bold hover:underline">Manage Components</button>
-                                        </div>
+                                    {!step.id.startsWith('step_') ? (
+                                        /* Requests */
+                                        <div className={styles['onboarding-manager__requests-section']}>
+                                            <div className={styles['onboarding-manager__requests-header']}>
+                                                <h4>
+                                                    <Icon name="component_exchange" className="text-[#1978e5]" /> Component Requests
+                                                </h4>
+                                                <button type="button" className="text-[10px] text-[#1978e5] font-bold hover:underline">Manage Components</button>
+                                            </div>
 
-                                        <div className={styles['onboarding-manager__requests-grid']}>
-                                            {step.requests?.map(req => {
-                                                const isStepLocal = step.id.startsWith('step_');
-                                                const sharedProps = {
-                                                    id: req.id,
-                                                    initialConfig: req.config,
-                                                    onDelete: () => handleDeleteRequest(idx, req.id),
-                                                    onSave: async (config: any) => {
-                                                        if (isStepLocal) {
-                                                            alert('You must save the step changes (Save Changes) before configuring its components.');
-                                                            return;
+                                            <div className={styles['onboarding-manager__requests-grid']}>
+                                                {step.requests?.map(req => {
+                                                    const isStepLocal = step.id.startsWith('step_');
+                                                    const sharedProps = {
+                                                        id: req.id,
+                                                        initialConfig: req.config,
+                                                        onDelete: () => handleDeleteRequest(idx, req.id),
+                                                        onSave: async (config: any) => {
+                                                            if (isStepLocal) {
+                                                                alert('You must save the step changes (Save Changes) before configuring its components.');
+                                                                return;
+                                                            }
+                                                            return handleSaveRequest(step.id, req.id, req.type, config);
                                                         }
-                                                        return handleSaveRequest(step.id, req.id, req.type, config);
-                                                    }
-                                                };
+                                                    };
 
-                                                if (req.type === 'form') return (
-                                                    <FormRequestCard
-                                                        key={req.id}
-                                                        title={req.title}
-                                                        disabled={isStepLocal}
-                                                        {...sharedProps}
-                                                    />
-                                                );
-                                                if (req.type === 'terms') return (
-                                                    <TermsAndConditionsRequestCard
-                                                        key={req.id}
-                                                        title={req.title}
-                                                        disabled={isStepLocal}
-                                                        {...sharedProps}
-                                                    />
-                                                );
-                                                if (req.type === 'document') return (
-                                                    <DocumentRequestCard
-                                                        key={req.id}
-                                                        title={req.title}
-                                                        disabled={isStepLocal}
-                                                        {...sharedProps}
-                                                    />
-                                                );
-                                                return (
-                                                    <RequestPaymentCard
-                                                        key={req.id}
-                                                        title={req.title}
-                                                        productPrice={productPrice}
-                                                        disabled={isStepLocal}
-                                                        {...sharedProps}
-                                                    />
-                                                );
-                                            })}
+                                                    if (req.type === 'form') return (
+                                                        <FormRequestCard
+                                                            key={req.id}
+                                                            title={req.title}
+                                                            disabled={isStepLocal}
+                                                            {...sharedProps}
+                                                        />
+                                                    );
+                                                    if (req.type === 'terms') return (
+                                                        <TermsAndConditionsRequestCard
+                                                            key={req.id}
+                                                            title={req.title}
+                                                            disabled={isStepLocal}
+                                                            {...sharedProps}
+                                                        />
+                                                    );
+                                                    if (req.type === 'document') return (
+                                                        <DocumentRequestCard
+                                                            key={req.id}
+                                                            title={req.title}
+                                                            disabled={isStepLocal}
+                                                            {...sharedProps}
+                                                        />
+                                                    );
+                                                    return (
+                                                        <RequestPaymentCard
+                                                            key={req.id}
+                                                            title={req.title}
+                                                            productPrice={productPrice}
+                                                            disabled={isStepLocal}
+                                                            {...sharedProps}
+                                                        />
+                                                    );
+                                                })}
 
-                                            <div className={styles['onboarding-manager__add-requests-box']}>
-                                                <div className={styles['onboarding-manager__add-row']}>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => addRequest(idx, 'payment')}
-                                                        className={`${styles['onboarding-manager__add-card']} ${styles['onboarding-manager__add-card--payment']}`}
-                                                    >
-                                                        <div className={styles['onboarding-manager__add-card-icon']}>
-                                                            <Icon name="payments" style={{ fontSize: 16 }} />
-                                                        </div>
-                                                        <span className={styles['onboarding-manager__add-card-label']}>Payment</span>
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => addRequest(idx, 'document')}
-                                                        className={`${styles['onboarding-manager__add-card']} ${styles['onboarding-manager__add-card--document']}`}
-                                                    >
-                                                        <div className={styles['onboarding-manager__add-card-icon']}>
-                                                            <Icon name="description" style={{ fontSize: 16 }} />
-                                                        </div>
-                                                        <span className={styles['onboarding-manager__add-card-label']}>Document</span>
-                                                    </button>
-                                                </div>
-                                                <div className={styles['onboarding-manager__add-row']}>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => addRequest(idx, 'terms')}
-                                                        className={`${styles['onboarding-manager__add-card']} ${styles['onboarding-manager__add-card--terms']}`}
-                                                    >
-                                                        <div className={styles['onboarding-manager__add-card-icon']}>
-                                                            <Icon name="gavel" style={{ fontSize: 16 }} />
-                                                        </div>
-                                                        <span className={styles['onboarding-manager__add-card-label']}>Terms</span>
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => addRequest(idx, 'form')}
-                                                        className={`${styles['onboarding-manager__add-card']} ${styles['onboarding-manager__add-card--form']}`}
-                                                    >
-                                                        <div className={styles['onboarding-manager__add-card-icon']}>
-                                                            <Icon name="assignment" style={{ fontSize: 16 }} />
-                                                        </div>
-                                                        <span className={styles['onboarding-manager__add-card-label']}>Form</span>
-                                                    </button>
+                                                <div className={styles['onboarding-manager__add-requests-box']}>
+                                                    <div className={styles['onboarding-manager__add-row']}>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => addRequest(idx, 'payment')}
+                                                            className={`${styles['onboarding-manager__add-card']} ${styles['onboarding-manager__add-card--payment']}`}
+                                                        >
+                                                            <div className={styles['onboarding-manager__add-card-icon']}>
+                                                                <Icon name="payments" style={{ fontSize: 16 }} />
+                                                            </div>
+                                                            <span className={styles['onboarding-manager__add-card-label']}>Payment</span>
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => addRequest(idx, 'document')}
+                                                            className={`${styles['onboarding-manager__add-card']} ${styles['onboarding-manager__add-card--document']}`}
+                                                        >
+                                                            <div className={styles['onboarding-manager__add-card-icon']}>
+                                                                <Icon name="description" style={{ fontSize: 16 }} />
+                                                            </div>
+                                                            <span className={styles['onboarding-manager__add-card-label']}>Document</span>
+                                                        </button>
+                                                    </div>
+                                                    <div className={styles['onboarding-manager__add-row']}>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => addRequest(idx, 'terms')}
+                                                            className={`${styles['onboarding-manager__add-card']} ${styles['onboarding-manager__add-card--terms']}`}
+                                                        >
+                                                            <div className={styles['onboarding-manager__add-card-icon']}>
+                                                                <Icon name="gavel" style={{ fontSize: 16 }} />
+                                                            </div>
+                                                            <span className={styles['onboarding-manager__add-card-label']}>Terms</span>
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => addRequest(idx, 'form')}
+                                                            className={`${styles['onboarding-manager__add-card']} ${styles['onboarding-manager__add-card--form']}`}
+                                                        >
+                                                            <div className={styles['onboarding-manager__add-card-icon']}>
+                                                                <Icon name="assignment" style={{ fontSize: 16 }} />
+                                                            </div>
+                                                            <span className={styles['onboarding-manager__add-card-label']}>Form</span>
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    ) : (
+                                        <div className="py-8 px-6 text-center bg-slate-800/30 rounded-xl mt-4 border border-dashed border-slate-700">
+                                            <Icon name="info" className="text-slate-500 mb-2" />
+                                            <p className="text-slate-400 text-sm">Save this step first to start adding component requests.</p>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>

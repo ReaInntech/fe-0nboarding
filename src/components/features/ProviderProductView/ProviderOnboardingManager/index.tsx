@@ -317,6 +317,7 @@ export default function ProviderOnboardingManager({
                                                     const sharedProps = {
                                                         id: req.id,
                                                         initialConfig: req.config,
+                                                        hasResolved: req.hasResolved,
                                                         onDelete: () => handleDeleteRequest(idx, req.id),
                                                         onSave: async (config: any) => {
                                                             if (isStepLocal) {

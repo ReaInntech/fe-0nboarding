@@ -132,11 +132,13 @@ export interface SubscriptionDTO {
   status: string;
   price: number;
   progress_pct: number;
-  progress_label?: string;
-  progress_value?: string;
+  created_at: string;
   next_renewal?: string;
   provisioned_at?: string;
-  created_at: string;
+  has_action_request?: boolean;
+  current_step?: {
+    label: string;
+  };
   product: {
     id: string;
     name: string;
@@ -233,6 +235,7 @@ export interface OnboardingRequest {
   title: string;
   type: 'payment' | 'document' | 'terms' | 'form';
   config?: any;
+  hasResolved?: boolean;
 }
 
 export interface OnboardingStep {

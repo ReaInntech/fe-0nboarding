@@ -126,7 +126,8 @@ export function mapOnboardingStep(dto: any): OnboardingStep {
       id: req.id,
       title: req.title,
       type: req.request_type,
-      config: req.config
+      config: req.config,
+      hasResolved: Array.isArray(req.resolved_requests) && req.resolved_requests.length > 0
     }))
   };
 }

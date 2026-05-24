@@ -79,14 +79,17 @@ export default function ServicesList({ subscriptions, className }: ServicesListP
                                     </div>
                                     <span className={styles['services-list__progress-value']}>
                                         <Icon name={sub.hasActionRequest ? "error_outline" : "play_arrow"} className={`${styles['services-list__progress-value-icon']} ${sub.hasActionRequest ? styles['services-list__progress-value-icon--action-request'] : styles['services-list__progress-value-icon--normal']}`} />
-                                        {sub.progressValue}
+                                        {sub.progressLabel}
                                     </span>
                                 </div>
                             </div>
 
                             <div className={styles['services-list__card-footer']}>
                                 <div className={styles['services-list__cost-wrapper']}>
-                                    <span className={styles['services-list__cost-label']}>Monthly cost</span>
+                                    <span className={styles['services-list__cost-label']}>
+                                        {sub.pricePeriod === '' ? 'One-time payment' :
+                                            (sub.pricePeriod?.includes('year') || sub.pricePeriod?.includes('annual') ? 'Yearly cost' : 'Monthly cost')}
+                                    </span>
                                     <span className={styles['services-list__cost-value']}>
                                         {sub.price}<span className={styles['services-list__cost-period']}>{sub.pricePeriod}</span>
                                     </span>

@@ -25,6 +25,7 @@ export interface FormRequestCardProps {
     onDelete?: () => void;
     onSave?: (config: FormRequestConfig) => Promise<void>;
     disabled?: boolean;
+    hasResolved?: boolean;
 }
 
 const FIELD_TYPES = ['string', 'number', 'email', 'tel', 'textarea'];
@@ -36,7 +37,8 @@ export default function FormRequestCard({
     initialConfig,
     onDelete,
     onSave,
-    disabled = false
+    disabled = false,
+    hasResolved = false
 }: FormRequestCardProps) {
     const [config, setConfig] = useState<FormRequestConfig>(initialConfig || {
         formTitle: title || '',
@@ -112,14 +114,20 @@ export default function FormRequestCard({
                         )}
                     </button>
 
-                    <button
-                        type="button"
-                        onClick={onDelete}
-                        disabled={disabled}
-                        className={`${styles['delete-btn']} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    <span
+                        title={hasResolved ? "No se puede eliminar porque este challenge ya fue resuelto por usuarios" : "Delete request"}
+                        className="inline-flex"
                     >
-                        <Icon name="delete" style={{ fontSize: 14 }} />
-                    </button>
+                        <button
+                            type="button"
+                            onClick={onDelete}
+                            disabled={disabled || hasResolved}
+                            className={`${styles['delete-btn']} ${(disabled || hasResolved) ? 'opacity-50' : ''}`}
+                            style={(disabled || hasResolved) ? { pointerEvents: 'none' } : undefined}
+                        >
+                            <Icon name="delete" style={{ fontSize: 14 }} />
+                        </button>
+                    </span>
                 </div>
             </div>
 

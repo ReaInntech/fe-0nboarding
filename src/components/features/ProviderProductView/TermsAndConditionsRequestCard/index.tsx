@@ -28,6 +28,7 @@ export interface TermsAndConditionsRequestCardProps {
     onDelete?: () => void;
     onSave?: (config: TermsRequestConfig) => Promise<void>;
     disabled?: boolean;
+    hasResolved?: boolean;
 }
 
 export default function TermsAndConditionsRequestCard({
@@ -37,7 +38,8 @@ export default function TermsAndConditionsRequestCard({
     initialConfig,
     onDelete,
     onSave,
-    disabled = false
+    disabled = false,
+    hasResolved = false
 }: TermsAndConditionsRequestCardProps) {
     const [config, setConfig] = useState<TermsRequestConfig>({
         documentTitle: initialConfig?.documentTitle || title || '',
@@ -185,14 +187,20 @@ export default function TermsAndConditionsRequestCard({
                             )}
                         </button>
 
-                        <button
-                            type="button"
-                            onClick={onDelete}
-                            disabled={disabled}
-                            className={`${styles['delete-btn']} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        <span
+                            title={hasResolved ? "No se puede eliminar porque este challenge ya fue resuelto por usuarios" : "Delete request"}
+                            className="inline-flex"
                         >
-                            <Icon name="delete" style={{ fontSize: 14 }} />
-                        </button>
+                            <button
+                                type="button"
+                                onClick={onDelete}
+                                disabled={disabled || hasResolved}
+                                className={`${styles['delete-btn']} ${(disabled || hasResolved) ? 'opacity-50' : ''}`}
+                                style={(disabled || hasResolved) ? { pointerEvents: 'none' } : undefined}
+                            >
+                                <Icon name="delete" style={{ fontSize: 14 }} />
+                            </button>
+                        </span>
                     </div>
                 </div>
 

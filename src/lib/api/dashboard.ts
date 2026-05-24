@@ -5,8 +5,8 @@ import { Notification, NotificationDTO, Subscription, SubscriptionDTO } from './
 export function mapNotification(dto: NotificationDTO): Notification {
   // Use a safer variant cast with a fallback
   const validVariants = ['critical', 'warning', 'info', 'success'] as const;
-  const variant = validVariants.includes(dto.priority as any) 
-    ? (dto.priority as Notification['variant']) 
+  const variant = validVariants.includes(dto.priority as any)
+    ? (dto.priority as Notification['variant'])
     : 'info';
 
   return {
@@ -21,14 +21,14 @@ export function mapSubscription(dto: SubscriptionDTO): Subscription {
   return {
     id: dto.id,
     name: dto.product?.name || 'Service',
-    tier: dto.progress_label || 'Default Plan',
+    tier: dto.product?.billing_model ? `${dto.product.billing_model} Plan` : 'Standard Plan',
     icon: dto.product?.icon || 'hub',
     status: dto.status as Subscription['status'],
-    progressLabel: dto.progress_label || "Current Stage",
-    progressValue: dto.progress_value || "Processing",
+    progressLabel: dto.current_step?.label,
     progressPct: dto.progress_pct || 0,
-    price: dto.price ? `$${dto.price}` : undefined,
-    pricePeriod: "/mo",
+    hasActionRequest: dto.has_action_request || false,
+    price: dto.price ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(dto.price) : undefined,
+    pricePeriod: dto.product?.billing_model === 'one_time' ? "" : (dto.product?.billing_model ? `/${dto.product.billing_model.toLowerCase()}` : "/mo"),
     product: {
       name: dto.product?.name || '',
       icon: dto.product?.icon || '',

@@ -17,14 +17,14 @@ export function mapNotification(dto: NotificationDTO): Notification {
   };
 }
 
-export function mapSubscription(dto: SubscriptionDTO): Subscription {
+export function mapSubscription(dto: any): Subscription {
   return {
     id: dto.id,
     name: dto.product?.name || 'Service',
     tier: dto.product?.billing_model ? `${dto.product.billing_model} Plan` : 'Standard Plan',
     icon: dto.product?.icon || 'hub',
     status: dto.status as Subscription['status'],
-    progressLabel: dto.current_step?.label,
+    progressLabel: dto.current_step?.label || dto.progress_label || '',
     progressPct: dto.progress_pct || 0,
     hasActionRequest: dto.has_action_request || false,
     price: dto.price ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(dto.price) : undefined,
@@ -33,7 +33,23 @@ export function mapSubscription(dto: SubscriptionDTO): Subscription {
       name: dto.product?.name || '',
       icon: dto.product?.icon || '',
       iconColor: dto.product?.icon_color || '',
-    }
+    },
+    
+    // Map provider-specific aliased details
+    client: dto.client ? {
+      id: dto.client.id,
+      legalName: dto.client.legal_name || dto.client.legalName || '',
+      clientType: dto.client.client_type || dto.client.clientType || 'legal_entity',
+      email: dto.client.email || '',
+      phone: dto.client.phone || '',
+    } : undefined,
+    tierName: dto.tierName || dto.tier || (dto.product?.billing_model ? `${dto.product.billing_model} Plan` : 'Standard Plan'),
+    monthlyPrice: dto.monthlyPrice || Number(dto.price) || 0,
+    payments: dto.payments || [],
+    documents: dto.documents || [],
+    provisionedAt: dto.provisionedAt || dto.provisioned_at || null,
+    steps: dto.steps || [],
+    requests: dto.requests || [],
   };
 }
 

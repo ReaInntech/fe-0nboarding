@@ -16,7 +16,7 @@ export default async function ProviderDashboardPage() {
     const cookieStore = await cookies();
     const token = cookieStore.get('id_token')?.value;
     const sessionUser = await getSessionUser();
-    
+
     // Use org_id from custom claims if available
     const orgId = sessionUser?.org_id;
     const strategy = getMockStrategy();
@@ -28,6 +28,7 @@ export default async function ProviderDashboardPage() {
         try {
             const data = await getProviderDashboardInit(token, orgId);
             subscriptions = data.subscriptions;
+            console.log('ProviderDashboardPage subscriptions:', data);
             if (data.stats) stats = data.stats;
         } catch (error) {
             console.error('[ProviderDashboardPage] API failed:', error);
@@ -43,8 +44,8 @@ export default async function ProviderDashboardPage() {
     }
 
     return (
-        <ProviderDashboard 
-            subscriptions={subscriptions} 
+        <ProviderDashboard
+            subscriptions={subscriptions}
             stats={stats}
         />
     );

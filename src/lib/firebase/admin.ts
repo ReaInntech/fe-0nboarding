@@ -1,6 +1,6 @@
 import * as admin from 'firebase-admin';
 
-const projectId = process.env.FIREBASE_PROJECT_ID;
+const projectId = process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
 const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
 function formatPrivateKey(keyStr?: string) {
   if (!keyStr) return undefined;

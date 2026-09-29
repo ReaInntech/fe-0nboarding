@@ -9,9 +9,11 @@ export interface SubscriptionRowProps {
     sub: SubscriptionData;
     className?: string;
     initialExpanded?: boolean;
+    onDelete?: (sub: SubscriptionData) => void;
+    onDisable?: (sub: SubscriptionData) => void;
 }
 
-export default function SubscriptionRow({ sub, className, initialExpanded = false }: SubscriptionRowProps) {
+export default function SubscriptionRow({ sub, className, initialExpanded = false, onDelete, onDisable }: SubscriptionRowProps) {
     const [isExpanded, setIsExpanded] = useState(initialExpanded);
 
     let statusModifier = 'default';
@@ -56,6 +58,43 @@ export default function SubscriptionRow({ sub, className, initialExpanded = fals
                         <span className={styles['subscription-row__revenue-amount']}>${(sub.monthlyPrice || 0).toLocaleString()}</span>
                         <span className={styles['subscription-row__revenue-period']}>{sub.pricePeriod}</span>
                     </div>
+
+                    {/* Action Buttons: Delete / Disable */}
+                    <div className="flex items-center gap-1 ml-2" onClick={(e) => e.stopPropagation()}>
+                        {sub.can_delete !== false ? (
+                            <button
+                                type="button"
+                                title="Delete subscription"
+                                onClick={() => onDelete?.(sub)}
+                                className="size-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                            >
+                                <Icon name="delete_outline" className="text-lg" />
+                            </button>
+                        ) : (
+                            <button
+                                type="button"
+                                disabled
+                                title="Cannot delete because approved payments exist. You can disable it instead."
+                                className="size-8 rounded-lg flex items-center justify-center text-slate-600 cursor-not-allowed opacity-40"
+                            >
+                                <Icon name="delete" className="text-lg" />
+                            </button>
+                        )}
+
+                        <button
+                            type="button"
+                            title={sub.status === 'suspended' ? 'Reactivate subscription' : 'Disable / Suspend subscription'}
+                            onClick={() => onDisable?.(sub)}
+                            className={`size-8 rounded-lg flex items-center justify-center transition-colors ${
+                                sub.status === 'suspended'
+                                    ? 'text-emerald-400 hover:bg-emerald-500/10'
+                                    : 'text-amber-400 hover:bg-amber-500/10'
+                            }`}
+                        >
+                            <Icon name={sub.status === 'suspended' ? 'play_circle' : 'pause_circle'} className="text-lg" />
+                        </button>
+                    </div>
+
                     <button className={styles['subscription-row__expand-btn']}>
                         <Icon name={isExpanded ? 'expand_less' : 'expand_more'} />
                     </button>
@@ -126,7 +165,7 @@ export default function SubscriptionRow({ sub, className, initialExpanded = fals
                                     </div>
                                     {sub.payments.length > 3 && (
                                         <button className={`group ${styles['subscription-row__see-more-btn']}`}>
-                                            Ver mas
+                                            See more
                                             <Icon name="arrow_forward" className={styles['subscription-row__see-more-icon']} />
                                         </button>
                                     )}

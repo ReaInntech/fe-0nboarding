@@ -1,10 +1,10 @@
 @reference "tailwindcss";
 
 .unified-product-view {
-    @apply bg-[#f5f6f8] dark:bg-[#0f1523] font-sans text-slate-900 dark:text-slate-100 min-h-screen antialiased flex flex-col w-full overflow-x-hidden;
+    @apply pt-[64px] relative flex min-h-screen w-full flex-col overflow-x-hidden bg-[#f5f6f8] dark:bg-[#0f172a] font-sans text-slate-900 dark:text-slate-100 antialiased;
 
     &__main {
-        @apply max-w-7xl mx-auto mt-16 w-full px-6 py-8 flex flex-col gap-8 flex-1;
+        @apply flex-1 max-w-[1200px] mx-auto w-full px-4 lg:px-8 py-12 flex flex-col gap-8;
     }
 
     &__grid {

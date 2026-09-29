@@ -78,6 +78,26 @@ export async function getProviderSubscriptions(token: string, orgId: string): Pr
   return (data || []).map(mapSubscription);
 }
 
+export async function deleteProviderSubscription(id: string, token?: string, orgId?: string): Promise<{ success: boolean; message: string; id: string }> {
+  return apiFetch<{ success: boolean; message: string; id: string }>(`/dashboard/subscriptions/${id}`, {
+    method: 'DELETE',
+    microservice: 'provider',
+    token,
+    orgId,
+  });
+}
+
+export async function updateProviderSubscriptionStatus(id: string, status: string, token?: string, orgId?: string): Promise<{ success: boolean; message: string; subscription: any }> {
+  return apiFetch<{ success: boolean; message: string; subscription: any }>(`/dashboard/subscriptions/${id}/status`, {
+    method: 'PATCH',
+    microservice: 'provider',
+    token,
+    orgId,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status }),
+  });
+}
+
 export async function getFinanceKPIs(token: string, orgId: string): Promise<FinanceKpis> {
   const data = await apiFetch<FinanceKpiDTO>('/finance/kpis', {
     microservice: 'provider',

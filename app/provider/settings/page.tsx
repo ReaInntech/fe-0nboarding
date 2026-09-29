@@ -39,6 +39,7 @@ export default async function ProviderSettingsPage() {
       initialSettings={settings || (FALLBACK_PROVIDER_SETTINGS as any)}
       orgId={orgId}
       token={token}
+      userProfile={sessionUser}
     />
   );
 }

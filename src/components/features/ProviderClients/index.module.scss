@@ -219,7 +219,7 @@
 
     /* CSV Upload Zone */
     &__csv-zone {
-        @apply border-2 border-dashed border-slate-800 rounded-2xl p-8 text-center hover:border-blue-500/40 hover:bg-blue-500/[0.02] transition-all cursor-pointer space-y-3;
+        @apply block border-2 border-dashed border-slate-800 rounded-2xl p-8 text-center hover:border-blue-500/40 hover:bg-blue-500/[0.02] transition-all cursor-pointer space-y-3;
     }
 
     &__csv-icon {

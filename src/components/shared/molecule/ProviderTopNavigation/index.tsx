@@ -45,7 +45,6 @@ export default function ProviderTopNavigation({ onLogout, activeTab: activeTabPr
 
     const navItems: NavItem[] = [
         { name: 'Dashboard', path: '/provider/dashboard' },
-        { name: 'Clients', path: '/provider/clients' },
         { name: 'Products', path: '/provider/products' },
         { name: 'Finance', path: '/provider/finance' },
         { name: 'Settings', path: '/provider/settings' },

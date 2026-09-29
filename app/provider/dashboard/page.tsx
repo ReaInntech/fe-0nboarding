@@ -17,27 +17,25 @@ export default async function ProviderDashboardPage() {
     const token = cookieStore.get('id_token')?.value;
     const sessionUser = await getSessionUser();
 
-    // Use org_id from custom claims if available
-    const orgId = sessionUser?.org_id;
+    // Use org_id from custom claims or provider default
+    const orgId = sessionUser?.org_id || '8a6ceaa0-c2e0-4945-93eb-bb04b7a2a2a9';
     const strategy = getMockStrategy();
 
     let subscriptions: Subscription[] = [];
     let stats = null;
 
-    if (token && orgId) {
-        try {
-            const data = await getProviderDashboardInit(token, orgId);
-            subscriptions = data.subscriptions;
-            console.log('ProviderDashboardPage subscriptions:', data);
-            if (data.stats) stats = data.stats;
-        } catch (error) {
-            console.error('[ProviderDashboardPage] API failed:', error);
-        }
+    try {
+        const data = await getProviderDashboardInit(token || '', orgId);
+        subscriptions = data.subscriptions || [];
+        console.log(`[ProviderDashboardPage] Loaded ${subscriptions.length} subscriptions`);
+        if (data.stats) stats = data.stats;
+    } catch (error) {
+        console.error('[ProviderDashboardPage] API failed:', error);
     }
 
-    // Default to mock data only if strategy allows
+    // Default to mock data only if strategy allows OR in dev mode if empty
     const hasNoData = !subscriptions.length;
-    if (hasNoData && (strategy === 'always' || (strategy === 'fallback' && (!token || process.env.NODE_ENV === 'development')))) {
+    if (hasNoData && (strategy === 'always' || strategy === 'fallback' || process.env.NODE_ENV === 'development')) {
         console.log(`[ProviderDashboardPage] Using fallback mock data (Strategy: ${strategy})`);
         subscriptions = FALLBACK_PROVIDER_DASHBOARD_DATA.subscriptions;
         if (!stats) stats = (FALLBACK_PROVIDER_DASHBOARD_DATA as any).stats;

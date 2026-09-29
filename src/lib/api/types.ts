@@ -61,6 +61,8 @@ export interface Subscription {
   provisionedAt?: string | null;
   steps?: any[];
   requests?: any[];
+  can_delete?: boolean;
+  has_approved_payment?: boolean;
 }
 
 export type SubscriptionData = Subscription; // For compatibility with components

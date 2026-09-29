@@ -50,6 +50,8 @@ export function mapSubscription(dto: any): Subscription {
     provisionedAt: dto.provisionedAt || dto.provisioned_at || null,
     steps: dto.steps || [],
     requests: dto.requests || [],
+    can_delete: dto.can_delete !== undefined ? dto.can_delete : true,
+    has_approved_payment: dto.has_approved_payment !== undefined ? dto.has_approved_payment : false,
   };
 }
 

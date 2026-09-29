@@ -12,6 +12,8 @@ import {
 } from '@/src/lib/api/provider';
 import Button from '@/src/components/shared/atoms/Button';
 import Icon from '@/src/components/shared/atoms/Icon';
+import ProviderTopNavigation from '../../shared/molecule/ProviderTopNavigation';
+import Footer from '../../shared/molecule/Footer';
 import styles from './index.module.scss';
 
 export interface ProviderClientsProps {
@@ -19,6 +21,7 @@ export interface ProviderClientsProps {
   initialMetrics: ProviderClientsMetrics;
   orgId: string;
   token?: string;
+  userProfile?: any;
 }
 
 export default function ProviderClients({
@@ -476,20 +479,19 @@ export default function ProviderClients({
                       {/* Status */}
                       <td>
                         <span
-                          className={`${styles['provider-clients__status-badge']} ${
-                            client.status === 'active'
+                          className={`${styles['provider-clients__status-badge']} ${client.status === 'active'
                               ? styles['provider-clients__status-badge--active']
                               : client.status === 'in_progress'
-                              ? styles['provider-clients__status-badge--in_progress']
-                              : styles['provider-clients__status-badge--suspended']
-                          }`}
+                                ? styles['provider-clients__status-badge--in_progress']
+                                : styles['provider-clients__status-badge--suspended']
+                            }`}
                         >
                           <span className="size-1.5 rounded-full bg-current" />
                           {client.status === 'active'
                             ? 'Active'
                             : client.status === 'in_progress'
-                            ? 'In Onboarding'
-                            : 'Suspended'}
+                              ? 'In Onboarding'
+                              : 'Suspended'}
                         </span>
                       </td>
 
@@ -610,8 +612,8 @@ export default function ProviderClients({
                       onChange={(e) => setSingleForm({ ...singleForm, client_type: e.target.value as any })}
                       className={styles['provider-clients__select']}
                     >
-                      <option value="legal_entity">Persona Jurídica (Company / Org)</option>
-                      <option value="natural_person">Persona Natural (Individual)</option>
+                      <option value="legal_entity">Legal Entity (Company / Org)</option>
+                      <option value="natural_person">Natural Person (Individual)</option>
                     </select>
                   </div>
 
@@ -652,15 +654,7 @@ export default function ProviderClients({
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-slate-800 flex items-center justify-end gap-3">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsSingleModalOpen(false)}
-                    disabled={isSubmittingSingle}
-                  >
-                    Cancel
-                  </Button>
+                <div className="pt-4 border-t border-slate-800 flex justify-end">
                   <Button
                     type="submit"
                     variant="primary"
@@ -684,7 +678,7 @@ export default function ProviderClients({
               <div className={styles['provider-clients__modal-header']}>
                 <h2 className={styles['provider-clients__modal-title']}>
                   <Icon name="upload_file" className="text-blue-400" />
-                  Bulk CSV Import (RF-PV-30)
+                  Bulk CSV Import
                 </h2>
                 <button
                   type="button"
@@ -779,15 +773,7 @@ export default function ProviderClients({
                     </div>
                   )}
 
-                  <div className="pt-4 border-t border-slate-800 flex items-center justify-end gap-3">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setIsBulkModalOpen(false)}
-                      disabled={isImportingBulk}
-                    >
-                      Cancel
-                    </Button>
+                  <div className="pt-4 border-t border-slate-800 flex justify-end">
                     <Button
                       type="button"
                       variant="primary"
@@ -852,11 +838,10 @@ export default function ProviderClients({
         {/* Floating Toast Notification */}
         {feedback && (
           <div
-            className={`${styles['provider-clients__toast']} ${
-              feedback.type === 'success'
+            className={`${styles['provider-clients__toast']} ${feedback.type === 'success'
                 ? styles['provider-clients__toast--success']
                 : styles['provider-clients__toast--error']
-            }`}
+              }`}
           >
             <Icon
               name={feedback.type === 'success' ? 'check_circle' : 'error'}

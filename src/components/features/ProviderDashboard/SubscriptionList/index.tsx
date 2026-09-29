@@ -7,9 +7,17 @@ export interface SubscriptionListProps {
     subscriptions: SubscriptionData[];
     className?: string;
     allExpanded?: boolean;
+    onDelete?: (sub: SubscriptionData) => void;
+    onDisable?: (sub: SubscriptionData) => void;
 }
 
-export default function SubscriptionList({ subscriptions = [], className, allExpanded = false }: SubscriptionListProps) {
+export default function SubscriptionList({
+    subscriptions = [],
+    className,
+    allExpanded = false,
+    onDelete,
+    onDisable,
+}: SubscriptionListProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [productFilter, setProductFilter] = useState('All');
 
@@ -68,7 +76,13 @@ export default function SubscriptionList({ subscriptions = [], className, allExp
             <div className={styles['subscription-list__list-container']}>
                 {filteredSubscriptions.length > 0 ? (
                     filteredSubscriptions.map(sub => (
-                        <SubscriptionRow key={sub.id} sub={sub} initialExpanded={allExpanded} />
+                        <SubscriptionRow
+                            key={sub.id}
+                            sub={sub}
+                            initialExpanded={allExpanded}
+                            onDelete={onDelete}
+                            onDisable={onDisable}
+                        />
                     ))
                 ) : (
                     <div className={styles['subscription-list__empty-state']}>

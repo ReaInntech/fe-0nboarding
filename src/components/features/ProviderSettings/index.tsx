@@ -14,12 +14,15 @@ import {
 } from '@/src/lib/api/provider';
 import Button from '@/src/components/shared/atoms/Button';
 import Icon from '@/src/components/shared/atoms/Icon';
+import ProviderTopNavigation from '../../shared/molecule/ProviderTopNavigation';
+import Footer from '../../shared/molecule/Footer';
 import styles from './index.module.scss';
 
 export interface ProviderSettingsProps {
   initialSettings: ProviderSettingsResponse;
   orgId: string;
   token?: string;
+  userProfile?: any;
 }
 
 type TabType = 'branding' | 'profile' | 'localization' | 'notifications' | 'plan';
@@ -28,6 +31,7 @@ export default function ProviderSettings({
   initialSettings,
   orgId,
   token,
+  userProfile,
 }: ProviderSettingsProps) {
   const [activeTab, setActiveTab] = useState<TabType>('branding');
   const [isSaving, setIsSaving] = useState(false);
@@ -101,6 +105,7 @@ export default function ProviderSettings({
 
   return (
     <div className={styles['provider-settings']}>
+      <ProviderTopNavigation activeTab="Settings" userProfile={userProfile} />
       <div className={styles['provider-settings__container']}>
         {/* Page Header */}
         <div className={styles['provider-settings__header']}>
@@ -179,7 +184,7 @@ export default function ProviderSettings({
               onClick={() => setActiveTab('branding')}
             >
               <Icon name="brush" />
-              <span>Visual Identity & Branding (RF-PV-24)</span>
+              <span>Visual Identity & Branding</span>
             </button>
             <button
               type="button"
@@ -187,7 +192,7 @@ export default function ProviderSettings({
               onClick={() => setActiveTab('profile')}
             >
               <Icon name="corporate_fare" />
-              <span>Corporate Profile (RF-PV-23)</span>
+              <span>Corporate Profile </span>
             </button>
             <button
               type="button"
@@ -195,7 +200,7 @@ export default function ProviderSettings({
               onClick={() => setActiveTab('localization')}
             >
               <Icon name="language" />
-              <span>Regional Localization (RF-PV-25)</span>
+              <span>Regional Localization </span>
             </button>
             <button
               type="button"
@@ -203,7 +208,7 @@ export default function ProviderSettings({
               onClick={() => setActiveTab('notifications')}
             >
               <Icon name="notifications_active" />
-              <span>Notification Rules (RF-PV-26)</span>
+              <span>Notification Rules</span>
             </button>
             <button
               type="button"
@@ -211,7 +216,7 @@ export default function ProviderSettings({
               onClick={() => setActiveTab('plan')}
             >
               <Icon name="diamond" />
-              <span>Plan & Quotas (RF-PV-27)</span>
+              <span>Plan & Quotas </span>
             </button>
           </div>
         </div>
@@ -907,11 +912,10 @@ export default function ProviderSettings({
         {/* Floating Toast Alert */}
         {feedback && (
           <div
-            className={`${styles['provider-settings__toast']} ${
-              feedback.type === 'success'
+            className={`${styles['provider-settings__toast']} ${feedback.type === 'success'
                 ? styles['provider-settings__toast--success']
                 : styles['provider-settings__toast--error']
-            }`}
+              }`}
           >
             <Icon
               name={feedback.type === 'success' ? 'check_circle' : 'error'}
@@ -921,6 +925,7 @@ export default function ProviderSettings({
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }

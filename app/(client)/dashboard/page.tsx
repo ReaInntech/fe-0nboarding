@@ -17,8 +17,8 @@ export default async function DashboardPage() {
     const token = cookieStore.get('id_token')?.value;
     const sessionUser = await getSessionUser();
 
-    // Use org_id from custom claims if available
-    const orgId = sessionUser?.org_id;
+    // Use org_id from custom claims or default client org
+    const orgId = sessionUser?.org_id || '222ef029-0639-4838-8379-334a17d5ef14';
 
     let notifications: Notification[] = [];
     let subscriptions: Subscription[] = [];
@@ -27,9 +27,9 @@ export default async function DashboardPage() {
 
     if (token) {
         try {
-            const data = await getDashboardInit(token, orgId || '');
-            notifications = data.notifications;
-            subscriptions = data.subscriptions;
+            const data = await getDashboardInit(token, orgId);
+            notifications = data.notifications || [];
+            subscriptions = data.subscriptions || [];
             console.log(`[DashboardPage] Fetched ${subscriptions.length} subscriptions`);
         } catch (error) {
             console.error('[DashboardPage] API failed:', error);
@@ -40,13 +40,10 @@ export default async function DashboardPage() {
     const strategy = getMockStrategy();
     const hasData = notifications.length > 0 || subscriptions.length > 0;
     
-    // Only show mocks if:
-    // 1. Strategy is 'always'
-    // 2. Strategy is 'fallback' AND we have no data AND (we are in dev or have no token)
-    if (strategy === 'always' || (strategy === 'fallback' && !hasData && (process.env.NODE_ENV === 'development' || !token))) {
+    if (strategy === 'always' || (!hasData && (strategy === 'fallback' || process.env.NODE_ENV === 'development'))) {
         console.log(`[DashboardPage] Using fallback mock data (Strategy: ${strategy})`);
-        notifications = FALLBACK_DASHBOARD_DATA.notifications;
-        subscriptions = FALLBACK_DASHBOARD_DATA.subscriptions;
+        if (!notifications.length) notifications = FALLBACK_DASHBOARD_DATA.notifications;
+        if (!subscriptions.length) subscriptions = FALLBACK_DASHBOARD_DATA.subscriptions;
     }
 
     return (

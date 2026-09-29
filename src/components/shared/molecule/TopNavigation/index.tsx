@@ -54,7 +54,7 @@ export default function TopNavigation({ isProvider, onLogout, activeTab: activeT
         { name: 'Support', path: '/support' },
     ];
 
-    const activeTab = activeTabProp || navItems.find(item => pathname?.startsWith(item.path))?.name || 'Services';
+    const activeTab = activeTabProp || (pathname?.startsWith('/subscriptions') ? 'Services' : navItems.find(item => pathname?.startsWith(item.path))?.name) || 'Services';
 
     // Fetch notifications
     useEffect(() => {

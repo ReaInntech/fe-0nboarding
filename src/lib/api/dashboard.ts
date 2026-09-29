@@ -53,22 +53,73 @@ export function mapSubscription(dto: any): Subscription {
   };
 }
 
-export async function getNotifications(token: string, orgId: string): Promise<Notification[]> {
-  const data = await apiFetch<NotificationDTO[]>('/notifications', { token, orgId });
-  return (data || []).map(mapNotification);
+export async function getNotifications(token?: string, orgId?: string): Promise<Notification[]> {
+  return executeWithFallback(async () => {
+    const data = await apiFetch<NotificationDTO[]>('/notifications', { token, orgId });
+    return (data || []).map(mapNotification);
+  }, FALLBACK_DASHBOARD_DATA.notifications);
 }
 
-export async function getSubscriptions(token: string, orgId: string): Promise<Subscription[]> {
-  const data = await apiFetch<SubscriptionDTO[]>('/subscriptions', { token, orgId });
-  return (data || []).map(mapSubscription);
+export async function getSubscriptions(token?: string, orgId?: string): Promise<Subscription[]> {
+  return executeWithFallback(async () => {
+    const data = await apiFetch<SubscriptionDTO[]>('/subscriptions', { token, orgId });
+    return (data || []).map(mapSubscription);
+  }, FALLBACK_DASHBOARD_DATA.subscriptions);
 }
 
-export async function markNotificationRead(id: string, token: string, orgId: string) {
+export async function markNotificationRead(id: string, token?: string, orgId?: string) {
   return apiFetch(`/notifications/${id}`, {
     method: 'PATCH',
+    microservice: 'core',
     token,
     orgId,
     body: JSON.stringify({ is_read: true }),
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+export async function getUnreadNotificationsCount(token?: string, orgId?: string): Promise<number> {
+  try {
+    const data = await apiFetch<{ unread_count: number }>('/notifications/unread-count', {
+      microservice: 'core',
+      token,
+      orgId,
+    });
+    return data?.unread_count || 0;
+  } catch {
+    return 0;
+  }
+}
+
+export async function markAllNotificationsRead(token?: string, orgId?: string) {
+  return apiFetch('/notifications/read-all', {
+    method: 'PATCH',
+    microservice: 'core',
+    token,
+    orgId,
+  });
+}
+
+/**
+ * RF-TR-03: Request 6-digit OTP code for Provider Mode activation
+ */
+export async function generateProviderOtp(token?: string) {
+  return apiFetch<any>('/auth/otp/generate', {
+    method: 'POST',
+    microservice: 'core',
+    token,
+  });
+}
+
+/**
+ * RF-TR-03: Verify 6-digit OTP code for Provider Mode activation
+ */
+export async function verifyProviderOtp(code: string, token?: string) {
+  return apiFetch<any>('/auth/otp/verify', {
+    method: 'POST',
+    microservice: 'core',
+    token,
+    body: JSON.stringify({ code }),
     headers: { 'Content-Type': 'application/json' },
   });
 }

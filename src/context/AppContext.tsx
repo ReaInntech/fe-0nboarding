@@ -87,8 +87,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Subscribe to Global API Unauthorized events (401)
     import('../lib/api/config').then(({ setUnauthorizedListener }) => {
-      setUnauthorizedListener(() => {
-        console.warn('[AppContext] Global 401 detected via API listener. Triggering logout.');
+      setUnauthorizedListener(async () => {
+        console.warn('[AppContext] Global 401 detected via API listener. Verifying auth status before logout...');
+        try {
+          if (auth.currentUser) {
+            const token = await auth.currentUser.getIdToken(true);
+            if (token) {
+              console.log('[AppContext] Firebase session is valid (token refreshed). Skipping logout.');
+              return;
+            }
+          }
+        } catch {
+          console.warn('[AppContext] Firebase token refresh failed. Proceeding with logout.');
+        }
         handleLogout();
       });
     });

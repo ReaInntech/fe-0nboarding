@@ -9,7 +9,7 @@ function formatPrivateKey(keyStr?: string) {
   let key = keyStr.replace(/^"|"$/g, '');
   
   // Extract base64 content between the standard PEM headers
-  const match = key.match(/-----BEGIN PRIVATE KEY-----(.*?)-----END PRIVATE KEY-----/s);
+  const match = key.match(/-----BEGIN PRIVATE KEY-----([\s\S]*?)-----END PRIVATE KEY-----/);
   if (match) {
     // Remove literal '\n', literal '\', and all whitespace from the base64 content
     const base64 = match[1].replace(/\\n/g, '').replace(/\\/g, '').replace(/\s+/g, '');

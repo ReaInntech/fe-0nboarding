@@ -233,7 +233,7 @@ export interface ReorderStepsDTO {
 export interface OnboardingRequest {
   id: string;
   title: string;
-  type: 'payment' | 'document' | 'terms' | 'form';
+  type: 'payment' | 'document' | 'terms' | 'form' | 'document_review';
   config?: any;
   hasResolved?: boolean;
 }
@@ -253,6 +253,12 @@ export interface ClientRequest {
   status: 'pending' | 'in_review' | 'approved' | 'rejected' | string;
   priority: 'high' | 'medium' | 'low' | string;
   date: string;
+  subscription_id?: string;
+  status_request_id?: string;
+  request_type?: string;
+  client_name?: string;
+  feedback_notes?: string;
+  resolved_data?: any;
 }
 
 export interface RequirementField {

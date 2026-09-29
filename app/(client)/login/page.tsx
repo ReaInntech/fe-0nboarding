@@ -36,8 +36,14 @@ export default function LoginPage() {
                 console.log('[LoginPage] Sign in success');
             }
 
-            // The onAuthStateChanged listener in AppContext will handle session creation and profile fetching.
-            // We just need to wait for the redirect handled by the useEffect above.
+            // Sync server session cookies immediately to avoid race conditions with SSR
+            try {
+                const token = await userCredential.user.getIdToken();
+                const { createSession } = await import('@/src/lib/firebase/auth-actions');
+                await createSession(token);
+            } catch (err) {
+                console.warn('[LoginPage] Immediate session sync failed, fallback to AppContext listener', err);
+            }
         } catch (err: any) {
             console.error('[LoginPage] Auth error:', err);
             let message = 'Authentication failed.';
@@ -56,8 +62,15 @@ export default function LoginPage() {
     const handleGoogleLogin = async () => {
         setAuthError(null);
         try {
-            await signInWithPopup(auth, googleProvider);
+            const userCredential = await signInWithPopup(auth, googleProvider);
             console.log('[LoginPage] Google sign in success');
+            try {
+                const token = await userCredential.user.getIdToken();
+                const { createSession } = await import('@/src/lib/firebase/auth-actions');
+                await createSession(token);
+            } catch (err) {
+                console.warn('[LoginPage] Google immediate session sync failed', err);
+            }
             router.push('/dashboard');
         } catch (err: any) {
             console.error('[LoginPage] Google login error:', err);

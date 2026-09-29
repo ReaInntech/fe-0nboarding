@@ -57,7 +57,7 @@ export default function ProviderProductView({
         });
     };
 
-    const handleSaveStepMetadata = async (stepId: string, data: Partial<OnboardingStep>) => {
+    const handleSaveStepMetadata = async (stepId: string, data: Partial<OnboardingStep>): Promise<void> => {
         if (!product?.productCode) return;
         const freshToken = await getFreshToken();
         const isNew = stepId.startsWith('step_');
@@ -66,7 +66,7 @@ export default function ProviderProductView({
         const stepLabel = data.name || 'New Step';
 
         if (isNew) {
-            return await api.createProductStep(product.productCode, freshToken, orgId, {
+            await api.createProductStep(product.productCode, freshToken, orgId, {
                 label: stepLabel,
                 description: data.description || '',
                 icon: data.icon || 'Plus',
@@ -74,7 +74,7 @@ export default function ProviderProductView({
                 sort_order: onboardingSteps.length // Append to end
             });
         } else {
-            return await api.updateProductStepMetadata(product.productCode, stepId, freshToken, orgId, {
+            await api.updateProductStepMetadata(product.productCode, stepId, freshToken, orgId, {
                 label: stepLabel,
                 description: data.description,
                 icon: data.icon,

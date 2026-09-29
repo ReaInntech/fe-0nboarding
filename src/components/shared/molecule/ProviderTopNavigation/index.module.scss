@@ -48,6 +48,14 @@
         @apply pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400;
     }
 
+    &__bell-btn {
+        @apply relative p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer flex items-center justify-center;
+    }
+
+    &__bell-badge {
+        @apply absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-blue-600 text-white rounded-full text-[9px] font-bold flex items-center justify-center border border-slate-900 shadow-md;
+    }
+
     &__logout-btn {
         @apply hidden md:flex items-center text-slate-400 hover:text-white transition-colors ml-2 cursor-pointer;
     }

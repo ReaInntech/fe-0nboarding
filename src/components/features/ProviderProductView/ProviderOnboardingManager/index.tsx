@@ -7,6 +7,7 @@ import Button from '../../../shared/atoms/Button';
 import ConfirmDialog from '../../../shared/molecule/ConfirmDialog';
 import RequestPaymentCard from '../RequestPaymentCard';
 import DocumentRequestCard from '../DocumentRequestCard';
+import DocumentReviewRequestCard from '../DocumentReviewRequestCard';
 import TermsAndConditionsRequestCard from '../TermsAndConditionsRequestCard';
 import FormRequestCard from '../FormRequestCard';
 import { OnboardingStep, OnboardingRequest } from '@/src/lib/api/types';
@@ -103,7 +104,8 @@ export default function ProviderOnboardingManager({
             payment: 'Payment Request',
             document: 'Document Request',
             terms: 'Terms & Conditions',
-            form: 'Form Request'
+            form: 'Form Request',
+            document_review: 'Review & Approval Request',
         };
         const newRequest: OnboardingRequest = {
             id: `req_${Date.now()}`,
@@ -352,6 +354,14 @@ export default function ProviderOnboardingManager({
                                                             {...sharedProps}
                                                         />
                                                     );
+                                                    if (req.type === 'document_review') return (
+                                                        <DocumentReviewRequestCard
+                                                            key={req.id}
+                                                            title={req.title}
+                                                            disabled={isStepLocal}
+                                                            {...sharedProps}
+                                                        />
+                                                    );
                                                     return (
                                                         <RequestPaymentCard
                                                             key={req.id}
@@ -406,6 +416,18 @@ export default function ProviderOnboardingManager({
                                                                 <Icon name="assignment" style={{ fontSize: 16 }} />
                                                             </div>
                                                             <span className={styles['onboarding-manager__add-card-label']}>Form</span>
+                                                        </button>
+                                                    </div>
+                                                    <div className={styles['onboarding-manager__add-row']}>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => addRequest(idx, 'document_review')}
+                                                            className={`${styles['onboarding-manager__add-card']} border-blue-500/20 hover:border-blue-500/60`}
+                                                        >
+                                                            <div className={`${styles['onboarding-manager__add-card-icon']} text-blue-400 bg-blue-500/10`}>
+                                                                <Icon name="rule_folder" style={{ fontSize: 16 }} />
+                                                            </div>
+                                                            <span className={styles['onboarding-manager__add-card-label']}>Review & Approval</span>
                                                         </button>
                                                     </div>
                                                 </div>

@@ -1,0 +1,97 @@
+@reference "tailwindcss";
+
+.doc-review-card {
+    @apply p-5 bg-[#0f1523]/60 border border-slate-800 rounded-xl transition-all duration-300;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 20px -10px rgba(0, 0, 0, 0.5);
+
+    &:hover {
+        @apply border-blue-500/40 shadow-lg shadow-blue-500/5;
+        transform: translateY(-2px);
+    }
+
+    &__header {
+        @apply flex items-center justify-between mb-5 pb-3 border-b border-white/[0.03];
+    }
+
+    &__title-box {
+        @apply flex items-center gap-3;
+    }
+
+    &__icon-wrapper {
+        @apply size-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center;
+        box-shadow: inset 0 0 10px rgba(59, 130, 246, 0.05);
+    }
+
+    &__title {
+        @apply text-xs font-bold text-slate-100 uppercase tracking-widest;
+    }
+
+    &__actions {
+        @apply flex items-center gap-1.5 transition-opacity;
+        
+        button {
+            @apply p-1.5 rounded-md text-slate-500 hover:text-white hover:bg-white/5 transition-all;
+        }
+
+        .delete-btn {
+            @apply hover:text-red-400 hover:bg-red-400/5;
+        }
+    }
+
+    &__body {
+        @apply space-y-4;
+    }
+
+    &__upload-zone {
+        @apply text-center border border-dashed border-slate-800 rounded-xl p-5 hover:bg-blue-500/[0.02] hover:border-blue-500/30 transition-all cursor-pointer;
+
+        &:hover &-icon {
+            @apply text-blue-400 border-blue-500/20 scale-110;
+        }
+
+        &:hover &-text {
+            @apply text-slate-200;
+        }
+    }
+
+    &__upload-zone-icon {
+        @apply size-10 rounded-full bg-slate-950/50 border border-slate-800 flex items-center justify-center mx-auto mb-3 text-slate-600 transition-all duration-300;
+    }
+
+    &__upload-zone-text {
+        @apply text-[10px] font-bold text-slate-400 transition-colors uppercase tracking-wider;
+    }
+
+    &__upload-zone-subtext {
+        @apply text-[10px] text-slate-500 mt-1.5;
+    }
+
+    &__field {
+        @apply flex flex-col gap-2;
+    }
+
+    &__label {
+        @apply text-[9px] font-black uppercase tracking-[0.15em] text-blue-400/80;
+    }
+
+    &__input {
+        @apply w-full bg-slate-950/40 border border-slate-800/80 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all placeholder:text-slate-700;
+    }
+
+    &__toggle-row {
+        @apply flex items-center justify-between p-3 rounded-lg bg-slate-950/30 border border-slate-800/60;
+    }
+
+    &__toggle-label {
+        @apply text-xs font-medium text-slate-300;
+    }
+
+    &__toggle-subtext {
+        @apply text-[10px] text-slate-500;
+    }
+
+    &__toggle-input {
+        @apply h-4 w-4 rounded border-slate-700 bg-slate-900 text-blue-600 focus:ring-blue-500/20;
+    }
+}

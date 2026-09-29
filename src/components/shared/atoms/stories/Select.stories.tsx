@@ -17,13 +17,16 @@ const meta = {
     activeColor: { control: 'color' },
     label: { control: 'text' }
   },
+  args: {
+    onChange: () => {},
+  },
 } satisfies Meta<typeof Select>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 // Wrapper to show dark theme and manage state
-const InteractiveDecorator = (Story: React.FC, context: any) => {
+const InteractiveDecorator = (Story: any, context: any) => {
   const [val, setVal] = useState(context.args.value || context.args.options[0].value);
 
   return (

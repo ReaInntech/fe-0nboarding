@@ -13,13 +13,15 @@ import PaymentRequest, { PaymentRequestProps } from '../PaymentRequest';
 import DocumentRequest, { DocumentRequestProps } from '../DocumentRequest';
 import FormRequest, { FormRequestProps } from '../FormRequest';
 import TermsAndConditionsRequest, { TermsAndConditionsRequestProps } from '../TermsAndConditionsRequest';
+import DocumentReviewRequest, { DocumentReviewRequestProps } from '../DocumentReviewRequest';
 import styles from './index.module.scss';
 
 export type RequestType =
     | ({ type: 'payment' } & PaymentRequestProps)
     | ({ type: 'document' } & DocumentRequestProps)
     | ({ type: 'form' } & FormRequestProps)
-    | ({ type: 'terms' } & TermsAndConditionsRequestProps);
+    | ({ type: 'terms' } & TermsAndConditionsRequestProps)
+    | ({ type: 'document_review' } & DocumentReviewRequestProps);
 
 export interface UnifiedProductViewProps {
     headerProps: ProductHeaderProps;
@@ -91,6 +93,8 @@ export default function UnifiedProductView({
                                             return <FormRequest key={index} {...componentProps} />;
                                         case 'terms':
                                             return <TermsAndConditionsRequest key={index} {...componentProps} />;
+                                        case 'document_review':
+                                            return <DocumentReviewRequest key={index} {...componentProps} />;
                                         default:
                                             return null;
                                     }

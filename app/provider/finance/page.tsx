@@ -55,7 +55,7 @@ export default async function ProviderFinancePage() {
 
     return (
         <ProviderFinance 
-            kpis={kpis}
+            kpis={kpis || FALLBACK_PROVIDER_FINANCE_DATA.kpis}
             revenueData={revenueData}
             distributionData={distributionData}
             transactions={transactions}

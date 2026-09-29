@@ -1,0 +1,223 @@
+@reference "tailwindcss";
+
+.provider-settings {
+    @apply pt-[72px] min-h-screen bg-[#0b0f19] text-slate-200 font-sans pb-20;
+
+    &__container {
+        @apply max-w-6xl mx-auto px-6 space-y-8;
+    }
+
+    &__header {
+        @apply flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 border-b border-slate-800/80;
+    }
+
+    &__header-title-box {
+        @apply flex items-center gap-4;
+    }
+
+    &__header-icon {
+        @apply size-12 rounded-2xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center text-2xl shadow-lg shadow-blue-500/10;
+    }
+
+    &__title {
+        @apply text-2xl font-bold text-white tracking-tight flex items-center gap-3;
+    }
+
+    &__subtitle {
+        @apply text-xs text-slate-400 mt-1;
+    }
+
+    &__save-bar {
+        @apply flex items-center gap-3;
+    }
+
+    /* Tabs Bar */
+    &__tabs-wrapper {
+        @apply bg-slate-900/60 p-1.5 rounded-2xl border border-slate-800/80 backdrop-blur-md;
+    }
+
+    &__tabs {
+        @apply flex items-center gap-2 overflow-x-auto;
+    }
+
+    &__tab-button {
+        @apply flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all whitespace-nowrap;
+
+        &--active {
+            @apply bg-blue-600 text-white shadow-lg shadow-blue-600/20 hover:bg-blue-600 hover:text-white;
+        }
+    }
+
+    /* Tab Panels */
+    &__panel {
+        @apply space-y-8;
+    }
+
+    /* Cards */
+    &__card {
+        @apply bg-[#0f1523]/80 border border-slate-800/80 rounded-2xl p-6 shadow-xl backdrop-blur-md space-y-6;
+    }
+
+    &__card-header {
+        @apply flex items-start justify-between pb-4 border-b border-slate-800/60;
+    }
+
+    &__card-title {
+        @apply text-base font-bold text-white flex items-center gap-2;
+    }
+
+    &__card-description {
+        @apply text-xs text-slate-400 mt-1;
+    }
+
+    /* Forms */
+    &__form-grid {
+        @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+    }
+
+    &__form-full {
+        @apply md:col-span-2;
+    }
+
+    &__field-group {
+        @apply flex flex-col gap-2;
+    }
+
+    &__field-label {
+        @apply text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center justify-between;
+    }
+
+    &__field-hint {
+        @apply text-[11px] text-slate-500 font-normal lowercase;
+    }
+
+    &__input {
+        @apply w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all;
+    }
+
+    &__select {
+        @apply w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all appearance-none cursor-pointer;
+    }
+
+    /* Color Swatch & Picker */
+    &__color-picker-box {
+        @apply flex items-center gap-3 p-3 bg-slate-950/50 border border-slate-800 rounded-xl;
+    }
+
+    &__color-swatch-input {
+        @apply size-9 rounded-lg border-0 cursor-pointer bg-transparent overflow-hidden p-0;
+    }
+
+    &__color-hex-input {
+        @apply flex-1 bg-transparent font-mono text-xs uppercase text-slate-200 focus:outline-none;
+    }
+
+    /* Live Preview Component */
+    &__preview-card {
+        @apply bg-[#0b0f19] border border-slate-700/80 rounded-2xl p-6 shadow-2xl space-y-5;
+    }
+
+    &__preview-badge {
+        @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-400 border border-blue-500/20;
+    }
+
+    &__preview-mockup {
+        @apply rounded-xl border border-slate-800 bg-slate-900/50 p-5 space-y-4;
+    }
+
+    &__preview-navbar {
+        @apply flex items-center justify-between pb-3 border-b border-slate-800;
+    }
+
+    &__preview-brand {
+        @apply flex items-center gap-3;
+    }
+
+    &__preview-logo {
+        @apply h-7 max-w-[130px] object-contain;
+    }
+
+    &__preview-isotype {
+        @apply size-7 rounded-lg flex items-center justify-center font-bold text-white text-xs shadow-md;
+    }
+
+    &__preview-client-badge {
+        @apply px-3 py-1 rounded-full text-[11px] font-semibold text-white shadow-sm;
+    }
+
+    /* Notification Toggles */
+    &__toggle-card {
+        @apply flex items-center justify-between p-4 bg-slate-950/40 border border-slate-800/80 rounded-xl hover:border-slate-700 transition-all;
+    }
+
+    &__toggle-info {
+        @apply space-y-0.5 pr-4;
+    }
+
+    &__toggle-title {
+        @apply text-xs font-semibold text-white;
+    }
+
+    &__toggle-desc {
+        @apply text-[11px] text-slate-400;
+    }
+
+    &__switch {
+        @apply relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer;
+        background-color: #1e293b;
+
+        &--checked {
+            @apply bg-blue-600;
+        }
+    }
+
+    &__switch-thumb {
+        @apply inline-block h-4 w-4 transform rounded-full bg-white transition-transform ml-1;
+
+        &--checked {
+            transform: translateX(1.25rem);
+        }
+    }
+
+    /* Plan & Quota Meters */
+    &__quota-grid {
+        @apply grid grid-cols-1 md:grid-cols-3 gap-4;
+    }
+
+    &__quota-card {
+        @apply p-4 rounded-xl bg-slate-950/50 border border-slate-800/80 space-y-3;
+    }
+
+    &__quota-header {
+        @apply flex items-center justify-between text-xs text-slate-400;
+    }
+
+    &__quota-numbers {
+        @apply flex items-baseline gap-1 text-sm font-bold text-white;
+    }
+
+    &__quota-limit {
+        @apply text-xs font-normal text-slate-500;
+    }
+
+    &__progress-track {
+        @apply h-2 w-full bg-slate-800 rounded-full overflow-hidden;
+    }
+
+    &__progress-fill {
+        @apply h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-500;
+    }
+
+    /* Notification Alerts */
+    &__toast {
+        @apply fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl border shadow-2xl backdrop-blur-md transition-all text-xs font-medium;
+
+        &--success {
+            @apply bg-emerald-950/90 border-emerald-500/30 text-emerald-200;
+        }
+
+        &--error {
+            @apply bg-rose-950/90 border-rose-500/30 text-rose-200;
+        }
+    }
+}

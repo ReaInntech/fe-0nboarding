@@ -170,11 +170,17 @@ export const FALLBACK_SUPPORT_DATA = {
 
 export const FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA = {
     product: {
+        id: "prod-mock-1",
         name: "Cloud Infrastructure",
+        description: "Enterprise high-performance cloud hosting and automated infrastructure management.",
+        price: 499.00,
+        period: "month",
+        sold: 12,
         productCode: "PROD-1029",
+        category: "Cloud",
         icon: "cloud",
         iconColor: "text-blue-500",
-        status: "active"
+        status: "active" as const
     },
     onboardingSteps: [
         { 
@@ -336,3 +342,151 @@ export const FALLBACK_SUBSCRIPTION_DETAIL_DATA: UnifiedProductViewProps = {
         ]
     },
 };
+
+export const FALLBACK_PROVIDER_SETTINGS = {
+    organization: {
+        id: 'org-prov-1',
+        legal_name: 'Acme Cloud Technologies S.A.S.',
+        trade_name: 'Acme Cloud Solutions',
+        client_type: 'legal_entity',
+        tax_id: '900.829.102-4',
+        email: 'contacto@acmecloud.com',
+        phone: '+57 300 123 4567',
+        address: 'Cra 43A # 1-50, Medellín, Colombia',
+        country: 'Colombia',
+        website: 'https://acmecloud.com',
+        domain: 'acmecloud.com',
+    },
+    branding: {
+        logo_url: null as string | null,
+        isotype_url: null as string | null,
+        favicon_url: null as string | null,
+        brand_primary_color: '#1978E5',
+        brand_secondary_color: '#10B981',
+        brand_accent_color: '#F59E0B',
+    },
+    localization: {
+        currency: 'COP',
+        language: 'es',
+        timezone: 'America/Bogota',
+        date_format: 'DD/MM/YYYY',
+    },
+    notifications: {
+        notification_email: 'alertas@acmecloud.com',
+        mute_notifications: false,
+        email_on_request: true,
+        inapp_on_request: true,
+        email_on_ticket: true,
+        inapp_on_ticket: true,
+        email_on_payment: true,
+        inapp_on_payment: true,
+    },
+    plan: {
+        name: 'Enterprise Scale',
+        renewal_date: '2026-12-31',
+        products_used: 4,
+        products_limit: 20,
+        clients_used: 48,
+        clients_limit: 250,
+        storage_used_gb: 12.4,
+        storage_limit_gb: 100,
+    }
+};
+
+export const FALLBACK_PROVIDER_CLIENTS_DATA = {
+    metrics: {
+        total: 24,
+        active: 18,
+        in_progress: 5,
+        suspended: 1,
+    },
+    clients: [
+        {
+            id: 'org-cli-1',
+            legal_name: 'Real Innovation Tech S.A.S.',
+            trade_name: 'Real Innovation',
+            dominio: 'realinnovation.tech',
+            email: 'admin@realinnovation.tech',
+            phone: '+57 310 987 6543',
+            country: 'Colombia',
+            client_type: 'legal_entity' as const,
+            created_at: '2026-03-10T10:00:00Z',
+            subscriptions_count: 2,
+            active_subscriptions_count: 2,
+            status: 'active' as const,
+            subscriptions: [
+                { id: 'sub-1', productName: 'Cloud Infrastructure Enterprise', status: 'active', price: 1290 },
+                { id: 'sub-2', productName: 'AI Strategic Advisory', status: 'active', price: 2500 }
+            ]
+        },
+        {
+            id: 'org-cli-2',
+            legal_name: 'Banco Andino de Desarrollo',
+            trade_name: 'Banco Andino',
+            dominio: 'bancoandino.com',
+            email: 'procurement@bancoandino.com',
+            phone: '+57 601 456 7890',
+            country: 'Colombia',
+            client_type: 'legal_entity' as const,
+            created_at: '2026-03-15T14:30:00Z',
+            subscriptions_count: 1,
+            active_subscriptions_count: 0,
+            status: 'in_progress' as const,
+            subscriptions: [
+                { id: 'sub-3', productName: 'Security Compliance Suite', status: 'in_progress', price: 3400 }
+            ]
+        },
+        {
+            id: 'org-cli-3',
+            legal_name: 'Fintech Solutions Latam Ltd.',
+            trade_name: 'Fintech Latam',
+            dominio: 'fintechlatam.io',
+            email: 'ops@fintechlatam.io',
+            phone: '+52 55 1234 5678',
+            country: 'México',
+            client_type: 'legal_entity' as const,
+            created_at: '2026-02-20T09:15:00Z',
+            subscriptions_count: 1,
+            active_subscriptions_count: 1,
+            status: 'active' as const,
+            subscriptions: [
+                { id: 'sub-4', productName: 'Core Payment Gateway Connector', status: 'active', price: 950 }
+            ]
+        },
+        {
+            id: 'org-cli-4',
+            legal_name: 'Dr. Carlos Mendoza',
+            trade_name: 'Mendoza Consultores',
+            dominio: 'mendozaconsulting.com',
+            email: 'carlos@mendozaconsulting.com',
+            phone: '+57 320 555 4321',
+            country: 'Colombia',
+            client_type: 'natural_person' as const,
+            created_at: '2026-04-01T16:00:00Z',
+            subscriptions_count: 1,
+            active_subscriptions_count: 0,
+            status: 'in_progress' as const,
+            subscriptions: [
+                { id: 'sub-5', productName: 'Cloud Infrastructure Basic', status: 'in_progress', price: 499 }
+            ]
+        },
+        {
+            id: 'org-cli-5',
+            legal_name: 'Logística Continental S.A.',
+            trade_name: 'Continental Cargo',
+            dominio: 'continentalcargo.pe',
+            email: 'sistemas@continentalcargo.pe',
+            phone: '+51 1 987 6543',
+            country: 'Perú',
+            client_type: 'legal_entity' as const,
+            created_at: '2026-01-12T11:45:00Z',
+            subscriptions_count: 1,
+            active_subscriptions_count: 0,
+            status: 'suspended' as const,
+            subscriptions: [
+                { id: 'sub-6', productName: 'Dedicated Fleet API', status: 'suspended', price: 800 }
+            ]
+        }
+    ]
+};
+

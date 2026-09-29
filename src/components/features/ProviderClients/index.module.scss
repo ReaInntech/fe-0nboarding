@@ -1,0 +1,241 @@
+@reference "tailwindcss";
+
+.provider-clients {
+    @apply pt-[72px] min-h-screen bg-[#0b0f19] text-slate-200 font-sans pb-24;
+
+    &__container {
+        @apply max-w-7xl mx-auto px-6 space-y-8;
+    }
+
+    /* Header */
+    &__header {
+        @apply flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 border-b border-slate-800/80;
+    }
+
+    &__header-title-box {
+        @apply flex items-center gap-4;
+    }
+
+    &__header-icon {
+        @apply size-12 rounded-2xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center text-2xl shadow-lg shadow-blue-500/10;
+    }
+
+    &__title {
+        @apply text-2xl font-bold text-white tracking-tight flex items-center gap-3;
+    }
+
+    &__subtitle {
+        @apply text-xs text-slate-400 mt-1;
+    }
+
+    &__actions {
+        @apply flex items-center gap-3;
+    }
+
+    /* Metrics Grid */
+    &__metrics-grid {
+        @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4;
+    }
+
+    &__metric-card {
+        @apply p-5 rounded-2xl bg-[#0f1523]/80 border border-slate-800/80 backdrop-blur-md shadow-xl transition-all duration-300;
+
+        &:hover {
+            @apply border-slate-700/80 -translate-y-0.5;
+        }
+    }
+
+    &__metric-header {
+        @apply flex items-center justify-between text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2;
+    }
+
+    &__metric-value {
+        @apply text-3xl font-extrabold text-white tracking-tight;
+    }
+
+    &__metric-subtext {
+        @apply text-[11px] text-slate-500 mt-1;
+    }
+
+    /* Controls Bar: Search & Status Filters */
+    &__controls-bar {
+        @apply flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-4 rounded-2xl bg-[#0f1523]/60 border border-slate-800/80 backdrop-blur-md;
+    }
+
+    &__search-box {
+        @apply relative flex-1 max-w-md;
+    }
+
+    &__search-icon {
+        @apply absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-lg;
+    }
+
+    &__search-input {
+        @apply w-full bg-slate-950/60 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all;
+    }
+
+    &__filter-tabs {
+        @apply flex items-center gap-1.5 overflow-x-auto;
+    }
+
+    &__filter-tab {
+        @apply px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all whitespace-nowrap;
+
+        &--active {
+            @apply bg-blue-600 text-white shadow-md shadow-blue-600/20 hover:bg-blue-600 hover:text-white;
+        }
+    }
+
+    /* Clients Table */
+    &__table-wrapper {
+        @apply rounded-2xl bg-[#0f1523]/80 border border-slate-800/80 backdrop-blur-md shadow-2xl overflow-hidden;
+    }
+
+    &__table {
+        @apply w-full text-left border-collapse text-xs;
+    }
+
+    &__thead {
+        @apply bg-slate-950/60 border-b border-slate-800 text-[11px] uppercase tracking-wider text-slate-400 font-semibold;
+
+        th {
+            @apply py-3.5 px-5;
+        }
+    }
+
+    &__tbody {
+        @apply divide-y divide-slate-800/60;
+
+        tr {
+            @apply hover:bg-white/[0.02] transition-colors;
+        }
+
+        td {
+            @apply py-4 px-5 align-middle;
+        }
+    }
+
+    &__client-identity {
+        @apply flex items-center gap-3;
+    }
+
+    &__client-avatar {
+        @apply size-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-bold flex items-center justify-center text-sm shadow-md shadow-blue-600/10;
+    }
+
+    &__client-name {
+        @apply text-sm font-bold text-white tracking-wide;
+    }
+
+    &__client-domain {
+        @apply text-[11px] text-slate-400 font-mono flex items-center gap-1 mt-0.5;
+    }
+
+    &__status-badge {
+        @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider;
+
+        &--active {
+            @apply bg-emerald-500/10 text-emerald-400 border border-emerald-500/20;
+        }
+
+        &--in_progress {
+            @apply bg-amber-500/10 text-amber-400 border border-amber-500/20;
+        }
+
+        &--suspended {
+            @apply bg-rose-500/10 text-rose-400 border border-rose-500/20;
+        }
+    }
+
+    &__empty {
+        @apply text-center py-16 px-4 space-y-3;
+    }
+
+    &__empty-icon {
+        @apply size-12 rounded-2xl bg-slate-800/40 text-slate-500 flex items-center justify-center mx-auto text-2xl;
+    }
+
+    /* Modal Backdrop & Container */
+    &__modal-backdrop {
+        @apply fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4;
+    }
+
+    &__modal {
+        @apply w-full max-w-2xl bg-[#0f1523] border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto;
+    }
+
+    &__modal-header {
+        @apply flex items-center justify-between pb-4 border-b border-slate-800;
+    }
+
+    &__modal-title {
+        @apply text-lg font-bold text-white flex items-center gap-2.5;
+    }
+
+    &__modal-close {
+        @apply p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all;
+    }
+
+    /* Forms inside Modals */
+    &__form-grid {
+        @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+    }
+
+    &__form-full {
+        @apply md:col-span-2;
+    }
+
+    &__field-group {
+        @apply flex flex-col gap-1.5;
+    }
+
+    &__field-label {
+        @apply text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center justify-between;
+    }
+
+    &__input {
+        @apply w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all;
+    }
+
+    &__select {
+        @apply w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all appearance-none cursor-pointer;
+    }
+
+    &__domain-badge {
+        @apply flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium mt-1;
+
+        &--available {
+            @apply bg-emerald-500/10 text-emerald-400 border border-emerald-500/20;
+        }
+
+        &--unavailable {
+            @apply bg-amber-500/10 text-amber-400 border border-amber-500/20;
+        }
+
+        &--checking {
+            @apply bg-blue-500/10 text-blue-400 border border-blue-500/20 animate-pulse;
+        }
+    }
+
+    /* CSV Upload Zone */
+    &__csv-zone {
+        @apply border-2 border-dashed border-slate-800 rounded-2xl p-8 text-center hover:border-blue-500/40 hover:bg-blue-500/[0.02] transition-all cursor-pointer space-y-3;
+    }
+
+    &__csv-icon {
+        @apply size-12 rounded-full bg-blue-600/10 text-blue-400 flex items-center justify-center mx-auto text-2xl;
+    }
+
+    /* Toast */
+    &__toast {
+        @apply fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl border shadow-2xl backdrop-blur-md transition-all text-xs font-medium;
+
+        &--success {
+            @apply bg-emerald-950/90 border-emerald-500/30 text-emerald-200;
+        }
+
+        &--error {
+            @apply bg-rose-950/90 border-rose-500/30 text-rose-200;
+        }
+    }
+}

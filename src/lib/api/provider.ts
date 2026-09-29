@@ -20,7 +20,9 @@ import {
   FALLBACK_PROVIDER_DASHBOARD_DATA,
   FALLBACK_PROVIDER_FINANCE_DATA,
   FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA,
-  FALLBACK_PROVIDER_PRODUCTS_DATA
+  FALLBACK_PROVIDER_PRODUCTS_DATA,
+  FALLBACK_PROVIDER_SETTINGS,
+  FALLBACK_PROVIDER_CLIENTS_DATA,
 } from './mocks';
 import { mapBillingPeriod } from '../utils/product';
 
@@ -395,5 +397,294 @@ export async function createClientOrganization(token: string, orgId: string, dat
       email: data.email,
     }),
     headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+export interface ProviderSettingsBranding {
+  logo_url?: string | null;
+  isotype_url?: string | null;
+  favicon_url?: string | null;
+  brand_primary_color?: string;
+  brand_secondary_color?: string;
+  brand_accent_color?: string;
+}
+
+export interface ProviderSettingsLocalization {
+  currency?: string;
+  language?: string;
+  timezone?: string;
+  date_format?: string;
+}
+
+export interface ProviderSettingsNotifications {
+  notification_email?: string;
+  mute_notifications?: boolean;
+  email_on_request?: boolean;
+  inapp_on_request?: boolean;
+  email_on_ticket?: boolean;
+  inapp_on_ticket?: boolean;
+  email_on_payment?: boolean;
+  inapp_on_payment?: boolean;
+}
+
+export interface ProviderOrganizationProfile {
+  legal_name?: string;
+  trade_name?: string;
+  tax_id?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  country?: string;
+  website?: string;
+}
+
+export interface ProviderSettingsResponse {
+  organization: any;
+  branding: ProviderSettingsBranding;
+  localization: ProviderSettingsLocalization;
+  notifications: ProviderSettingsNotifications;
+  plan?: {
+    name: string;
+    renewal_date: string;
+    products_used: number;
+    products_limit: number;
+    clients_used: number;
+    clients_limit: number;
+    storage_used_gb: number;
+    storage_limit_gb: number;
+  };
+}
+
+/**
+ * Fetch unified provider settings (Provider API + Core Organization)
+ */
+export async function getProviderSettings(token?: string, orgId?: string): Promise<ProviderSettingsResponse> {
+  return executeWithFallback(async () => {
+    // 1. Fetch Provider Settings from onbording-provider-api
+    const providerSettings = await apiFetch<any>('/settings', {
+      microservice: 'provider',
+      token,
+      orgId,
+    });
+
+    // 2. Fetch Organization legal profile from onbording-core-api
+    let orgData = FALLBACK_PROVIDER_SETTINGS.organization;
+    if (orgId) {
+      try {
+        const orgRes = await apiFetch<any>(`/organizations/${orgId}`, {
+          microservice: 'core',
+          token,
+          orgId,
+        });
+        if (orgRes) {
+          orgData = { ...orgData, ...orgRes };
+        }
+      } catch (err) {
+        console.warn('Could not fetch organization from core-api, using fallback/stored:', err);
+      }
+    }
+
+    return {
+      organization: orgData,
+      branding: {
+        logo_url: providerSettings?.logo_url ?? FALLBACK_PROVIDER_SETTINGS.branding.logo_url,
+        isotype_url: providerSettings?.isotype_url ?? FALLBACK_PROVIDER_SETTINGS.branding.isotype_url,
+        favicon_url: providerSettings?.favicon_url ?? FALLBACK_PROVIDER_SETTINGS.branding.favicon_url,
+        brand_primary_color: providerSettings?.brand_primary_color ?? FALLBACK_PROVIDER_SETTINGS.branding.brand_primary_color,
+        brand_secondary_color: providerSettings?.brand_secondary_color ?? FALLBACK_PROVIDER_SETTINGS.branding.brand_secondary_color,
+        brand_accent_color: providerSettings?.brand_accent_color ?? FALLBACK_PROVIDER_SETTINGS.branding.brand_accent_color,
+      },
+      localization: {
+        currency: providerSettings?.currency ?? FALLBACK_PROVIDER_SETTINGS.localization.currency,
+        language: providerSettings?.language ?? FALLBACK_PROVIDER_SETTINGS.localization.language,
+        timezone: providerSettings?.timezone ?? FALLBACK_PROVIDER_SETTINGS.localization.timezone,
+        date_format: providerSettings?.date_format ?? FALLBACK_PROVIDER_SETTINGS.localization.date_format,
+      },
+      notifications: {
+        notification_email: providerSettings?.notification_email ?? FALLBACK_PROVIDER_SETTINGS.notifications.notification_email,
+        mute_notifications: providerSettings?.mute_notifications ?? FALLBACK_PROVIDER_SETTINGS.notifications.mute_notifications,
+        email_on_request: providerSettings?.email_on_request ?? FALLBACK_PROVIDER_SETTINGS.notifications.email_on_request,
+        inapp_on_request: providerSettings?.inapp_on_request ?? FALLBACK_PROVIDER_SETTINGS.notifications.inapp_on_request,
+        email_on_ticket: providerSettings?.email_on_ticket ?? FALLBACK_PROVIDER_SETTINGS.notifications.email_on_ticket,
+        inapp_on_ticket: providerSettings?.inapp_on_ticket ?? FALLBACK_PROVIDER_SETTINGS.notifications.inapp_on_ticket,
+        email_on_payment: providerSettings?.email_on_payment ?? FALLBACK_PROVIDER_SETTINGS.notifications.email_on_payment,
+        inapp_on_payment: providerSettings?.inapp_on_payment ?? FALLBACK_PROVIDER_SETTINGS.notifications.inapp_on_payment,
+      },
+      plan: FALLBACK_PROVIDER_SETTINGS.plan,
+    };
+  }, FALLBACK_PROVIDER_SETTINGS);
+}
+
+/**
+ * Update Provider Branding Settings (Provider API)
+ */
+export async function updateProviderBranding(token?: string, orgId?: string, dto?: ProviderSettingsBranding) {
+  return apiFetch('/settings/branding', {
+    method: 'PUT',
+    microservice: 'provider',
+    token,
+    orgId,
+    body: JSON.stringify(dto),
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+/**
+ * Update Provider Localization Settings (Provider API)
+ */
+export async function updateProviderLocalization(token?: string, orgId?: string, dto?: ProviderSettingsLocalization) {
+  return apiFetch('/settings/localization', {
+    method: 'PUT',
+    microservice: 'provider',
+    token,
+    orgId,
+    body: JSON.stringify(dto),
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+/**
+ * Update Provider Notification Preferences (Provider API)
+ */
+export async function updateProviderNotifications(token?: string, orgId?: string, dto?: ProviderSettingsNotifications) {
+  return apiFetch('/settings/notifications', {
+    method: 'PUT',
+    microservice: 'provider',
+    token,
+    orgId,
+    body: JSON.stringify(dto),
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+/**
+ * Update Organization Profile (Core API)
+ */
+export async function updateOrganizationProfile(orgId: string, token: string | undefined, dto: ProviderOrganizationProfile) {
+  return apiFetch(`/organizations/${orgId}`, {
+    method: 'PUT',
+    microservice: 'core',
+    token,
+    orgId,
+    body: JSON.stringify(dto),
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+export interface ProviderClient {
+  id: string;
+  legal_name: string;
+  trade_name?: string;
+  dominio: string;
+  email: string;
+  phone?: string;
+  country?: string;
+  client_type: 'legal_entity' | 'natural_person';
+  created_at: string;
+  subscriptions_count: number;
+  active_subscriptions_count: number;
+  status: 'active' | 'in_progress' | 'suspended';
+  subscriptions?: Array<{
+    id: string;
+    productName?: string;
+    status: string;
+    price: number;
+  }>;
+}
+
+export interface ProviderClientsMetrics {
+  total: number;
+  active: number;
+  in_progress: number;
+  suspended: number;
+}
+
+export interface ProviderClientsResponse {
+  clients: ProviderClient[];
+  metrics: ProviderClientsMetrics;
+}
+
+export interface CreateClientDTO {
+  legal_name: string;
+  trade_name?: string;
+  email: string;
+  client_type?: 'legal_entity' | 'natural_person';
+  tax_id?: string;
+  phone?: string;
+  country?: string;
+  address?: string;
+  role?: 'owner' | 'admin' | 'member' | 'viewer';
+  product_id?: string;
+}
+
+export interface BulkImportResult {
+  summary: {
+    total: number;
+    successful: number;
+    failed: number;
+  };
+  successList: any[];
+  errors: Array<{
+    row: number;
+    email: string;
+    legal_name?: string;
+    error: string;
+  }>;
+}
+
+/**
+ * Fetch Provider Clients directory and metrics (Provider API)
+ */
+export async function getProviderClients(token?: string, orgId?: string): Promise<ProviderClientsResponse> {
+  return executeWithFallback(async () => {
+    const data = await apiFetch<any>('/clients', {
+      microservice: 'provider',
+      token,
+      orgId,
+    });
+    return data || FALLBACK_PROVIDER_CLIENTS_DATA;
+  }, FALLBACK_PROVIDER_CLIENTS_DATA);
+}
+
+/**
+ * Check domain and email availability (Provider API)
+ */
+export async function checkClientDomain(domain: string, email?: string, token?: string, orgId?: string) {
+  const query = new URLSearchParams();
+  if (domain) query.set('domain', domain);
+  if (email) query.set('email', email);
+
+  return apiFetch<any>(`/clients/check-domain?${query.toString()}`, {
+    microservice: 'provider',
+    token,
+    orgId,
+  });
+}
+
+/**
+ * Create a new client individually (Provider API)
+ */
+export async function createProviderClient(dto: CreateClientDTO, token?: string, orgId?: string) {
+  return apiFetch('/clients', {
+    method: 'POST',
+    microservice: 'provider',
+    token,
+    orgId,
+    body: JSON.stringify(dto),
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+/**
+ * Bulk import clients via CSV rows (Provider API)
+ */
+export async function bulkImportClients(clients: CreateClientDTO[], token?: string, orgId?: string): Promise<BulkImportResult> {
+  return apiFetch<BulkImportResult>('/clients/bulk-import', {
+    method: 'POST',
+    microservice: 'provider',
+    token,
+    orgId,
+    body: JSON.stringify({ clients }),
+    headers: { 'Content-Type': 'application/json' },
   });
 }

@@ -52,14 +52,27 @@ export function getMockStrategy(): MockStrategy {
  * Standardized Fetching Wrapper
  */
 export async function apiFetch<T>(endpoint: string, options: ApiOptions = {}): Promise<T> {
-  const { microservice = 'core', token, orgId, context, ...fetchOptions } = options;
+  const { microservice = 'core', token: explicitToken, orgId, context, ...fetchOptions } = options;
   const baseUrl = getBaseUrl(microservice);
   
   const headers = new Headers(fetchOptions.headers);
+  let token = explicitToken;
+
+  // Auto-inject client Firebase token if not provided explicitly
+  if (!token && typeof window !== 'undefined') {
+    try {
+      const { auth } = await import('../firebase/config');
+      if (auth.currentUser) {
+        token = await auth.currentUser.getIdToken().catch(() => undefined);
+      }
+    } catch {
+      // Firebase auth not initialized or ready
+    }
+  }
   
   if (token) {
     console.debug(`[apiFetch] Injecting Authorization header for ${endpoint} | Token present: true`);
-    headers.set('Authorization', `Bearer ${token}`);
+    headers.set('Authorization', token.startsWith('Bearer ') ? token : `Bearer ${token}`);
   } else {
     console.warn(`[apiFetch] No token provided for ${endpoint}`);
   }
@@ -72,19 +85,42 @@ export async function apiFetch<T>(endpoint: string, options: ApiOptions = {}): P
     headers.set('X-BFF-Context', context);
   }
 
-  const response = await fetch(`${baseUrl}${endpoint}`, {
+  let response = await fetch(`${baseUrl}${endpoint}`, {
     ...fetchOptions,
     headers,
   });
 
+  // If 401 on client and we have an active Firebase user, try a forced token refresh once
+  if (response.status === 401 && typeof window !== 'undefined') {
+    try {
+      const { auth } = await import('../firebase/config');
+      if (auth.currentUser) {
+        const freshToken = await auth.currentUser.getIdToken(true).catch(() => null);
+        if (freshToken && freshToken !== token) {
+          token = freshToken;
+          headers.set('Authorization', `Bearer ${freshToken}`);
+          response = await fetch(`${baseUrl}${endpoint}`, {
+            ...fetchOptions,
+            headers,
+          });
+        }
+      }
+    } catch {
+      // Refresh attempt failed
+    }
+  }
+
   if (response.status === 401) {
-    console.warn('[API] Unauthorized (401) detected. Notifying listener.');
-    if (unauthorizedListener) unauthorizedListener();
+    console.warn(`[API] Unauthorized (401) detected for ${endpoint}`);
+    // Only notify listener if this was an authenticated request that failed after refresh attempt
+    if (token && unauthorizedListener) {
+      unauthorizedListener();
+    }
   }
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || `API Error: ${response.status} ${response.statusText}`);
+    throw new Error(errorData.error || errorData.message || `API Error: ${response.status} ${response.statusText}`);
   }
 
   const result = await response.json();

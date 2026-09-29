@@ -1,11 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useApp } from '@/src/context/AppContext';
 import Logo from '../../atoms/Logo';
 import Icon from '../../atoms/Icon';
 import Avatar from '../../atoms/Avatar';
+import NotificationDrawer, { NotificationItemData } from '../NotificationDrawer';
+import OtpModal from '../OtpModal';
+import {
+  getNotifications,
+  getUnreadNotificationsCount,
+  markNotificationRead,
+  markAllNotificationsRead
+} from '@/src/lib/api/dashboard';
 import styles from './index.module.scss';
 
 interface NavItem {
@@ -32,6 +40,14 @@ export default function TopNavigation({ isProvider, onLogout, activeTab: activeT
 
     const [mode, setMode] = useState(isProvider ? 'provider' : 'client');
 
+    // Notifications state
+    const [isNotificationDrawerOpen, setIsNotificationDrawerOpen] = useState(false);
+    const [notifications, setNotifications] = useState<NotificationItemData[]>([]);
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    // 2FA OTP Modal state (RF-TR-03)
+    const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
+
     const navItems: NavItem[] = [
         { name: 'Services', path: '/dashboard' },
         { name: 'Billing', path: '/billing' },
@@ -40,6 +56,57 @@ export default function TopNavigation({ isProvider, onLogout, activeTab: activeT
 
     const activeTab = activeTabProp || navItems.find(item => pathname?.startsWith(item.path))?.name || 'Services';
 
+    // Fetch notifications
+    useEffect(() => {
+        if (!user) return;
+        let isMounted = true;
+        const fetchNotifs = async () => {
+            try {
+                const token = user.accessToken;
+                const orgId = user.org_id || user.organization?.id;
+                const count = await getUnreadNotificationsCount(token, orgId);
+                if (isMounted) setUnreadCount(count);
+
+                const data = await getNotifications(token, orgId);
+                if (isMounted && data) {
+                    const mapped: NotificationItemData[] = data.map((n: any) => ({
+                        id: n.id,
+                        title: n.title,
+                        message: n.message,
+                        variant: n.variant || 'info',
+                        is_read: n.is_read ?? n.read ?? false,
+                        time: n.time || n.created_at,
+                    }));
+                    setNotifications(mapped);
+                }
+            } catch (err) {
+                console.warn('Could not load notifications:', err);
+            }
+        };
+        fetchNotifs();
+        return () => { isMounted = false; };
+    }, [user?.accessToken, user?.org_id, user?.organization?.id]);
+
+    const handleMarkRead = async (id: string) => {
+        try {
+            await markNotificationRead(id, user?.accessToken, user?.org_id || user?.organization?.id);
+            setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+            setUnreadCount(prev => Math.max(0, prev - 1));
+        } catch (err) {
+            console.error('Error marking notification as read:', err);
+        }
+    };
+
+    const handleMarkAllRead = async () => {
+        try {
+            await markAllNotificationsRead(user?.accessToken, user?.org_id || user?.organization?.id);
+            setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+            setUnreadCount(0);
+        } catch (err) {
+            console.error('Error marking all notifications as read:', err);
+        }
+    };
+
     const handleLogout = async () => {
         await signOut();
         onLogout?.();
@@ -47,109 +114,156 @@ export default function TopNavigation({ isProvider, onLogout, activeTab: activeT
     };
 
     const handleModeChange = (newMode: string) => {
-        setMode(newMode);
         if (newMode === 'provider') {
+            const isVerified = typeof window !== 'undefined' && sessionStorage.getItem('provider_2fa_session') === 'verified';
+            if (!isVerified) {
+                setIsOtpModalOpen(true);
+                return;
+            }
+            setMode('provider');
             router.push('/provider/dashboard');
         } else {
+            setMode('client');
             router.push('/dashboard');
         }
     };
 
+    const handleOtpSuccess = () => {
+        setIsOtpModalOpen(false);
+        setMode('provider');
+        router.push('/provider/dashboard');
+    };
+
     return (
-        <header className={styles.nav}>
-            <div className={styles['nav__container']}>
-                <div className={styles['nav__logo-wrapper']}>
-                    <a href="/" className={styles['nav__logo-link']}>
-                        <Logo theme="dark" />
-                    </a>
-                </div>
-
-                <nav className={styles['nav__desktop-nav']}>
-                    {navItems.map((item) => (
-                        <a
-                            key={item.name}
-                            className={`${styles['nav__nav-link']} ${activeTab === item.name ? styles['nav__nav-link--active'] : ''}`}
-                            href={item.path}
-                        >
-                            {item.name}
+        <>
+            <header className={styles.nav}>
+                <div className={styles['nav__container']}>
+                    <div className={styles['nav__logo-wrapper']}>
+                        <a href="/" className={styles['nav__logo-link']}>
+                            <Logo theme="dark" />
                         </a>
-                    ))}
-                </nav>
+                    </div>
 
-                <div className={styles['nav__controls']}>
-                    {!isNaturalPerson && (
-                        <div className={styles['nav__mode-selector']}>
-                            <span className={styles['nav__mode-label']}>Mode:</span>
-                            <select
-                                value={mode}
-                                onChange={(e) => handleModeChange(e.target.value)}
-                                className={styles['nav__mode-select']}
-                            >
-                                <option value="client">Client</option>
-                                <option value="provider">Provider</option>
-                            </select>
-                            <div className={styles['nav__mode-icon']}>
-                                <Icon name="expand_more" />
-                            </div>
-                        </div>
-                    )}
-
-                    <Avatar sizeClasses="size-8" src={profile.avatar_url || profile.firebasePhotoUrl || ''} />
-
-                    <button onClick={handleLogout} className={styles['nav__logout-btn']} title="Logout">
-                        <Icon name="logout" className={styles['nav__logout-icon']} />
-                    </button>
-
-                    <button
-                        className={styles['nav__mobile-toggle']}
-                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        aria-label="Toggle menu"
-                    >
-                        <Icon name={isMobileMenuOpen ? "close" : "menu"} className={styles['nav__mobile-toggle-icon']} />
-                    </button>
-                </div>
-            </div>
-
-            {isMobileMenuOpen && (
-                <div className={styles['nav__mobile-menu']}>
-                    <nav className={styles['nav__mobile-nav']}>
+                    <nav className={styles['nav__desktop-nav']}>
                         {navItems.map((item) => (
                             <a
                                 key={item.name}
-                                className={`${styles['nav__mobile-link']} ${activeTab === item.name ? styles['nav__mobile-link--active'] : ''}`}
+                                className={`${styles['nav__nav-link']} ${activeTab === item.name ? styles['nav__nav-link--active'] : ''}`}
                                 href={item.path}
-                                onClick={() => setIsMobileMenuOpen(false)}
                             >
                                 {item.name}
                             </a>
                         ))}
+                    </nav>
 
+                    <div className={styles['nav__controls']}>
                         {!isNaturalPerson && (
-                            <div className={styles['nav__mobile-mode']}>
-                                <span className={styles['nav__mobile-mode-label']}>Mode</span>
-                                <div className={styles['nav__mobile-mode-wrapper']}>
-                                    <select
-                                        value={mode}
-                                        onChange={(e) => handleModeChange(e.target.value)}
-                                        className={styles['nav__mode-select']}
-                                    >
-                                        <option value="client">Client</option>
-                                        <option value="provider">Provider</option>
-                                    </select>
-                                    <div className={styles['nav__mode-icon']}>
-                                        <Icon name="expand_more" />
-                                    </div>
+                            <div className={styles['nav__mode-selector']}>
+                                <span className={styles['nav__mode-label']}>Mode:</span>
+                                <select
+                                    value={mode}
+                                    onChange={(e) => handleModeChange(e.target.value)}
+                                    className={styles['nav__mode-select']}
+                                >
+                                    <option value="client">Client</option>
+                                    <option value="provider">Provider</option>
+                                </select>
+                                <div className={styles['nav__mode-icon']}>
+                                    <Icon name="expand_more" />
                                 </div>
                             </div>
                         )}
 
-                        <button onClick={handleLogout} className={styles['nav__mobile-logout']}>
-                            <Icon name="logout" className={styles['nav__mobile-logout-icon']} />
-                            <span className={styles['nav__mobile-logout-text']}>Logout</span>
+                        {/* Notification Bell */}
+                        <button
+                            type="button"
+                            className={styles['nav__bell-btn']}
+                            onClick={() => setIsNotificationDrawerOpen(true)}
+                            title="Notifications"
+                            aria-label="View notifications"
+                        >
+                            <Icon name="notifications" />
+                            {unreadCount > 0 && (
+                                <span className={styles['nav__bell-badge']}>
+                                    {unreadCount > 9 ? '9+' : unreadCount}
+                                </span>
+                            )}
                         </button>
-                    </nav>
+
+                        <Avatar sizeClasses="size-8" src={profile.avatar_url || profile.firebasePhotoUrl || ''} />
+
+                        <button onClick={handleLogout} className={styles['nav__logout-btn']} title="Logout">
+                            <Icon name="logout" className={styles['nav__logout-icon']} />
+                        </button>
+
+                        <button
+                            className={styles['nav__mobile-toggle']}
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                            aria-label="Toggle menu"
+                        >
+                            <Icon name={isMobileMenuOpen ? "close" : "menu"} className={styles['nav__mobile-toggle-icon']} />
+                        </button>
+                    </div>
                 </div>
-            )}
-        </header>
+
+                {isMobileMenuOpen && (
+                    <div className={styles['nav__mobile-menu']}>
+                        <nav className={styles['nav__mobile-nav']}>
+                            {navItems.map((item) => (
+                                <a
+                                    key={item.name}
+                                    className={`${styles['nav__mobile-link']} ${activeTab === item.name ? styles['nav__mobile-link--active'] : ''}`}
+                                    href={item.path}
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                >
+                                    {item.name}
+                                </a>
+                            ))}
+
+                            {!isNaturalPerson && (
+                                <div className={styles['nav__mobile-mode']}>
+                                    <span className={styles['nav__mobile-mode-label']}>Mode</span>
+                                    <div className={styles['nav__mobile-mode-wrapper']}>
+                                        <select
+                                            value={mode}
+                                            onChange={(e) => handleModeChange(e.target.value)}
+                                            className={styles['nav__mode-select']}
+                                        >
+                                            <option value="client">Client</option>
+                                            <option value="provider">Provider</option>
+                                        </select>
+                                        <div className={styles['nav__mode-icon']}>
+                                            <Icon name="expand_more" />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            <button onClick={handleLogout} className={styles['nav__mobile-logout']}>
+                                <Icon name="logout" className={styles['nav__mobile-logout-icon']} />
+                                <span className={styles['nav__mobile-logout-text']}>Logout</span>
+                            </button>
+                        </nav>
+                    </div>
+                )}
+            </header>
+
+            {/* Transversal Notification Drawer */}
+            <NotificationDrawer
+                isOpen={isNotificationDrawerOpen}
+                onClose={() => setIsNotificationDrawerOpen(false)}
+                notifications={notifications}
+                unreadCount={unreadCount}
+                onMarkRead={handleMarkRead}
+                onMarkAllRead={handleMarkAllRead}
+            />
+
+            {/* 2FA OTP Modal for Provider Mode (RF-TR-03) */}
+            <OtpModal
+                isOpen={isOtpModalOpen}
+                onClose={() => setIsOtpModalOpen(false)}
+                onSuccess={handleOtpSuccess}
+            />
+        </>
     );
 }

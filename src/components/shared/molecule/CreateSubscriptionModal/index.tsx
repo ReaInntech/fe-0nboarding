@@ -73,7 +73,7 @@ export default function CreateSubscriptionModal({
         try {
             const token = user?.accessToken || '';
             const orgId = user?.organization?.id || '';
-            const res = await api.checkEmail(email, token, orgId);
+            const res: any = await api.checkEmail(email, token, orgId);
             
             if (res.exists) {
                 setClientData(res.user);
@@ -96,7 +96,7 @@ export default function CreateSubscriptionModal({
         try {
             const token = user?.accessToken || '';
             const orgId = user?.organization?.id || '';
-            const newOrg = await api.createClientOrganization(token, orgId, {
+            const newOrg: any = await api.createClientOrganization(token, orgId, {
                 legal_name: newClientName,
                 email: email,
             });

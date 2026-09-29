@@ -75,6 +75,7 @@ export const DocumentCard: StoryObj<typeof DocumentRequestCard> = {
     render: () => (
         <div style={{ width: '400px' }}>
             <DocumentRequestCard
+                id="doc-1"
                 title="Identity Verification"
                 onDelete={() => console.log('Delete')}
             />
@@ -86,6 +87,7 @@ export const FormCard: StoryObj<typeof FormRequestCard> = {
     render: () => (
         <div style={{ width: '400px' }}>
             <FormRequestCard
+                id="form-1"
                 title="Compliance Survey"
                 onDelete={() => console.log('Delete')}
             />
@@ -97,6 +99,7 @@ export const PaymentCard: StoryObj<typeof RequestPaymentCard> = {
     render: () => (
         <div style={{ width: '400px' }}>
             <RequestPaymentCard
+                id="pay-1"
                 title="Security Deposit"
                 onDelete={() => console.log('Delete')}
             />
@@ -108,6 +111,7 @@ export const TermsCard: StoryObj<typeof TermsAndConditionsRequestCard> = {
     render: () => (
         <div style={{ width: '400px' }}>
             <TermsAndConditionsRequestCard
+                id="terms-1"
                 title="End User License Agreement"
                 onDelete={() => console.log('Delete')}
             />

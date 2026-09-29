@@ -1,0 +1,49 @@
+@reference "tailwindcss";
+
+.otp-modal {
+    @apply fixed inset-0 z-50 flex items-center justify-center p-4;
+
+    &__backdrop {
+        @apply fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity duration-300;
+    }
+
+    &__panel {
+        @apply relative z-10 w-full max-w-md bg-[#0f1523] border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6 text-center backdrop-blur-xl transition-all duration-300;
+    }
+
+    &__icon-box {
+        @apply size-14 rounded-2xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center mx-auto text-2xl shadow-lg shadow-blue-500/10;
+    }
+
+    &__title {
+        @apply text-lg font-bold text-white tracking-tight;
+    }
+
+    &__subtitle {
+        @apply text-xs text-slate-400 mt-1.5 leading-relaxed;
+    }
+
+    &__input-box {
+        @apply flex justify-center gap-2 my-4;
+    }
+
+    &__code-input {
+        @apply w-full max-w-xs bg-slate-950/80 border border-slate-700/80 rounded-2xl px-4 py-3 text-center text-2xl font-mono tracking-[0.5em] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all;
+    }
+
+    &__hint {
+        @apply p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-[11px] text-blue-300 flex items-center justify-center gap-1.5;
+    }
+
+    &__actions {
+        @apply flex flex-col gap-2.5 pt-2;
+    }
+
+    &__resend-btn {
+        @apply text-xs text-slate-400 hover:text-white font-medium transition-colors;
+    }
+
+    &__error {
+        @apply text-xs text-rose-400 font-medium;
+    }
+}

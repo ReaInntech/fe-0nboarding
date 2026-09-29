@@ -17,11 +17,17 @@ export default meta;
 type Story = StoryObj<typeof ProviderProductView>;
 
 const mockProduct = {
+    id: 'prod_mock_story',
     name: 'Advanced Cloud Analytics',
+    description: 'Real-time analytics and predictive metrics infrastructure',
+    price: 350.00,
+    period: 'month',
+    sold: 28,
     productCode: 'ACA-2024-X1',
+    category: 'Analytics',
     icon: 'analytics',
     iconColor: '#1978e5',
-    status: 'active',
+    status: 'active' as const,
 };
 
 const mockSteps = [
@@ -65,7 +71,7 @@ export const Standard: Story = {
     args: {
         product: mockProduct,
         onboardingSteps: mockSteps as any,
-        requirements: mockRequirements,
+        metadata: { environment: 'production', region: 'us-east-1' },
         requests: mockRequests as any,
     },
 };
@@ -86,7 +92,7 @@ export const Empty: Story = {
     args: {
         product: mockProduct,
         onboardingSteps: [],
-        requirements: [],
+        metadata: {},
         requests: [],
     },
 };

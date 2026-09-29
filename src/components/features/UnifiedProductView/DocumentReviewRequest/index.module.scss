@@ -1,0 +1,89 @@
+@reference "tailwindcss";
+
+.doc-review-request {
+    @apply bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm;
+
+    &__header {
+        @apply px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/30;
+    }
+
+    &__title-box {
+        @apply text-lg font-bold flex items-center gap-2 text-slate-900 dark:text-white;
+    }
+
+    &__content {
+        @apply p-6;
+    }
+
+    &__layout {
+        @apply flex flex-col gap-6;
+    }
+
+    &__info {
+        @apply space-y-4;
+    }
+
+    &__doc-title {
+        @apply font-bold text-slate-900 dark:text-slate-100 text-base;
+    }
+
+    &__instructions {
+        @apply text-sm text-slate-500 dark:text-slate-400 mt-1;
+    }
+
+    &__document-card {
+        @apply flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 hover:border-blue-500/40 transition-colors;
+    }
+
+    &__document-left {
+        @apply flex items-center gap-3;
+    }
+
+    &__document-icon {
+        @apply size-10 rounded-lg bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center;
+    }
+
+    &__document-name {
+        @apply text-sm font-semibold text-slate-800 dark:text-slate-200;
+    }
+
+    &__document-hint {
+        @apply text-xs text-slate-400;
+    }
+
+    &__document-actions {
+        @apply flex items-center gap-2;
+    }
+
+    &__action-bar {
+        @apply flex flex-col sm:flex-row gap-3 pt-2;
+    }
+
+    &__approve-btn {
+        @apply flex-1 py-2.5 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm flex items-center justify-center gap-2 transition-colors shadow-sm;
+    }
+
+    &__reject-btn {
+        @apply py-2.5 px-4 rounded-lg border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 font-medium text-sm flex items-center justify-center gap-2 transition-colors;
+    }
+
+    &__comments-panel {
+        @apply p-4 rounded-xl border border-red-200 dark:border-red-900/40 bg-red-50/50 dark:bg-red-950/10 space-y-3;
+    }
+
+    &__textarea {
+        @apply w-full p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-red-500 outline-none resize-none;
+    }
+
+    &__status-box {
+        @apply flex items-start gap-3 p-4 rounded-xl border;
+
+        &--approved {
+            @apply bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30 text-emerald-800 dark:text-emerald-300;
+        }
+
+        &--rejected {
+            @apply bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/30 text-red-800 dark:text-red-300;
+        }
+    }
+}

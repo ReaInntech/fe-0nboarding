@@ -25,9 +25,9 @@ export default async function DashboardPage() {
 
     console.log('[DashboardPage] Auth Check:', { hasToken: !!token, hasOrgId: !!orgId, userId: sessionUser?.uid });
 
-    if (token && orgId) {
+    if (token) {
         try {
-            const data = await getDashboardInit(token, orgId);
+            const data = await getDashboardInit(token, orgId || '');
             notifications = data.notifications;
             subscriptions = data.subscriptions;
             console.log(`[DashboardPage] Fetched ${subscriptions.length} subscriptions`);

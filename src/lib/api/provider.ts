@@ -16,14 +16,6 @@ import {
   ProductDTO,
   OnboardingStep
 } from './types';
-import {
-  FALLBACK_PROVIDER_DASHBOARD_DATA,
-  FALLBACK_PROVIDER_FINANCE_DATA,
-  FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA,
-  FALLBACK_PROVIDER_PRODUCTS_DATA,
-  FALLBACK_PROVIDER_SETTINGS,
-  FALLBACK_PROVIDER_CLIENTS_DATA,
-} from './mocks';
 import { mapBillingPeriod } from '../utils/product';
 
 export function mapProduct(dto: ProductDTO): Product {
@@ -128,13 +120,16 @@ export async function getProviderProducts(token: string, orgId: string): Promise
  * BFF Aggregator for Provider Products List
  */
 export async function getProviderProductsInit(token: string, orgId: string) {
-  return executeWithFallback(async () => {
+  try {
     const data = await getProviderProducts(token, orgId);
     const productsRaw = Array.isArray(data) ? data : (data as any).products || [];
     return {
       products: productsRaw.map(mapProduct)
     };
-  }, FALLBACK_PROVIDER_PRODUCTS_DATA);
+  } catch (error) {
+    console.error('[ProviderAPI] getProviderProductsInit failed:', error);
+    return { products: [] };
+  }
 }
 
 export function mapOnboardingStep(dto: any): OnboardingStep {
@@ -155,46 +150,44 @@ export function mapOnboardingStep(dto: any): OnboardingStep {
 }
 
 export async function getProviderProductDetailData(id: string, token?: string, orgId?: string) {
-  return executeWithFallback(async () => {
-    // 1. Fetch Product with Steps
-    const data = await apiFetch<any>(`/products/${id}`, {
-      microservice: 'core',
-      token,
-      orgId
-    });
+  // 1. Fetch Product with Steps
+  const data = await apiFetch<any>(`/products/${id}`, {
+    microservice: 'core',
+    token,
+    orgId
+  });
 
-    if (!data) return FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA;
+  if (!data) return null;
 
-    // 2. Map Product
-    const productDTO: ProductDTO = {
-      id: data.id,
-      product_code: data.product_code,
-      name: data.name,
-      description: data.description,
-      icon: data.icon,
-      icon_color: data.icon_color,
-      service_type: data.service_type,
-      base_price: data.base_price,
-      billing_model: data.billing_model,
-      price: data.price,
-      total_sold: data.total_sold,
-      status: data.status,
-      category: data.category
-    };
+  // 2. Map Product
+  const productDTO: ProductDTO = {
+    id: data.id,
+    product_code: data.product_code,
+    name: data.name,
+    description: data.description,
+    icon: data.icon,
+    icon_color: data.icon_color,
+    service_type: data.service_type,
+    base_price: data.base_price,
+    billing_model: data.billing_model,
+    price: data.price,
+    total_sold: data.total_sold,
+    status: data.status,
+    category: data.category
+  };
 
-    // 3. Map Steps
-    const onboardingSteps = (data.contracting_steps || []).map(mapOnboardingStep);
+  // 3. Map Steps
+  const onboardingSteps = (data.contracting_steps || []).map(mapOnboardingStep);
 
-    // 4. Extract Metadata
-    const metadata = data.metadata?.custom_attributes || {};
+  // 4. Extract Metadata
+  const metadata = data.metadata?.custom_attributes || {};
 
-    return {
-      product: mapProduct(productDTO),
-      onboardingSteps,
-      metadata,
-      requests: [] // Planned for second iteration
-    };
-  }, FALLBACK_PROVIDER_PRODUCT_DETAIL_DATA);
+  return {
+    product: mapProduct(productDTO),
+    onboardingSteps,
+    metadata,
+    requests: []
+  };
 }
 
 /**
@@ -342,24 +335,30 @@ export async function deleteProductStep(productId: string, stepId: string, token
  * BFF Aggregator for Provider Dashboard Initial State
  */
 export async function getProviderDashboardInit(token: string, orgId: string) {
-  return executeWithFallback(async () => {
+  try {
     const [subscriptions, stats] = await Promise.all([
       getProviderSubscriptions(token, orgId),
       getProviderStats(token, orgId),
     ]);
 
     return {
-      subscriptions,
-      stats,
+      subscriptions: subscriptions || [],
+      stats: stats || null,
     };
-  }, FALLBACK_PROVIDER_DASHBOARD_DATA);
+  } catch (error) {
+    console.error('[ProviderAPI] getProviderDashboardInit failed:', error);
+    return {
+      subscriptions: [],
+      stats: null,
+    };
+  }
 }
 
 /**
  * BFF Aggregator for Provider Finance Initial State
  */
 export async function getProviderFinanceInit(token: string, orgId: string) {
-  return executeWithFallback(async () => {
+  try {
     const [kpis, revenueHistory] = await Promise.all([
       getFinanceKPIs(token, orgId),
       getRevenueHistory(token, orgId),
@@ -367,9 +366,15 @@ export async function getProviderFinanceInit(token: string, orgId: string) {
 
     return {
       kpis,
-      revenueHistory,
+      revenueHistory: revenueHistory || [],
     };
-  }, FALLBACK_PROVIDER_FINANCE_DATA);
+  } catch (error) {
+    console.error('[ProviderAPI] getProviderFinanceInit failed:', error);
+    return {
+      kpis: null,
+      revenueHistory: [],
+    };
+  }
 }
 
 /**
@@ -479,60 +484,75 @@ export interface ProviderSettingsResponse {
  * Fetch unified provider settings (Provider API + Core Organization)
  */
 export async function getProviderSettings(token?: string, orgId?: string): Promise<ProviderSettingsResponse> {
-  return executeWithFallback(async () => {
-    // 1. Fetch Provider Settings from onbording-provider-api
-    const providerSettings = await apiFetch<any>('/settings', {
-      microservice: 'provider',
-      token,
-      orgId,
-    });
+  // 1. Fetch Provider Settings from onbording-provider-api
+  const providerSettings = await apiFetch<any>('/settings', {
+    microservice: 'provider',
+    token,
+    orgId,
+  }).catch(() => null);
 
-    // 2. Fetch Organization legal profile from onbording-core-api
-    let orgData = FALLBACK_PROVIDER_SETTINGS.organization;
-    if (orgId) {
-      try {
-        const orgRes = await apiFetch<any>(`/organizations/${orgId}`, {
-          microservice: 'core',
-          token,
-          orgId,
-        });
-        if (orgRes) {
-          orgData = { ...orgData, ...orgRes };
-        }
-      } catch (err) {
-        console.warn('Could not fetch organization from core-api, using fallback/stored:', err);
+  // 2. Fetch Organization legal profile from onbording-core-api
+  let orgData: any = {
+    id: orgId || '',
+    legal_name: '',
+    trade_name: '',
+    tax_id: '',
+    country: 'CO',
+    client_type: 'legal_entity',
+  };
+
+  if (orgId) {
+    try {
+      const orgRes = await apiFetch<any>(`/organizations/${orgId}`, {
+        microservice: 'core',
+        token,
+        orgId,
+      });
+      if (orgRes) {
+        orgData = { ...orgData, ...orgRes };
       }
+    } catch (err) {
+      console.warn('Could not fetch organization from core-api:', err);
     }
+  }
 
-    return {
-      organization: orgData,
-      branding: {
-        logo_url: providerSettings?.logo_url ?? FALLBACK_PROVIDER_SETTINGS.branding.logo_url,
-        isotype_url: providerSettings?.isotype_url ?? FALLBACK_PROVIDER_SETTINGS.branding.isotype_url,
-        favicon_url: providerSettings?.favicon_url ?? FALLBACK_PROVIDER_SETTINGS.branding.favicon_url,
-        brand_primary_color: providerSettings?.brand_primary_color ?? FALLBACK_PROVIDER_SETTINGS.branding.brand_primary_color,
-        brand_secondary_color: providerSettings?.brand_secondary_color ?? FALLBACK_PROVIDER_SETTINGS.branding.brand_secondary_color,
-        brand_accent_color: providerSettings?.brand_accent_color ?? FALLBACK_PROVIDER_SETTINGS.branding.brand_accent_color,
-      },
-      localization: {
-        currency: providerSettings?.currency ?? FALLBACK_PROVIDER_SETTINGS.localization.currency,
-        language: providerSettings?.language ?? FALLBACK_PROVIDER_SETTINGS.localization.language,
-        timezone: providerSettings?.timezone ?? FALLBACK_PROVIDER_SETTINGS.localization.timezone,
-        date_format: providerSettings?.date_format ?? FALLBACK_PROVIDER_SETTINGS.localization.date_format,
-      },
-      notifications: {
-        notification_email: providerSettings?.notification_email ?? FALLBACK_PROVIDER_SETTINGS.notifications.notification_email,
-        mute_notifications: providerSettings?.mute_notifications ?? FALLBACK_PROVIDER_SETTINGS.notifications.mute_notifications,
-        email_on_request: providerSettings?.email_on_request ?? FALLBACK_PROVIDER_SETTINGS.notifications.email_on_request,
-        inapp_on_request: providerSettings?.inapp_on_request ?? FALLBACK_PROVIDER_SETTINGS.notifications.inapp_on_request,
-        email_on_ticket: providerSettings?.email_on_ticket ?? FALLBACK_PROVIDER_SETTINGS.notifications.email_on_ticket,
-        inapp_on_ticket: providerSettings?.inapp_on_ticket ?? FALLBACK_PROVIDER_SETTINGS.notifications.inapp_on_ticket,
-        email_on_payment: providerSettings?.email_on_payment ?? FALLBACK_PROVIDER_SETTINGS.notifications.email_on_payment,
-        inapp_on_payment: providerSettings?.inapp_on_payment ?? FALLBACK_PROVIDER_SETTINGS.notifications.inapp_on_payment,
-      },
-      plan: FALLBACK_PROVIDER_SETTINGS.plan,
-    };
-  }, FALLBACK_PROVIDER_SETTINGS);
+  return {
+    organization: orgData,
+    branding: {
+      logo_url: providerSettings?.logo_url ?? '',
+      isotype_url: providerSettings?.isotype_url ?? '',
+      favicon_url: providerSettings?.favicon_url ?? '',
+      brand_primary_color: providerSettings?.brand_primary_color ?? '#1978e5',
+      brand_secondary_color: providerSettings?.brand_secondary_color ?? '#0f172a',
+      brand_accent_color: providerSettings?.brand_accent_color ?? '#38bdf8',
+    },
+    localization: {
+      currency: providerSettings?.currency ?? 'USD',
+      language: providerSettings?.language ?? 'en',
+      timezone: providerSettings?.timezone ?? 'UTC',
+      date_format: providerSettings?.date_format ?? 'YYYY-MM-DD',
+    },
+    notifications: {
+      notification_email: providerSettings?.notification_email ?? '',
+      mute_notifications: providerSettings?.mute_notifications ?? false,
+      email_on_request: providerSettings?.email_on_request ?? true,
+      inapp_on_request: providerSettings?.inapp_on_request ?? true,
+      email_on_ticket: providerSettings?.email_on_ticket ?? true,
+      inapp_on_ticket: providerSettings?.inapp_on_ticket ?? true,
+      email_on_payment: providerSettings?.email_on_payment ?? true,
+      inapp_on_payment: providerSettings?.inapp_on_payment ?? true,
+    },
+    plan: {
+      name: 'Enterprise Plan',
+      renewal_date: 'N/A',
+      products_used: 0,
+      products_limit: 10,
+      clients_used: 0,
+      clients_limit: 50,
+      storage_used_gb: 0,
+      storage_limit_gb: 100,
+    },
+  };
 }
 
 /**
@@ -657,14 +677,23 @@ export interface BulkImportResult {
  * Fetch Provider Clients directory and metrics (Provider API)
  */
 export async function getProviderClients(token?: string, orgId?: string): Promise<ProviderClientsResponse> {
-  return executeWithFallback(async () => {
+  try {
     const data = await apiFetch<any>('/clients', {
       microservice: 'provider',
       token,
       orgId,
     });
-    return data || FALLBACK_PROVIDER_CLIENTS_DATA;
-  }, FALLBACK_PROVIDER_CLIENTS_DATA);
+    return data || {
+      metrics: { total: 0, active: 0, in_progress: 0, suspended: 0 },
+      clients: []
+    };
+  } catch (error) {
+    console.error('[ProviderAPI] getProviderClients failed:', error);
+    return {
+      metrics: { total: 0, active: 0, in_progress: 0, suspended: 0 },
+      clients: []
+    };
+  }
 }
 
 /**

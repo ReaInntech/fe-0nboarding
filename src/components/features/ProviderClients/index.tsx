@@ -184,7 +184,6 @@ export default function ProviderClients({
       const tradeNameIdx = headers.findIndex((h) => h.includes('trade') || h.includes('comercial'));
       const emailIdx = headers.findIndex((h) => h.includes('email') || h.includes('correo'));
       const typeIdx = headers.findIndex((h) => h.includes('type') || h.includes('tipo'));
-      const roleIdx = headers.findIndex((h) => h.includes('role') || h.includes('rol'));
       const phoneIdx = headers.findIndex((h) => h.includes('phone') || h.includes('telefono'));
 
       const rows: Array<CreateClientDTO & { isValid: boolean; error?: string }> = [];
@@ -195,7 +194,6 @@ export default function ProviderClients({
         const trade_name = tradeNameIdx >= 0 ? cols[tradeNameIdx] : legal_name;
         const email = emailIdx >= 0 ? cols[emailIdx] : cols[1];
         const client_type = (typeIdx >= 0 && cols[typeIdx]?.includes('natural')) ? 'natural_person' : 'legal_entity';
-        const role = (roleIdx >= 0 && cols[roleIdx]) ? (cols[roleIdx] as any) : 'admin';
         const phone = phoneIdx >= 0 ? cols[phoneIdx] : '';
 
         const isValidEmail = email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -207,7 +205,6 @@ export default function ProviderClients({
           trade_name: trade_name || legal_name || '',
           email: email || '',
           client_type,
-          role,
           phone,
           isValid,
           error,
@@ -268,7 +265,7 @@ export default function ProviderClients({
   };
 
   const downloadExampleCsv = () => {
-    const csvContent = 'data:text/csv;charset=utf-8,legal_name,trade_name,email,client_type,role,phone\nAcme Cloud Latam S.A.S.,Acme Cloud,contacto@acmelatam.com,legal_entity,admin,+573001234567\nCarlos Martinez,Martinez Consultores,carlos@martinezconsultores.com,natural_person,admin,+573109876543\n';
+    const csvContent = 'data:text/csv;charset=utf-8,legal_name,trade_name,email,client_type,phone\nAcme Cloud Latam S.A.S.,Acme Cloud,contacto@acmelatam.com,legal_entity,+573001234567\nCarlos Martinez,Martinez Consultores,carlos@martinezconsultores.com,natural_person,+573109876543\n';
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
@@ -314,8 +311,8 @@ export default function ProviderClients({
 
           <div className={styles['provider-clients__actions']}>
             <Button variant="outline" onClick={() => setIsBulkModalOpen(true)}>
-              <div className="flex items-center gap-2 text-slate-300">
-                <Icon name="upload_file" />
+              <div className="flex items-center gap-2 text-slate-100">
+                <Icon name="upload_file" className="text-blue-400" />
                 <span>Bulk CSV Import</span>
               </div>
             </Button>

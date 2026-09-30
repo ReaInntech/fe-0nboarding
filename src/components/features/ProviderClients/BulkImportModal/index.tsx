@@ -61,7 +61,6 @@ export default function BulkImportModal({
         const client_type = (rowData.client_type === 'natural_person' || rowData.client_type === 'natural')
           ? 'natural_person'
           : 'legal_entity';
-        const role = rowData.role || 'admin';
         const phone = rowData.phone || rowData.telefono || '';
 
         const isValid = !!(legal_name && email && email.includes('@'));
@@ -72,7 +71,6 @@ export default function BulkImportModal({
           trade_name,
           email,
           client_type,
-          role,
           phone,
           isValid,
           error,
@@ -103,10 +101,11 @@ export default function BulkImportModal({
 
   const downloadExampleCsv = () => {
     const csvContent =
-      'legal_name,trade_name,email,client_type,role,phone\n' +
-      'Alpha Soluciones SAS,Alpha Tech,contacto@alphasoluciones.com,legal_entity,admin,+573001112233\n' +
-      'Carlos Andres Gomez,Carlos Gomez,carlos.gomez@gmail.com,natural_person,admin,+573104445566\n' +
-      'Beta Logistica SAS,Beta Logistics,gerencia@betalogistica.co,legal_entity,admin,+573207778899\n';
+      'legal_name,trade_name,email,client_type,phone\n' +
+      'Alpha Soluciones SAS,Alpha Tech,contacto@alphasoluciones.com,legal_entity,+573001112233\n' +
+      'Alpha Soluciones SAS,Alpha Tech,operaciones@alphasoluciones.com,legal_entity,+573001112234\n' +
+      'Carlos Andres Gomez,Carlos Gomez,carlos.gomez@gmail.com,natural_person,+573104445566\n' +
+      'Beta Logistica SAS,Beta Logistics,gerencia@betalogistica.co,legal_entity,+573207778899\n';
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
@@ -162,7 +161,10 @@ export default function BulkImportModal({
                   {csvFile ? csvFile.name : 'Click or drag a CSV file to upload'}
                 </p>
                 <p className="text-xs text-slate-500 mt-1">
-                  Columns: <code>legal_name, trade_name, email, client_type, role, phone</code>
+                  Columns: <code>legal_name, trade_name, email, client_type, phone</code>
+                </p>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Roles are assigned automatically: <strong>Admin</strong> for new organizations or first user; <strong>Operator</strong> for subsequent users.
                 </p>
               </div>
             </label>
@@ -202,7 +204,12 @@ export default function BulkImportModal({
                   {parsedRows.slice(0, 10).map((row, idx) => (
                     <div key={idx} className="p-3 flex items-center justify-between text-xs">
                       <div className="space-y-0.5">
-                        <span className="font-semibold text-white">{row.legal_name || 'No Name'}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-white">{row.legal_name || 'No Name'}</span>
+                          <span className="text-[10px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 font-mono">
+                            {row.client_type === 'natural_person' ? 'Natural Person' : 'Legal Entity'}
+                          </span>
+                        </div>
                         <div className="text-[11px] text-slate-400">{row.email}</div>
                       </div>
                       {row.isValid ? (
@@ -253,13 +260,36 @@ export default function BulkImportModal({
               </div>
               <div>
                 <div className="text-xl font-bold text-emerald-400">{bulkResult.summary.successful}</div>
-                <div className="text-[10px] text-slate-500 uppercase">Created / Invited</div>
+                <div className="text-[10px] text-slate-500 uppercase">Created / Linked</div>
               </div>
               <div>
                 <div className="text-xl font-bold text-rose-400">{bulkResult.summary.failed}</div>
                 <div className="text-[10px] text-slate-500 uppercase">Failed / Duplicates</div>
               </div>
             </div>
+
+            {bulkResult.successList && bulkResult.successList.length > 0 && (
+              <div className="space-y-2">
+                <span className="text-xs font-bold text-slate-300">Successfully Imported Clients</span>
+                <div className="max-h-36 overflow-y-auto space-y-1.5 rounded-xl bg-slate-950/40 p-3 border border-slate-800 text-xs">
+                  {bulkResult.successList.map((item: any, idx: number) => (
+                    <div key={idx} className="flex items-center justify-between text-[11px]">
+                      <div className="flex items-center gap-2 truncate">
+                        <span className="text-slate-200 font-medium truncate">{item.client?.legal_name || 'Client'}</span>
+                        <span className="text-slate-500 font-mono text-[10px]">{item.user?.email}</span>
+                      </div>
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border shrink-0 ${
+                        item.role === 'admin'
+                          ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                          : 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20'
+                      }`}>
+                        {item.role === 'admin' ? 'Admin' : 'Operator'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {bulkResult.errors.length > 0 && (
               <div className="space-y-2">

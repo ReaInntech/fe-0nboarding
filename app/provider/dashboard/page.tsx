@@ -1,7 +1,5 @@
 import ProviderDashboard from '@/src/components/features/ProviderDashboard/ProviderDashboard';
 import { getProviderDashboardInit } from '@/src/lib/api/provider';
-import { getMockStrategy } from '@/src/lib/api/config';
-import { FALLBACK_PROVIDER_DASHBOARD_DATA } from '@/src/lib/api/mocks';
 import { Subscription } from '@/src/lib/api/types';
 import { getSessionUser } from '@/src/lib/firebase/auth-actions';
 import { cookies } from 'next/headers';
@@ -19,7 +17,6 @@ export default async function ProviderDashboardPage() {
 
     // Use org_id from custom claims or provider default
     const orgId = sessionUser?.org_id || '8a6ceaa0-c2e0-4945-93eb-bb04b7a2a2a9';
-    const strategy = getMockStrategy();
 
     let subscriptions: Subscription[] = [];
     let stats = null;
@@ -33,18 +30,11 @@ export default async function ProviderDashboardPage() {
         console.error('[ProviderDashboardPage] API failed:', error);
     }
 
-    // Default to mock data only if strategy allows OR in dev mode if empty
-    const hasNoData = !subscriptions.length;
-    if (hasNoData && (strategy === 'always' || strategy === 'fallback' || process.env.NODE_ENV === 'development')) {
-        console.log(`[ProviderDashboardPage] Using fallback mock data (Strategy: ${strategy})`);
-        subscriptions = FALLBACK_PROVIDER_DASHBOARD_DATA.subscriptions;
-        if (!stats) stats = (FALLBACK_PROVIDER_DASHBOARD_DATA as any).stats;
-    }
-
     return (
         <ProviderDashboard
             subscriptions={subscriptions}
             stats={stats}
+            userProfile={sessionUser}
         />
     );
 }

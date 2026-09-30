@@ -1,5 +1,4 @@
-import { apiFetch, executeWithFallback } from './config';
-import { FALLBACK_SUPPORT_DATA } from './mocks';
+import { apiFetch } from './config';
 
 export async function getTickets(id: string, token: string, orgId: string) {
   return apiFetch(`/subscriptions/${id}/tickets`, { token, orgId });
@@ -23,9 +22,8 @@ export async function createTicket(subscriptionId: string, data: any, token: str
  * BFF Aggregator for Support Initial State
  */
 export async function getSupportData(token?: string, orgId?: string) {
-  return executeWithFallback(async () => {
-    // Currently mapping is handled by providing the FALLBACK_SUPPORT_DATA 
-    // until real endpoints are fully wired.
-    throw new Error('Not implemented');
-  }, FALLBACK_SUPPORT_DATA);
+  return {
+    stats: { open: 0, in_progress: 0, resolved: 0, closed: 0 },
+    ticketListProps: { tickets: [], total: 0 }
+  };
 }

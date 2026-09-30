@@ -1,6 +1,5 @@
-import { apiFetch, executeWithFallback } from './config';
+import { apiFetch } from './config';
 import { Subscription, SubscriptionDTO } from './types';
-import { FALLBACK_SUBSCRIPTION_DETAIL_DATA } from './mocks';
 import { UnifiedProductViewProps } from '@/src/components/features/UnifiedProductView/UnifiedProductView';
 
 /**
@@ -165,20 +164,18 @@ export async function getSubscriptionResolvedRequests(id: string, token: string,
  * Aggregates main subscription data with sub-resources (requests, documents, etc.)
  */
 export async function getSubscriptionDetailInit(id: string, token: string, orgId: string): Promise<UnifiedProductViewProps> {
-    return executeWithFallback(async () => {
-        const [subscription, statusRequests, resolvedRequests, documents] = await Promise.all([
-            getSubscriptionDetail(id, token, orgId),
-            getSubscriptionRequests(id, token, orgId),
-            getSubscriptionResolvedRequests(id, token, orgId),
-            getSubscriptionDocuments(id, token, orgId)
-        ]);
-        console.log('requests', statusRequests, resolvedRequests);
-        return mapSubscriptionToUnifiedView({
-            subscription,
-            requests: statusRequests,
-            resolvedRequests: resolvedRequests,
-            documents,
-            payments: subscription.payments || [] // Currently payments are in findOne
-        });
-    }, FALLBACK_SUBSCRIPTION_DETAIL_DATA);
+    const [subscription, statusRequests, resolvedRequests, documents] = await Promise.all([
+        getSubscriptionDetail(id, token, orgId),
+        getSubscriptionRequests(id, token, orgId),
+        getSubscriptionResolvedRequests(id, token, orgId),
+        getSubscriptionDocuments(id, token, orgId)
+    ]);
+    console.log('requests', statusRequests, resolvedRequests);
+    return mapSubscriptionToUnifiedView({
+        subscription,
+        requests: statusRequests,
+        resolvedRequests: resolvedRequests,
+        documents,
+        payments: subscription.payments || []
+    });
 }

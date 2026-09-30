@@ -1,5 +1,4 @@
-import { apiFetch, executeWithFallback } from './config';
-import { FALLBACK_BILLING_DATA } from './mocks';
+import { apiFetch } from './config';
 import { 
   Transaction, 
   TransactionDTO, 
@@ -54,15 +53,21 @@ export async function getPaymentMethods(token: string, orgId: string): Promise<P
  * BFF Aggregator for Billing Initial State
  */
 export async function getBillingInit(token: string, orgId: string) {
-  return executeWithFallback(async () => {
+  try {
     const [transactions, methods] = await Promise.all([
       getTransactions(token, orgId),
       getPaymentMethods(token, orgId),
     ]);
 
     return {
-      transactions,
-      methods,
+      transactions: transactions || [],
+      methods: methods || [],
     };
-  }, FALLBACK_BILLING_DATA);
+  } catch (error) {
+    console.error('[PaymentsAPI] getBillingInit failed:', error);
+    return {
+      transactions: [],
+      methods: [],
+    };
+  }
 }

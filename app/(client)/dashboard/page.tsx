@@ -1,7 +1,5 @@
 import Dashboard from '@/src/components/features/Dashboard/Dashboard';
 import { getDashboardInit } from '@/src/lib/api/dashboard';
-import { getMockStrategy } from '@/src/lib/api/config';
-import { FALLBACK_DASHBOARD_DATA } from '@/src/lib/api/mocks';
 import { Notification, Subscription } from '@/src/lib/api/types';
 import { getSessionUser } from '@/src/lib/firebase/auth-actions';
 import { cookies } from 'next/headers';
@@ -34,16 +32,6 @@ export default async function DashboardPage() {
         } catch (error) {
             console.error('[DashboardPage] API failed:', error);
         }
-    }
-
-    // Use strategy-aware mock logic
-    const strategy = getMockStrategy();
-    const hasData = notifications.length > 0 || subscriptions.length > 0;
-    
-    if (strategy === 'always' || (!hasData && (strategy === 'fallback' || process.env.NODE_ENV === 'development'))) {
-        console.log(`[DashboardPage] Using fallback mock data (Strategy: ${strategy})`);
-        if (!notifications.length) notifications = FALLBACK_DASHBOARD_DATA.notifications;
-        if (!subscriptions.length) subscriptions = FALLBACK_DASHBOARD_DATA.subscriptions;
     }
 
     return (

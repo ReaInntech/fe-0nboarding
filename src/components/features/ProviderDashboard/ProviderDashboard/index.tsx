@@ -115,8 +115,8 @@ export default function ProviderDashboard({
     const headerActions = (
         <div className="flex items-center gap-3">
             <Button variant="outline" onClick={() => setIsBulkModalOpen(true)}>
-                <div className="flex items-center gap-2 text-slate-300">
-                    <Icon name="upload_file" />
+                <div className="flex items-center gap-2 text-slate-100">
+                    <Icon name="upload_file" className="text-blue-400" />
                     <span>Bulk CSV Import</span>
                 </div>
             </Button>

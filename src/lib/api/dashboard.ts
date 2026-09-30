@@ -1,5 +1,4 @@
-import { apiFetch, executeWithFallback } from './config';
-import { FALLBACK_DASHBOARD_DATA } from './mocks';
+import { apiFetch } from './config';
 import { Notification, NotificationDTO, Subscription, SubscriptionDTO } from './types';
 
 export function mapNotification(dto: NotificationDTO): Notification {
@@ -60,17 +59,23 @@ export function mapSubscription(dto: any): Subscription {
 }
 
 export async function getNotifications(token?: string, orgId?: string): Promise<Notification[]> {
-  return executeWithFallback(async () => {
+  try {
     const data = await apiFetch<NotificationDTO[]>('/notifications', { token, orgId });
     return (data || []).map(mapNotification);
-  }, FALLBACK_DASHBOARD_DATA.notifications);
+  } catch (error) {
+    console.error('[DashboardAPI] getNotifications failed:', error);
+    return [];
+  }
 }
 
 export async function getSubscriptions(token?: string, orgId?: string): Promise<Subscription[]> {
-  return executeWithFallback(async () => {
+  try {
     const data = await apiFetch<SubscriptionDTO[]>('/subscriptions', { token, orgId });
     return (data || []).map(mapSubscription);
-  }, FALLBACK_DASHBOARD_DATA.subscriptions);
+  } catch (error) {
+    console.error('[DashboardAPI] getSubscriptions failed:', error);
+    return [];
+  }
 }
 
 export async function markNotificationRead(id: string, token?: string, orgId?: string) {
@@ -134,15 +139,13 @@ export async function verifyProviderOtp(code: string, token?: string) {
  * BFF Aggregator for Dashboard Initial State
  */
 export async function getDashboardInit(token: string, orgId: string) {
-  return executeWithFallback(async () => {
-    const [notifications, subscriptions] = await Promise.all([
-      getNotifications(token, orgId),
-      getSubscriptions(token, orgId),
-    ]);
+  const [notifications, subscriptions] = await Promise.all([
+    getNotifications(token, orgId),
+    getSubscriptions(token, orgId),
+  ]);
 
-    return {
-      notifications,
-      subscriptions,
-    };
-  }, FALLBACK_DASHBOARD_DATA);
+  return {
+    notifications,
+    subscriptions,
+  };
 }

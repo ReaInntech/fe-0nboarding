@@ -42,10 +42,7 @@ export type MockStrategy = 'always' | 'fallback' | 'off';
  * - Off: Never use mocks (default in production).
  */
 export function getMockStrategy(): MockStrategy {
-  const strategy = process.env.NEXT_PUBLIC_MOCK_STRATEGY as MockStrategy;
-  if (strategy) return strategy;
-  
-  return process.env.NODE_ENV === 'production' ? 'off' : 'fallback';
+  return 'off';
 }
 
 /**
@@ -128,26 +125,9 @@ export async function apiFetch<T>(endpoint: string, options: ApiOptions = {}): P
 }
 
 /**
- * Executes an API call with configurable fallback logic.
- * Respects the global NEXT_PUBLIC_MOCK_STRATEGY.
+ * Executes an API call directly against microservices.
+ * Mocks are disabled across the application.
  */
-export async function executeWithFallback<T>(apiCall: () => Promise<T>, fallbackData: T): Promise<T> {
-  const strategy = getMockStrategy();
-
-  if (strategy === 'always') {
-    console.debug('[Mock] Strategy is "always". Returning fallback data.');
-    return fallbackData;
-  }
-
-  try {
-    return await apiCall();
-  } catch (error) {
-    if (strategy === 'fallback') {
-      console.warn('[Mock] API call failed. Strategy is "fallback". Returning mock data.', error);
-      return fallbackData;
-    }
-    
-    console.error('[Mock] API call failed. Strategy is "off". Propagating error.', error);
-    throw error;
-  }
+export async function executeWithFallback<T>(apiCall: () => Promise<T>, _fallbackData?: T): Promise<T> {
+  return await apiCall();
 }

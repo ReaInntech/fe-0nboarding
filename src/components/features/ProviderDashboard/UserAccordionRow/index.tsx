@@ -198,8 +198,14 @@ export default function UserAccordionRow({
                                                 <div className="flex items-center gap-1.5">
                                                     <span className="font-medium text-slate-200 truncate text-xs">{usr.fullName}</span>
                                                     {usr.roleName && (
-                                                        <span className="text-[9px] px-1 py-0.2 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">
-                                                            {usr.roleName}
+                                                        <span className={`text-[9px] px-1.5 py-0.5 rounded font-semibold border ${
+                                                            usr.roleName.toLowerCase() === 'admin'
+                                                                ? 'bg-blue-500/20 text-blue-300 border-blue-500/30'
+                                                                : 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
+                                                        }`}>
+                                                            {usr.roleName.toLowerCase() === 'member'
+                                                                ? 'Operator'
+                                                                : usr.roleName.charAt(0).toUpperCase() + usr.roleName.slice(1)}
                                                         </span>
                                                     )}
                                                 </div>

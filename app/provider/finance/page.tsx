@@ -1,7 +1,5 @@
 import ProviderFinance from '@/src/components/features/ProviderFinance/ProviderFinance';
 import { getProviderFinanceInit } from '@/src/lib/api/provider';
-import { getMockStrategy } from '@/src/lib/api/config';
-import { FALLBACK_PROVIDER_FINANCE_DATA } from '@/src/lib/api/mocks';
 import { FinanceKpis, RevenueDataPoint } from '@/src/lib/api/types';
 import { getSessionUser } from '@/src/lib/firebase/auth-actions';
 import { cookies } from 'next/headers';
@@ -11,17 +9,24 @@ export const metadata = {
     description: 'Track your revenue, pending payouts, and recent payment history.',
 };
 
+const EMPTY_KPIS: FinanceKpis = {
+    totalRevenue: 0,
+    pendingPayout: 0,
+    activeClients: 0,
+    successRate: 0,
+    growth: 0,
+};
+
 export default async function ProviderFinancePage() {
     // SSR Fetching with Auth Token
     const cookieStore = await cookies();
     const token = cookieStore.get('id_token')?.value;
     const sessionUser = await getSessionUser();
     
-    // Use org_id from custom claims if available
-    const orgId = sessionUser?.org_id;
-    const strategy = getMockStrategy();
+    // Use org_id from custom claims or provider default
+    const orgId = sessionUser?.org_id || '8a6ceaa0-c2e0-4945-93eb-bb04b7a2a2a9';
 
-    let kpis: FinanceKpis | null = null;
+    let kpis: FinanceKpis = EMPTY_KPIS;
     let revenueData: RevenueDataPoint[] = [];
     let distributionData: any[] = [];
     let transactions: any[] = [];
@@ -29,39 +34,24 @@ export default async function ProviderFinancePage() {
     let clientsFilterList: any[] = [];
     let paymentMethodsList: any[] = [];
 
-    if (token && orgId) {
-        try {
-            const data = await getProviderFinanceInit(token, orgId);
-            if (data.kpis) kpis = data.kpis;
-            if (data.revenueHistory) revenueData = data.revenueHistory;
-            // Add other mappings if they exist in API
-        } catch (error) {
-            console.error('[ProviderFinancePage] API failed:', error);
-        }
-    }
-
-    // Default to mock data only if strategy allows
-    const hasNoData = !kpis && !revenueData.length;
-    if (hasNoData && (strategy === 'always' || (strategy === 'fallback' && (!token || process.env.NODE_ENV === 'development')))) {
-        console.log(`[ProviderFinancePage] Using fallback mock data (Strategy: ${strategy})`);
-        kpis = FALLBACK_PROVIDER_FINANCE_DATA.kpis;
-        revenueData = FALLBACK_PROVIDER_FINANCE_DATA.revenueHistory;
-        distributionData = FALLBACK_PROVIDER_FINANCE_DATA.distributionData;
-        transactions = FALLBACK_PROVIDER_FINANCE_DATA.transactions;
-        productsFilterList = FALLBACK_PROVIDER_FINANCE_DATA.productsFilterList;
-        clientsFilterList = FALLBACK_PROVIDER_FINANCE_DATA.clientsFilterList;
-        paymentMethodsList = FALLBACK_PROVIDER_FINANCE_DATA.paymentMethodsList;
+    try {
+        const data = await getProviderFinanceInit(token || '', orgId);
+        if (data.kpis) kpis = data.kpis;
+        if (data.revenueHistory) revenueData = data.revenueHistory;
+    } catch (error) {
+        console.error('[ProviderFinancePage] API failed:', error);
     }
 
     return (
         <ProviderFinance 
-            kpis={kpis || FALLBACK_PROVIDER_FINANCE_DATA.kpis}
+            kpis={kpis}
             revenueData={revenueData}
             distributionData={distributionData}
             transactions={transactions}
             productsFilterList={productsFilterList}
             clientsFilterList={clientsFilterList}
             paymentMethodsList={paymentMethodsList}
+            userProfile={sessionUser}
         />
     );
 }

@@ -18,21 +18,26 @@ interface ProviderProductsProps {
     userProfile?: any;
 }
 
-const ProviderProducts: React.FC<ProviderProductsProps> = ({ initialProducts, userProfile }) => {
+const ProviderProducts: React.FC<ProviderProductsProps> = ({ initialProducts = [], userProfile }) => {
     const { user } = useApp();
     const [products, setProducts] = useState<Product[]>(initialProducts);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterCategory, setFilterCategory] = useState('All');
 
+    React.useEffect(() => {
+        setProducts(initialProducts);
+    }, [initialProducts]);
+
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
 
-    const categories = ['All', ...Array.from(new Set(products.map(p => p.category)))];
+    const categories = ['All', ...Array.from(new Set(products.map(p => p?.category).filter(Boolean)))];
 
     const filteredProducts = products.filter(p => {
-        const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            p.productCode.toLowerCase().includes(searchTerm.toLowerCase());
+        if (!p) return false;
+        const matchesSearch = (p.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (p.productCode || '').toLowerCase().includes(searchTerm.toLowerCase());
         const matchesCategory = filterCategory === 'All' || p.category === filterCategory;
         return matchesSearch && matchesCategory;
     });

@@ -80,7 +80,14 @@ export default function CreateClientModal({
     setErrorMsg(null);
 
     try {
-      const res = await createProviderClient(singleForm, token, orgId);
+      const isNatural = singleForm.client_type === 'natural_person';
+      const payload: CreateClientDTO = {
+        ...singleForm,
+        legal_name: singleForm.legal_name.trim(),
+        admin_name: isNatural ? singleForm.legal_name.trim() : (singleForm.admin_name?.trim() || singleForm.legal_name.trim()),
+        trade_name: isNatural ? undefined : (singleForm.trade_name?.trim() || undefined),
+      };
+      const res = await createProviderClient(payload, token, orgId);
       onSuccess(res);
       onClose();
     } catch (err: any) {
@@ -115,45 +122,145 @@ export default function CreateClientModal({
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Entity Type Selector */}
+          <div className="grid grid-cols-2 gap-3 p-1.5 rounded-xl bg-slate-950/80 border border-slate-800">
+            <button
+              type="button"
+              onClick={() => setSingleForm({ ...singleForm, client_type: 'legal_entity' })}
+              className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-medium text-xs transition-all ${
+                singleForm.client_type === 'legal_entity'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Icon name="domain" className="text-base" />
+              <span>Legal Entity (Company)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setSingleForm({ ...singleForm, client_type: 'natural_person', trade_name: '' })}
+              className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-medium text-xs transition-all ${
+                singleForm.client_type === 'natural_person'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Icon name="person" className="text-base" />
+              <span>Natural Person (Individual)</span>
+            </button>
+          </div>
+
           <div className={styles['provider-clients__form-grid']}>
-            {/* Legal Name */}
-            <div className={styles['provider-clients__field-group']}>
-              <label className={styles['provider-clients__field-label']}>
-                Legal Name *
-              </label>
-              <input
-                type="text"
-                required
-                placeholder="e.g. Acme Corp LLC"
-                value={singleForm.legal_name}
-                onChange={(e) => setSingleForm({ ...singleForm, legal_name: e.target.value })}
-                className={styles['provider-clients__input']}
-              />
-            </div>
+            {singleForm.client_type === 'natural_person' ? (
+              /* --- NATURAL PERSON FIELDS --- */
+              <>
+                <div className={`${styles['provider-clients__field-group']} ${styles['provider-clients__form-full']}`}>
+                  <label className={styles['provider-clients__field-label']}>
+                    Full Name (Person & Legal Name) *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Daniel Bernal"
+                    value={singleForm.legal_name}
+                    onChange={(e) => setSingleForm({ ...singleForm, legal_name: e.target.value })}
+                    className={styles['provider-clients__input']}
+                  />
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    As a Natural Person, this name represents both the legal client and the platform user.
+                  </p>
+                </div>
 
-            {/* Trade Name */}
-            <div className={styles['provider-clients__field-group']}>
-              <label className={styles['provider-clients__field-label']}>
-                Trade Name
-              </label>
-              <input
-                type="text"
-                placeholder="e.g. Acme"
-                value={singleForm.trade_name || ''}
-                onChange={(e) => setSingleForm({ ...singleForm, trade_name: e.target.value })}
-                className={styles['provider-clients__input']}
-              />
-            </div>
+                <div className={styles['provider-clients__field-group']}>
+                  <label className={styles['provider-clients__field-label']}>National ID / Document *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. 1020304050"
+                    value={singleForm.tax_id || ''}
+                    onChange={(e) => setSingleForm({ ...singleForm, tax_id: e.target.value })}
+                    className={styles['provider-clients__input']}
+                  />
+                </div>
 
-            {/* Corporate Email & Domain Validation */}
+                <div className={styles['provider-clients__field-group']}>
+                  <label className={styles['provider-clients__field-label']}>Phone Number</label>
+                  <input
+                    type="tel"
+                    placeholder="+57 300 000 0000"
+                    value={singleForm.phone || ''}
+                    onChange={(e) => setSingleForm({ ...singleForm, phone: e.target.value })}
+                    className={styles['provider-clients__input']}
+                  />
+                </div>
+              </>
+            ) : (
+              /* --- LEGAL ENTITY FIELDS --- */
+              <>
+                <div className={styles['provider-clients__field-group']}>
+                  <label className={styles['provider-clients__field-label']}>
+                    Company Legal Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Acme Corp LLC"
+                    value={singleForm.legal_name}
+                    onChange={(e) => setSingleForm({ ...singleForm, legal_name: e.target.value })}
+                    className={styles['provider-clients__input']}
+                  />
+                </div>
+
+                <div className={styles['provider-clients__field-group']}>
+                  <label className={styles['provider-clients__field-label']}>
+                    Trade Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Acme"
+                    value={singleForm.trade_name || ''}
+                    onChange={(e) => setSingleForm({ ...singleForm, trade_name: e.target.value })}
+                    className={styles['provider-clients__input']}
+                  />
+                </div>
+
+                <div className={styles['provider-clients__field-group']}>
+                  <label className={styles['provider-clients__field-label']}>Tax ID / NIT *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="900.829.102-1"
+                    value={singleForm.tax_id || ''}
+                    onChange={(e) => setSingleForm({ ...singleForm, tax_id: e.target.value })}
+                    className={styles['provider-clients__input']}
+                  />
+                </div>
+
+                <div className={styles['provider-clients__field-group']}>
+                  <label className={styles['provider-clients__field-label']}>
+                    Admin Full Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Juan Perez"
+                    value={singleForm.admin_name || ''}
+                    onChange={(e) => setSingleForm({ ...singleForm, admin_name: e.target.value })}
+                    className={styles['provider-clients__input']}
+                  />
+                </div>
+              </>
+            )}
+
+            {/* Email & Domain Check */}
             <div className={`${styles['provider-clients__field-group']} ${styles['provider-clients__form-full']}`}>
               <label className={styles['provider-clients__field-label']}>
-                Administrator Corporate Email *
+                {singleForm.client_type === 'natural_person' ? 'Email Address *' : 'Administrator Corporate Email *'}
               </label>
               <input
                 type="email"
                 required
-                placeholder="admin@acme.com"
+                placeholder={singleForm.client_type === 'natural_person' ? 'user@example.com' : 'admin@acme.com'}
                 value={singleForm.email}
                 onChange={(e) => setSingleForm({ ...singleForm, email: e.target.value })}
                 className={styles['provider-clients__input']}
@@ -178,43 +285,6 @@ export default function CreateClientModal({
               )}
             </div>
 
-            {/* Client Type */}
-            <div className={styles['provider-clients__field-group']}>
-              <label className={styles['provider-clients__field-label']}>Entity Type</label>
-              <select
-                value={singleForm.client_type || 'legal_entity'}
-                onChange={(e) => setSingleForm({ ...singleForm, client_type: e.target.value as any })}
-                className={styles['provider-clients__select']}
-              >
-                <option value="legal_entity">Legal Entity (Company / Org)</option>
-                <option value="natural_person">Natural Person (Individual)</option>
-              </select>
-            </div>
-
-            {/* Tax ID */}
-            <div className={styles['provider-clients__field-group']}>
-              <label className={styles['provider-clients__field-label']}>Tax ID / NIT / Document</label>
-              <input
-                type="text"
-                placeholder="900.829.102-1"
-                value={singleForm.tax_id || ''}
-                onChange={(e) => setSingleForm({ ...singleForm, tax_id: e.target.value })}
-                className={styles['provider-clients__input']}
-              />
-            </div>
-
-            {/* Phone */}
-            <div className={styles['provider-clients__field-group']}>
-              <label className={styles['provider-clients__field-label']}>Phone Number</label>
-              <input
-                type="tel"
-                placeholder="+57 300 000 0000"
-                value={singleForm.phone || ''}
-                onChange={(e) => setSingleForm({ ...singleForm, phone: e.target.value })}
-                className={styles['provider-clients__input']}
-              />
-            </div>
-
             {/* Country */}
             <div className={styles['provider-clients__field-group']}>
               <label className={styles['provider-clients__field-label']}>Country</label>
@@ -226,6 +296,19 @@ export default function CreateClientModal({
                 className={styles['provider-clients__input']}
               />
             </div>
+
+            {singleForm.client_type === 'legal_entity' && (
+              <div className={styles['provider-clients__field-group']}>
+                <label className={styles['provider-clients__field-label']}>Company Phone</label>
+                <input
+                  type="tel"
+                  placeholder="+57 300 000 0000"
+                  value={singleForm.phone || ''}
+                  onChange={(e) => setSingleForm({ ...singleForm, phone: e.target.value })}
+                  className={styles['provider-clients__input']}
+                />
+              </div>
+            )}
           </div>
 
           <div className="pt-4 border-t border-slate-800 flex justify-end">

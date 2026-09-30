@@ -39,9 +39,13 @@ export function mapSubscription(dto: any): Subscription {
     client: dto.client ? {
       id: dto.client.id,
       legalName: dto.client.legal_name || dto.client.legalName || '',
+      tradeName: dto.client.trade_name || dto.client.tradeName || '',
       clientType: dto.client.client_type || dto.client.clientType || 'legal_entity',
       email: dto.client.email || '',
       phone: dto.client.phone || '',
+      taxId: dto.client.tax_id || dto.client.taxId || '',
+      country: dto.client.country || '',
+      users: dto.client.users || [],
     } : undefined,
     tierName: dto.tierName || dto.tier || (dto.product?.billing_model ? `${dto.product.billing_model} Plan` : 'Standard Plan'),
     monthlyPrice: dto.monthlyPrice || Number(dto.price) || 0,

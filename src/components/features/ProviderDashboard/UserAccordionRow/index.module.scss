@@ -1,0 +1,152 @@
+@reference "tailwindcss";
+
+.user-row {
+    @apply border border-slate-800/80 bg-[#151c2c] rounded-xl overflow-hidden transition-all duration-200 hover:border-slate-700;
+
+    &--expanded {
+        @apply border-slate-700/80 shadow-lg shadow-black/20;
+    }
+
+    &__header {
+        @apply p-5 flex flex-col lg:flex-row lg:items-center justify-between cursor-pointer gap-4 transition-colors;
+
+        &:hover {
+            @apply bg-slate-800/20;
+        }
+    }
+
+    &__identity {
+        @apply flex items-center gap-4 flex-1 min-w-0;
+    }
+
+    &__avatar {
+        @apply size-12 rounded-xl flex items-center justify-center font-bold text-base shrink-0 shadow-inner;
+
+        &--natural {
+            @apply bg-gradient-to-br from-indigo-500/20 to-blue-500/30 text-blue-300 border border-blue-500/30;
+        }
+
+        &--legal {
+            @apply bg-gradient-to-br from-cyan-500/20 to-teal-500/30 text-teal-300 border border-teal-500/30;
+        }
+    }
+
+    &__main-info {
+        @apply flex flex-col min-w-0;
+    }
+
+    &__name-line {
+        @apply flex items-center gap-2.5 flex-wrap;
+    }
+
+    &__name {
+        @apply font-semibold text-slate-100 text-base truncate;
+    }
+
+    &__badge-type {
+        @apply px-2 py-0.5 rounded-md text-[11px] font-semibold tracking-wide uppercase flex items-center gap-1 border;
+
+        &--natural {
+            @apply bg-indigo-500/10 text-indigo-300 border-indigo-500/30;
+        }
+
+        &--legal {
+            @apply bg-teal-500/10 text-teal-300 border-teal-500/30;
+        }
+    }
+
+    &__meta-line {
+        @apply flex items-center gap-3 text-xs text-slate-400 mt-1 flex-wrap;
+    }
+
+    &__meta-item {
+        @apply flex items-center gap-1.5;
+    }
+
+    &__stats-wrapper {
+        @apply flex items-center gap-6 justify-between lg:justify-end shrink-0 pt-2 lg:pt-0 border-t border-slate-800/60 lg:border-t-0;
+    }
+
+    &__sub-counter {
+        @apply flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/60 border border-slate-700/60 text-xs;
+    }
+
+    &__revenue {
+        @apply text-right;
+    }
+
+    &__revenue-amount {
+        @apply text-sm font-bold text-slate-200 block;
+    }
+
+    &__revenue-label {
+        @apply text-[11px] text-slate-500 block;
+    }
+
+    &__expand-btn {
+        @apply size-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-200 hover:bg-slate-800/80 transition-colors;
+    }
+
+    /* Accordion Body */
+    &__body {
+        @apply border-t border-slate-800/90 bg-[#0c121e]/90 p-5 md:p-6 space-y-6;
+    }
+
+    &__section-title {
+        @apply text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2 mb-3;
+    }
+
+    /* Client info & linked users card */
+    &__client-meta-grid {
+        @apply grid grid-cols-1 md:grid-cols-3 gap-4 p-4 rounded-xl bg-slate-900/60 border border-slate-800/80;
+    }
+
+    &__users-list {
+        @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3;
+    }
+
+    &__user-card {
+        @apply p-3 rounded-lg bg-slate-800/40 border border-slate-800 flex items-center gap-3;
+    }
+
+    /* Subscription Item Card inside accordion */
+    &__sub-card {
+        @apply p-4 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-slate-700/80 transition-all space-y-4;
+    }
+
+    &__sub-header {
+        @apply flex flex-col md:flex-row md:items-center justify-between gap-3;
+    }
+
+    &__product-info {
+        @apply flex items-center gap-3;
+    }
+
+    &__product-icon {
+        @apply size-10 rounded-lg bg-slate-800/90 flex items-center justify-center text-xl shrink-0;
+    }
+
+    &__status-badge {
+        @apply px-2.5 py-1 rounded-full text-xs font-medium border;
+
+        &--active {
+            @apply bg-emerald-500/10 text-emerald-400 border-emerald-500/20;
+        }
+
+        &--in_progress {
+            @apply bg-blue-500/10 text-blue-400 border-blue-500/20;
+        }
+
+        &--suspended {
+            @apply bg-rose-500/10 text-rose-400 border-rose-500/20;
+        }
+
+        &--cancelled, &--default {
+            @apply bg-slate-500/10 text-slate-400 border-slate-500/20;
+        }
+    }
+
+    &__actions {
+        @apply flex items-center gap-1.5;
+    }
+}

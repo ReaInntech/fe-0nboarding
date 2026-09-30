@@ -14,6 +14,8 @@ import Button from '@/src/components/shared/atoms/Button';
 import Icon from '@/src/components/shared/atoms/Icon';
 import ProviderTopNavigation from '../../shared/molecule/ProviderTopNavigation';
 import Footer from '../../shared/molecule/Footer';
+import CreateClientModal from './CreateClientModal';
+import BulkImportModal from './BulkImportModal';
 import styles from './index.module.scss';
 
 export interface ProviderClientsProps {
@@ -522,318 +524,26 @@ export default function ProviderClients({
           )}
         </div>
 
-        {/* --- MODAL 1: Individual Client Onboarding (RF-PV-29) --- */}
-        {isSingleModalOpen && (
-          <div className={styles['provider-clients__modal-backdrop']}>
-            <div className={styles['provider-clients__modal']}>
-              <div className={styles['provider-clients__modal-header']}>
-                <h2 className={styles['provider-clients__modal-title']}>
-                  <Icon name="person_add" className="text-blue-400" />
-                  New Client Registration (RF-PV-29)
-                </h2>
-                <button
-                  type="button"
-                  onClick={() => setIsSingleModalOpen(false)}
-                  className={styles['provider-clients__modal-close']}
-                >
-                  <Icon name="close" />
-                </button>
-              </div>
+        <CreateClientModal
+          isOpen={isSingleModalOpen}
+          onClose={() => setIsSingleModalOpen(false)}
+          onSuccess={(newClient) => {
+            showNotification('success', `Client ${newClient.trade_name || newClient.legal_name} registered successfully.`);
+            setClients((prev) => [newClient, ...prev]);
+          }}
+          token={token}
+          orgId={orgId}
+        />
 
-              <form onSubmit={handleCreateSingleClient} className="space-y-5">
-                <div className={styles['provider-clients__form-grid']}>
-                  {/* Legal Name */}
-                  <div className={styles['provider-clients__field-group']}>
-                    <label className={styles['provider-clients__field-label']}>
-                      Legal Business Name *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Acme Innovations Corp"
-                      value={singleForm.legal_name}
-                      onChange={(e) => setSingleForm({ ...singleForm, legal_name: e.target.value })}
-                      className={styles['provider-clients__input']}
-                    />
-                  </div>
-
-                  {/* Trade Name */}
-                  <div className={styles['provider-clients__field-group']}>
-                    <label className={styles['provider-clients__field-label']}>
-                      Trade / Commercial Name
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Acme"
-                      value={singleForm.trade_name || ''}
-                      onChange={(e) => setSingleForm({ ...singleForm, trade_name: e.target.value })}
-                      className={styles['provider-clients__input']}
-                    />
-                  </div>
-
-                  {/* Corporate Email & Domain Validation */}
-                  <div className={`${styles['provider-clients__field-group']} ${styles['provider-clients__form-full']}`}>
-                    <label className={styles['provider-clients__field-label']}>
-                      Administrator Corporate Email *
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="admin@acme.com"
-                      value={singleForm.email}
-                      onChange={(e) => setSingleForm({ ...singleForm, email: e.target.value })}
-                      className={styles['provider-clients__input']}
-                    />
-                    {domainCheckStatus.checking && (
-                      <div className={`${styles['provider-clients__domain-badge']} ${styles['provider-clients__domain-badge--checking']}`}>
-                        <Icon name="sync" className="animate-spin text-xs" />
-                        <span>Verifying domain availability in platform...</span>
-                      </div>
-                    )}
-                    {!domainCheckStatus.checking && domainCheckStatus.available === true && (
-                      <div className={`${styles['provider-clients__domain-badge']} ${styles['provider-clients__domain-badge--available']}`}>
-                        <Icon name="check_circle" className="text-xs" />
-                        <span>Domain is available for a new organization.</span>
-                      </div>
-                    )}
-                    {!domainCheckStatus.checking && domainCheckStatus.available === false && (
-                      <div className={`${styles['provider-clients__domain-badge']} ${styles['provider-clients__domain-badge--unavailable']}`}>
-                        <Icon name="warning" className="text-xs" />
-                        <span>{domainCheckStatus.reason || 'Domain is already registered by another organization.'}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Client Type */}
-                  <div className={styles['provider-clients__field-group']}>
-                    <label className={styles['provider-clients__field-label']}>Entity Type</label>
-                    <select
-                      value={singleForm.client_type || 'legal_entity'}
-                      onChange={(e) => setSingleForm({ ...singleForm, client_type: e.target.value as any })}
-                      className={styles['provider-clients__select']}
-                    >
-                      <option value="legal_entity">Legal Entity (Company / Org)</option>
-                      <option value="natural_person">Natural Person (Individual)</option>
-                    </select>
-                  </div>
-
-                  {/* Tax ID */}
-                  <div className={styles['provider-clients__field-group']}>
-                    <label className={styles['provider-clients__field-label']}>Tax ID / NIT / RUT</label>
-                    <input
-                      type="text"
-                      placeholder="900.829.102-1"
-                      value={singleForm.tax_id || ''}
-                      onChange={(e) => setSingleForm({ ...singleForm, tax_id: e.target.value })}
-                      className={styles['provider-clients__input']}
-                    />
-                  </div>
-
-                  {/* Phone */}
-                  <div className={styles['provider-clients__field-group']}>
-                    <label className={styles['provider-clients__field-label']}>Phone</label>
-                    <input
-                      type="tel"
-                      placeholder="+57 300 000 0000"
-                      value={singleForm.phone || ''}
-                      onChange={(e) => setSingleForm({ ...singleForm, phone: e.target.value })}
-                      className={styles['provider-clients__input']}
-                    />
-                  </div>
-
-                  {/* Country */}
-                  <div className={styles['provider-clients__field-group']}>
-                    <label className={styles['provider-clients__field-label']}>Country</label>
-                    <input
-                      type="text"
-                      placeholder="Colombia"
-                      value={singleForm.country || 'Colombia'}
-                      onChange={(e) => setSingleForm({ ...singleForm, country: e.target.value })}
-                      className={styles['provider-clients__input']}
-                    />
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t border-slate-800 flex justify-end">
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    disabled={isSubmittingSingle}
-                  >
-                    <div className="flex items-center gap-2">
-                      <Icon name={isSubmittingSingle ? 'sync' : 'send'} className={isSubmittingSingle ? 'animate-spin' : ''} />
-                      <span>{isSubmittingSingle ? 'Registering...' : 'Register & Send Invitation'}</span>
-                    </div>
-                  </Button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* --- MODAL 2: Bulk CSV Import (RF-PV-30) --- */}
-        {isBulkModalOpen && (
-          <div className={styles['provider-clients__modal-backdrop']}>
-            <div className={styles['provider-clients__modal']}>
-              <div className={styles['provider-clients__modal-header']}>
-                <h2 className={styles['provider-clients__modal-title']}>
-                  <Icon name="upload_file" className="text-blue-400" />
-                  Bulk CSV Import
-                </h2>
-                <button
-                  type="button"
-                  onClick={() => setIsBulkModalOpen(false)}
-                  className={styles['provider-clients__modal-close']}
-                >
-                  <Icon name="close" />
-                </button>
-              </div>
-
-              {!bulkResult ? (
-                <div className="space-y-6">
-                  {/* Upload Drop Zone */}
-                  <label className={styles['provider-clients__csv-zone']}>
-                    <input
-                      type="file"
-                      accept=".csv"
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handleCsvFileUpload(file);
-                      }}
-                    />
-                    <div className={styles['provider-clients__csv-icon']}>
-                      <Icon name="cloud_upload" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-white">
-                        {csvFile ? csvFile.name : 'Click or drag a CSV file to upload'}
-                      </p>
-                      <p className="text-xs text-slate-500 mt-1">
-                        Headers: <code>legal_name, trade_name, email, client_type, role, phone</code>
-                      </p>
-                    </div>
-                  </label>
-
-                  <div className="flex items-center justify-between text-xs text-slate-400">
-                    <span>Need the standard CSV structure?</span>
-                    <button
-                      type="button"
-                      onClick={downloadExampleCsv}
-                      className="text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1"
-                    >
-                      <Icon name="download" className="text-xs" />
-                      <span>Download Sample CSV</span>
-                    </button>
-                  </div>
-
-                  {/* Parsed Preview Table */}
-                  {parsedRows.length > 0 && (
-                    <div className="space-y-3 pt-2">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="font-bold uppercase tracking-wider text-slate-400">
-                          Pre-Validation Summary ({parsedRows.length} rows detected)
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                            {parsedRows.filter((r) => r.isValid).length} Valid
-                          </span>
-                          {parsedRows.filter((r) => !r.isValid).length > 0 && (
-                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
-                              {parsedRows.filter((r) => !r.isValid).length} Issues
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="max-h-52 overflow-y-auto rounded-xl border border-slate-800 bg-slate-950/60 divide-y divide-slate-800/60">
-                        {parsedRows.slice(0, 10).map((row, idx) => (
-                          <div key={idx} className="p-3 flex items-center justify-between text-xs">
-                            <div className="space-y-0.5">
-                              <span className="font-semibold text-white">{row.legal_name || 'Missing Name'}</span>
-                              <div className="text-[11px] text-slate-400">{row.email}</div>
-                            </div>
-                            {row.isValid ? (
-                              <span className="text-[10px] font-bold text-emerald-400 flex items-center gap-1">
-                                <Icon name="check" className="text-xs" /> Ready
-                              </span>
-                            ) : (
-                              <span className="text-[10px] font-bold text-rose-400 flex items-center gap-1">
-                                <Icon name="error" className="text-xs" /> {row.error}
-                              </span>
-                            )}
-                          </div>
-                        ))}
-                        {parsedRows.length > 10 && (
-                          <div className="p-2 text-center text-[10px] text-slate-500">
-                            + {parsedRows.length - 10} more records in file
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="pt-4 border-t border-slate-800 flex justify-end">
-                    <Button
-                      type="button"
-                      variant="primary"
-                      onClick={handleConfirmBulkImport}
-                      disabled={isImportingBulk || parsedRows.filter((r) => r.isValid).length === 0}
-                    >
-                      <div className="flex items-center gap-2">
-                        <Icon name={isImportingBulk ? 'sync' : 'publish'} className={isImportingBulk ? 'animate-spin' : ''} />
-                        <span>
-                          {isImportingBulk
-                            ? 'Processing Batch...'
-                            : `Import ${parsedRows.filter((r) => r.isValid).length} Valid Clients`}
-                        </span>
-                      </div>
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                /* Bulk Results View */
-                <div className="space-y-5">
-                  <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-around text-center">
-                    <div>
-                      <div className="text-xl font-bold text-white">{bulkResult.summary.total}</div>
-                      <div className="text-[10px] text-slate-500 uppercase">Total Rows</div>
-                    </div>
-                    <div>
-                      <div className="text-xl font-bold text-emerald-400">{bulkResult.summary.successful}</div>
-                      <div className="text-[10px] text-slate-500 uppercase">Imported</div>
-                    </div>
-                    <div>
-                      <div className="text-xl font-bold text-rose-400">{bulkResult.summary.failed}</div>
-                      <div className="text-[10px] text-slate-500 uppercase">Failed</div>
-                    </div>
-                  </div>
-
-                  {bulkResult.errors.length > 0 && (
-                    <div className="space-y-2">
-                      <span className="text-xs font-bold text-rose-400">Errors Breakdown</span>
-                      <div className="max-h-40 overflow-y-auto space-y-1 rounded-xl bg-slate-950/40 p-3 border border-slate-800 text-xs text-slate-400">
-                        {bulkResult.errors.map((err, idx) => (
-                          <div key={idx} className="flex items-start gap-2">
-                            <span className="font-mono text-[10px] text-slate-500">Row {err.row}:</span>
-                            <span className="text-slate-300 font-medium">{err.email}</span>
-                            <span className="text-rose-400">— {err.error}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="pt-4 border-t border-slate-800 flex justify-end">
-                    <Button variant="primary" onClick={() => setIsBulkModalOpen(false)}>
-                      Done
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+        <BulkImportModal
+          isOpen={isBulkModalOpen}
+          onClose={() => setIsBulkModalOpen(false)}
+          onSuccess={(result) => {
+            showNotification('success', `Bulk import completed: ${result.summary.successful} clients created.`);
+          }}
+          token={token}
+          orgId={orgId}
+        />
 
         {/* Floating Toast Notification */}
         {feedback && (

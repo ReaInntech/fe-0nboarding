@@ -26,6 +26,15 @@ export interface Notification {
   variant?: 'critical' | 'warning' | 'info' | 'success';
 }
 
+export interface ClientUser {
+  id: string;
+  fullName: string;
+  email: string;
+  phone?: string;
+  roleName?: string;
+  avatarUrl?: string;
+}
+
 export interface Subscription {
   id: string;
   name?: string;
@@ -45,9 +54,13 @@ export interface Subscription {
   client?: {
     id: string;
     legalName: string;
-    clientType: 'legal_entity' | 'person' | string;
+    tradeName?: string;
+    clientType: 'legal_entity' | 'natural_person' | 'person' | string;
     email: string;
     phone: string;
+    taxId?: string;
+    country?: string;
+    users?: ClientUser[];
   };
   product?: {
     name: string;

@@ -627,6 +627,7 @@ export interface ProviderClientsResponse {
 export interface CreateClientDTO {
   legal_name: string;
   trade_name?: string;
+  admin_name?: string;
   email: string;
   client_type?: 'legal_entity' | 'natural_person';
   tax_id?: string;

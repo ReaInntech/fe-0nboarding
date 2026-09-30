@@ -104,20 +104,101 @@ export const FALLBACK_PROVIDER_DASHBOARD_DATA = {
             tier: 'Enterprise Plan',
             icon: 'cloud',
             status: 'active',
-            progressLabel: 'Provisionamiento',
+            progressLabel: 'Provisioned',
             progressPct: 100,
             price: '$1,290.00',
             pricePeriod: '/mo',
             client: {
                 id: 'C-001',
-                legalName: 'Real Inovation Tech',
+                legalName: 'Real Innovation Tech SAS',
+                tradeName: 'Real Tech',
                 clientType: 'legal_entity',
+                taxId: '900.123.456-7',
+                country: 'Colombia',
                 email: 'contact@realinnovation.tech',
-                phone: '+1 555-0123'
+                phone: '+57 310 123 4567',
+                users: [
+                    { id: 'U-101', fullName: 'Carlos Gomez', email: 'carlos@realinnovation.tech', roleName: 'admin', phone: '+57 310 123 4567' },
+                    { id: 'U-102', fullName: 'Ana Lopez', email: 'ana@realinnovation.tech', roleName: 'member', phone: '+57 311 234 5678' }
+                ]
+            },
+            product: {
+                name: 'Cloud Infrastructure',
+                icon: 'cloud',
+                iconColor: '#3b82f6'
             },
             monthlyPrice: 1290,
-            documents: [{ name: 'SLA', status: 'signed' }],
-            payments: [{ id: 'P1', status: 'Paid', date: '2026-04-01', amount: 1290 }]
+            documents: [{ name: 'SLA Enterprise', status: 'signed' }],
+            payments: [{ id: 'P1', status: 'Paid', date: '2026-04-01', amount: 1290 }],
+            can_delete: false,
+            has_approved_payment: true
+        },
+        {
+            id: 'S-7002',
+            name: 'Cybersecurity Guard',
+            tier: 'Standard Plan',
+            icon: 'security',
+            status: 'in_progress',
+            progressLabel: 'Onboarding Security',
+            progressPct: 60,
+            price: '$450.00',
+            pricePeriod: '/mo',
+            client: {
+                id: 'C-001',
+                legalName: 'Real Innovation Tech SAS',
+                tradeName: 'Real Tech',
+                clientType: 'legal_entity',
+                taxId: '900.123.456-7',
+                country: 'Colombia',
+                email: 'contact@realinnovation.tech',
+                phone: '+57 310 123 4567',
+                users: [
+                    { id: 'U-101', fullName: 'Carlos Gomez', email: 'carlos@realinnovation.tech', roleName: 'admin', phone: '+57 310 123 4567' }
+                ]
+            },
+            product: {
+                name: 'Cybersecurity Guard',
+                icon: 'security',
+                iconColor: '#10b981'
+            },
+            monthlyPrice: 450,
+            documents: [{ name: 'Security Policy', status: 'pending' }],
+            payments: [],
+            can_delete: true,
+            has_approved_payment: false
+        },
+        {
+            id: 'S-7003',
+            name: 'Asesoría Jurídica Corporativa',
+            tier: 'Retainer Mensual',
+            icon: 'gavel',
+            status: 'active',
+            progressLabel: 'Active Service',
+            progressPct: 100,
+            price: '$750.00',
+            pricePeriod: '/mo',
+            client: {
+                id: 'C-002',
+                legalName: 'Daniel Bernal',
+                clientType: 'natural_person',
+                taxId: '1020304050',
+                country: 'Colombia',
+                email: 'daniel.bernal@gmail.com',
+                phone: '+57 300 987 6543',
+                users: [
+                    { id: 'U-201', fullName: 'Daniel Bernal', email: 'daniel.bernal@gmail.com', roleName: 'owner', phone: '+57 300 987 6543' }
+                ]
+            },
+            product: {
+                name: 'Asesoría Jurídica Corporativa',
+                icon: 'gavel',
+                iconColor: '#8b5cf6'
+            },
+            monthlyPrice: 750,
+            documents: [{ name: 'Contrato de Servicios', status: 'signed' }],
+            payments: [{ id: 'P2', status: 'Paid', date: '2026-04-10', amount: 750 }],
+            can_delete: false,
+            has_approved_payment: true
         }
     ],
     stats: {

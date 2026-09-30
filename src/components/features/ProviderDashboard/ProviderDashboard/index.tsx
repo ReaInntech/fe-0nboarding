@@ -5,6 +5,7 @@ import { useApp } from '@/src/context/AppContext';
 import ProviderTopNavigation from '../../../shared/molecule/ProviderTopNavigation';
 import Footer from '../../../shared/molecule/Footer';
 import SubscriptionList from '../SubscriptionList';
+import UserSubscriptionList from '../UserSubscriptionList';
 import PageHeader from '../../../shared/atoms/PageHeader';
 import Button from '../../../shared/atoms/Button';
 import Icon from '../../../shared/atoms/Icon';
@@ -41,6 +42,15 @@ export default function ProviderDashboard({
     useEffect(() => {
         setSubList(subscriptions);
     }, [subscriptions]);
+
+    // View tab state: 'subscriptions' vs 'users'
+    const [activeView, setActiveView] = useState<'subscriptions' | 'users'>('subscriptions');
+
+    // Unique clients count for tab badge
+    const uniqueClientsCount = useMemo(() => {
+        const ids = new Set(subList.map(s => s.client?.id || s.client?.legalName).filter(Boolean));
+        return ids.size;
+    }, [subList]);
 
     // Client modal states (RF-PV-29 & RF-PV-30)
     const [isSingleModalOpen, setIsSingleModalOpen] = useState(false);
@@ -150,12 +160,66 @@ export default function ProviderDashboard({
                     </div>
                 </div>
 
-                <SubscriptionList
-                    subscriptions={subList}
-                    allExpanded={allExpanded}
-                    onDelete={(sub) => setSubToDelete(sub)}
-                    onDisable={(sub) => setSubToDisable(sub)}
-                />
+                {/* Tab Switcher: By Subscriptions vs By User & Client */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3 mb-6">
+                    <div className="flex items-center gap-1.5 p-1 bg-slate-900/90 rounded-xl border border-slate-800 self-start">
+                        <button
+                            type="button"
+                            onClick={() => setActiveView('subscriptions')}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                                activeView === 'subscriptions'
+                                    ? 'bg-[#1978e5] text-white shadow-md shadow-[#1978e5]/20 font-semibold'
+                                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                            }`}
+                        >
+                            <Icon name="view_list" className="text-base" />
+                            <span>By Subscriptions</span>
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${activeView === 'subscriptions' ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-400'}`}>
+                                {subList.length}
+                            </span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setActiveView('users')}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                                activeView === 'users'
+                                    ? 'bg-[#1978e5] text-white shadow-md shadow-[#1978e5]/20 font-semibold'
+                                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                            }`}
+                        >
+                            <Icon name="group" className="text-base" />
+                            <span>By User & Client</span>
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${activeView === 'users' ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-400'}`}>
+                                {uniqueClientsCount}
+                            </span>
+                        </button>
+                    </div>
+
+                    <div className="text-xs text-slate-400 self-center sm:self-auto">
+                        {activeView === 'users' ? (
+                            <span>Grouped by user & organization with expandable subscription history</span>
+                        ) : (
+                            <span>Listing individual subscriptions and statuses</span>
+                        )}
+                    </div>
+                </div>
+
+                {activeView === 'subscriptions' ? (
+                    <SubscriptionList
+                        subscriptions={subList}
+                        allExpanded={allExpanded}
+                        onDelete={(sub) => setSubToDelete(sub)}
+                        onDisable={(sub) => setSubToDisable(sub)}
+                    />
+                ) : (
+                    <UserSubscriptionList
+                        subscriptions={subList}
+                        allExpanded={allExpanded}
+                        onDelete={(sub) => setSubToDelete(sub)}
+                        onDisable={(sub) => setSubToDisable(sub)}
+                    />
+                )}
             </div>
 
             {/* Modals for Client Registration and Bulk CSV Import */}

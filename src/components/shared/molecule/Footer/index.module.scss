@@ -1,18 +1,23 @@
 @reference "tailwindcss";
 
 .footer {
-    @apply mt-auto border-t border-slate-800 bg-[#0f1523] py-8 px-6;
+    @apply mt-auto border-t py-8 px-6 transition-colors duration-200;
+    background-color: var(--footer-bg, #0f1523);
+    border-color: var(--footer-border, #1e293b);
+    color: var(--footer-text, #94a3b8);
 
     &__container {
         @apply max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4;
     }
 
     &__brand {
-        @apply flex items-center gap-2 text-slate-400;
+        @apply flex items-center gap-2;
+        color: var(--footer-text, #94a3b8);
     }
 
     &__brand-icon {
         @apply text-xl;
+        color: var(--brand-primary, #1978e5);
     }
 
     &__copyright {
@@ -24,6 +29,11 @@
     }
 
     &__link {
-        @apply text-xs text-slate-500 hover:text-[#1978e5] transition-colors;
+        @apply text-xs transition-colors;
+        color: var(--footer-text, #64748b);
+
+        &:hover {
+            color: var(--footer-link, #ffffff);
+        }
     }
 }

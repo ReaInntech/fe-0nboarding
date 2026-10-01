@@ -38,8 +38,6 @@ export default function BrandingAssetUploadCard({
 }: BrandingAssetUploadCardProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [isManualUrlOpen, setIsManualUrlOpen] = useState(false);
-  const [manualUrl, setManualUrl] = useState('');
   const { uploadFile, isUploading, progress } = useFileUpload();
 
   const maxMb = (maxSizeBytes / (1024 * 1024)).toFixed(1).replace('.0', '');
@@ -51,14 +49,14 @@ export default function BrandingAssetUploadCard({
     // 2. Validate format / extension
     const ext = '.' + file.name.split('.').pop()?.toLowerCase();
     if (!allowedFormats.includes(ext)) {
-      onError(`Formato no válido (${ext || 'desconocido'}). Formatos admitidos: ${allowedFormats.join(', ')}`);
+      onError(`Invalid format (${ext || 'unknown'}). Supported formats: ${allowedFormats.join(', ')}`);
       return;
     }
 
     // 3. Validate size
     if (file.size > maxSizeBytes) {
       const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
-      onError(`El archivo pesa ${sizeMb} MB y supera el tamaño máximo permitido de ${maxMb} MB.`);
+      onError(`File size is ${sizeMb} MB and exceeds the maximum allowed size of ${maxMb} MB.`);
       return;
     }
 
@@ -67,7 +65,6 @@ export default function BrandingAssetUploadCard({
       try {
         const dimensions = await getImageDimensions(file);
         if (Math.abs(dimensions.width - dimensions.height) > 4) {
-          // Warning notification or alert
           console.warn(`Asset ${file.name} is not square: ${dimensions.width}x${dimensions.height}`);
         }
       } catch (e) {
@@ -81,7 +78,7 @@ export default function BrandingAssetUploadCard({
       onAssetChange(publicUrl);
     } catch (err: any) {
       console.error(`Failed to upload ${assetType}:`, err);
-      onError(err?.message || `Error al subir ${title} a DigitalOcean Spaces.`);
+      onError(err?.message || `Failed to upload ${title} to DigitalOcean Spaces.`);
     } finally {
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -118,13 +115,6 @@ export default function BrandingAssetUploadCard({
     if (file) {
       validateAndUploadFile(file);
     }
-  };
-
-  const handleManualUrlSave = () => {
-    if (!manualUrl.trim()) return;
-    onAssetChange(manualUrl.trim());
-    setManualUrl('');
-    setIsManualUrlOpen(false);
   };
 
   return (
@@ -189,43 +179,30 @@ export default function BrandingAssetUploadCard({
             />
           </div>
 
-          {/* Action Buttons: Replace & Remove */}
-          <div className="flex items-center justify-between text-xs pt-1">
-            <a
-              href={currentUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[11px] text-slate-400 hover:text-blue-400 flex items-center gap-1 truncate max-w-[200px]"
-              title={currentUrl}
+          {/* Action Buttons: Replace & Remove (No DigitalOcean link) */}
+          <div className="flex items-center justify-end gap-2 text-xs pt-1">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading}
+              className="py-1 px-3 text-xs"
             >
-              <Icon name="open_in_new" className="text-xs" />
-              <span className="truncate">Ver asset en DigitalOcean</span>
-            </a>
-
-            <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isUploading}
-                className="py-1 px-3 text-xs"
-              >
-                <div className="flex items-center gap-1.5 text-slate-100">
-                  <Icon name="sync" className="text-xs text-blue-400" />
-                  <span>Reemplazar</span>
-                </div>
-              </Button>
-              <button
-                type="button"
-                onClick={() => onAssetChange(null)}
-                disabled={isUploading}
-                className="px-2.5 py-1 rounded-lg text-xs font-medium text-rose-400 hover:bg-rose-500/10 border border-rose-500/20 transition-all flex items-center gap-1"
-                title="Eliminar asset"
-              >
-                <Icon name="delete" className="text-xs" />
-                <span>Eliminar</span>
-              </button>
-            </div>
+              <div className="flex items-center gap-1.5 text-slate-100">
+                <Icon name="sync" className="text-xs text-blue-400" />
+                <span>Replace</span>
+              </div>
+            </Button>
+            <button
+              type="button"
+              onClick={() => onAssetChange(null)}
+              disabled={isUploading}
+              className="px-2.5 py-1 rounded-lg text-xs font-medium text-rose-400 hover:bg-rose-500/10 border border-rose-500/20 transition-all flex items-center gap-1"
+              title="Remove asset"
+            >
+              <Icon name="delete" className="text-xs" />
+              <span>Remove</span>
+            </button>
           </div>
         </div>
       ) : (
@@ -244,7 +221,7 @@ export default function BrandingAssetUploadCard({
           {isUploading ? (
             <div className="space-y-2 py-2">
               <Icon name="sync" className="text-2xl text-blue-400 animate-spin" />
-              <p className="text-xs font-semibold text-slate-200">Subiendo a DigitalOcean Spaces...</p>
+              <p className="text-xs font-semibold text-slate-200">Uploading to DigitalOcean Spaces...</p>
               <div className="w-48 mx-auto h-1.5 bg-slate-800 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-blue-500 transition-all duration-300"
@@ -258,48 +235,15 @@ export default function BrandingAssetUploadCard({
                 <Icon name="cloud_upload" />
               </div>
               <p className="text-xs font-semibold text-white">
-                Haz clic para subir o arrastra y suelta tu archivo
+                Click to upload or drag and drop your file
               </p>
               <p className="text-[11px] text-slate-400">
-                Formatos: <code className="text-slate-300">{allowedFormats.join(', ')}</code> · Máx. {maxMb} MB
+                Formats: <code className="text-slate-300">{allowedFormats.join(', ')}</code> · Max {maxMb} MB
               </p>
             </div>
           )}
         </div>
       )}
-
-      {/* Manual URL toggle for edge cases / migrations */}
-      <div className="pt-1">
-        <button
-          type="button"
-          onClick={() => setIsManualUrlOpen(!isManualUrlOpen)}
-          className="text-[10px] text-slate-500 hover:text-slate-300 flex items-center gap-1 transition-colors"
-        >
-          <Icon name={isManualUrlOpen ? 'expand_less' : 'expand_more'} className="text-xs" />
-          <span>{isManualUrlOpen ? 'Ocultar entrada de URL manual' : 'O ingresar URL externa manualmente'}</span>
-        </button>
-
-        {isManualUrlOpen && (
-          <div className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-800/60">
-            <input
-              type="url"
-              placeholder="https://tu-dominio.com/logo.png"
-              value={manualUrl}
-              onChange={(e) => setManualUrl(e.target.value)}
-              className="flex-1 bg-slate-950/60 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleManualUrlSave}
-              disabled={!manualUrl.trim()}
-              className="py-1 px-3 text-xs"
-            >
-              Aplicar
-            </Button>
-          </div>
-        )}
-      </div>
     </div>
   );
 }

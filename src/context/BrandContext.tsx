@@ -1,17 +1,90 @@
 'use client';
 
 import React, { createContext, useContext, useEffect } from 'react';
-import { PublicProviderBranding } from '../lib/api/provider';
+import { PublicProviderBranding, BannerFooterTheme } from '../lib/api/provider';
 import { EffectiveProvider } from '../lib/api/dashboard';
+
+export interface BannerFooterStyles {
+  '--banner-bg': string;
+  '--banner-text': string;
+  '--banner-text-muted': string;
+  '--banner-border': string;
+  '--banner-active': string;
+  '--footer-bg': string;
+  '--footer-text': string;
+  '--footer-border': string;
+  '--footer-link': string;
+  themeType: BannerFooterTheme;
+}
+
+export function getBannerFooterStyles(theme?: string, primaryColor: string = '#1978E5'): BannerFooterStyles {
+  switch (theme) {
+    case 'light':
+      return {
+        '--banner-bg': '#ffffff',
+        '--banner-text': '#1e293b',
+        '--banner-text-muted': '#64748b',
+        '--banner-border': '#e2e8f0',
+        '--banner-active': primaryColor,
+        '--footer-bg': '#ffffff',
+        '--footer-text': '#64748b',
+        '--footer-border': '#e2e8f0',
+        '--footer-link': '#1e293b',
+        themeType: 'light',
+      };
+    case 'primary_light_text':
+      return {
+        '--banner-bg': primaryColor,
+        '--banner-text': '#ffffff',
+        '--banner-text-muted': '#e2e8f0',
+        '--banner-border': 'rgba(255, 255, 255, 0.18)',
+        '--banner-active': '#ffffff',
+        '--footer-bg': primaryColor,
+        '--footer-text': '#f1f5f9',
+        '--footer-border': 'rgba(255, 255, 255, 0.18)',
+        '--footer-link': '#ffffff',
+        themeType: 'primary_light_text',
+      };
+    case 'primary_dark_text':
+      return {
+        '--banner-bg': primaryColor,
+        '--banner-text': '#0f172a',
+        '--banner-text-muted': '#334155',
+        '--banner-border': 'rgba(0, 0, 0, 0.15)',
+        '--banner-active': '#000000',
+        '--footer-bg': primaryColor,
+        '--footer-text': '#1e293b',
+        '--footer-border': 'rgba(0, 0, 0, 0.15)',
+        '--footer-link': '#0f172a',
+        themeType: 'primary_dark_text',
+      };
+    case 'dark':
+    default:
+      return {
+        '--banner-bg': '#0f1523',
+        '--banner-text': '#cbd5e1',
+        '--banner-text-muted': '#94a3b8',
+        '--banner-border': '#1e293b',
+        '--banner-active': primaryColor,
+        '--footer-bg': '#0f1523',
+        '--footer-text': '#94a3b8',
+        '--footer-border': '#1e293b',
+        '--footer-link': '#cbd5e1',
+        themeType: 'dark',
+      };
+  }
+}
 
 interface BrandContextType {
   branding: PublicProviderBranding | null;
   providerSlug?: string;
   availableProviders?: EffectiveProvider[];
+  styles: BannerFooterStyles;
 }
 
 const BrandContext = createContext<BrandContextType>({
   branding: null,
+  styles: getBannerFooterStyles('dark'),
 });
 
 export function BrandProvider({
@@ -25,6 +98,9 @@ export function BrandProvider({
   providerSlug?: string;
   availableProviders?: EffectiveProvider[];
 }) {
+  const primaryColor = branding?.brand_primary_color || '#1978E5';
+  const themeStyles = getBannerFooterStyles(branding?.banner_footer_theme, primaryColor);
+
   useEffect(() => {
     if (branding) {
       if (branding.brand_primary_color) {
@@ -55,14 +131,15 @@ export function BrandProvider({
   }, [branding]);
 
   return (
-    <BrandContext.Provider value={{ branding, providerSlug, availableProviders }}>
+    <BrandContext.Provider value={{ branding, providerSlug, availableProviders, styles: themeStyles }}>
       <div
         className="white-label-client-scope w-full flex-1 flex flex-col bg-[#f5f6f8] text-slate-900 antialiased"
         style={
           {
-            '--brand-primary': branding?.brand_primary_color || '#1978e5',
+            '--brand-primary': primaryColor,
             '--brand-secondary': branding?.brand_secondary_color || '#0f172a',
             '--brand-accent': branding?.brand_accent_color || '#38bdf8',
+            ...themeStyles,
           } as React.CSSProperties
         }
       >

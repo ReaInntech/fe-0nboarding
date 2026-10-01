@@ -53,6 +53,23 @@ export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps
         .filter((p: any) => p.status === 'Paid')
         .reduce((sum: number, p: any) => sum + (p.amount_cents ? p.amount_cents / 100 : 0), 0);
 
+    // Support WhatsApp Phone Integration
+    const provOrg = sub.provider || sub.product?.provider || sub.product?.organization;
+    const providerName = provOrg?.name || provOrg?.trade_name || provOrg?.legal_name || 'Support';
+    const supportPhone = provOrg?.support_phone || provOrg?.phone || null;
+
+    let whatsappUrl: string | undefined = undefined;
+    let hasSupportPhone = false;
+
+    if (supportPhone && String(supportPhone).trim().length > 0) {
+        const cleanPhone = String(supportPhone).replace(/[^0-9]/g, '');
+        if (cleanPhone.length >= 7) {
+            hasSupportPhone = true;
+            const message = `Hola, requiero soporte para mi servicio "${sub.product?.name || sub.name || 'Servicio'}" (ID: ${sub.id})`;
+            whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+        }
+    }
+
     return {
         headerProps: {
             icon: sub.product?.icon || 'hub',
@@ -63,12 +80,12 @@ export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps
             productId: sub.product?.product_code || sub.id,
             meta: [
                 { icon: 'calendar_today', text: `Started ${sub.created_at ? new Date(sub.created_at).toLocaleDateString('en-US') : 'N/A'}` },
-                { icon: 'business', text: 'Real Innovation Tech' },
+                { icon: 'business', text: providerName },
                 { icon: 'category', text: sub.product?.billing_model || 'Subscription' },
             ],
-            actions: [
-                { label: 'Support', icon: 'support_agent', variant: 'secondary' },
-            ],
+            actions: hasSupportPhone && whatsappUrl ? [
+                { label: 'Soporte WhatsApp', icon: 'support_agent', variant: 'secondary', href: whatsappUrl },
+            ] : [],
         },
         showContractingProgress: !!(sub.contracting_steps || sub.steps)?.length,
         contractingProgressProps: {
@@ -93,13 +110,15 @@ export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps
                 ...mapProductMetadataToFields(sub.product_metadata_override, sub.product?.metadata),
             ],
         },
-        supportAccessProps: {
-            title: 'Real Innovation Support',
-            subtitle: 'Mon - Fri: 8:00 AM – 6:00 PM',
-            buttonLabel: 'Contact Support',
+        showSupportAccess: hasSupportPhone,
+        supportAccessProps: hasSupportPhone && whatsappUrl ? {
+            title: `${providerName} Soporte`,
+            subtitle: 'Atención directa vía WhatsApp',
+            buttonLabel: 'Contactar por WhatsApp',
             icon: 'support_agent',
-            accentColor: sub.product?.icon_color || '#1978e5',
-        },
+            accentColor: '#10b981',
+            whatsappUrl: whatsappUrl,
+        } : undefined,
         legalDocumentsProps: {
             documents: documentsRaw.map((doc: any) => ({
                 icon: 'description',

@@ -17,6 +17,7 @@ import Icon from '@/src/components/shared/atoms/Icon';
 import ProviderTopNavigation from '../../shared/molecule/ProviderTopNavigation';
 import Footer from '../../shared/molecule/Footer';
 import BrandingAssetUploadCard from './BrandingAssetUploadCard';
+import { getBannerFooterStyles } from '@/src/context/BrandContext';
 import styles from './index.module.scss';
 
 export interface ProviderSettingsProps {
@@ -44,6 +45,8 @@ export default function ProviderSettings({
   const [localization, setLocalization] = useState<ProviderSettingsLocalization>(initialSettings.localization);
   const [notifications, setNotifications] = useState<ProviderSettingsNotifications>(initialSettings.notifications);
   const plan = initialSettings.plan;
+
+  const previewThemeStyles = getBannerFooterStyles(branding.banner_footer_theme, branding.brand_primary_color || '#1978E5');
 
   const showNotification = (type: 'success' | 'error', message: string) => {
     setFeedback({ type, message });
@@ -88,7 +91,10 @@ export default function ProviderSettings({
   const handleSaveProfile = async () => {
     setIsSaving(true);
     try {
-      await updateOrganizationProfile(orgId, token, organization);
+      await Promise.all([
+        updateOrganizationProfile(orgId, token, organization),
+        updateProviderBranding(token, orgId, { support_phone: branding.support_phone }),
+      ]);
       showNotification('success', 'Corporate legal entity details updated successfully.');
     } catch (err: any) {
       console.error('Failed to save corporate profile:', err);
@@ -325,6 +331,26 @@ export default function ProviderSettings({
                       />
                     </div>
                   </div>
+
+                  {/* Banner & Footer Theme Style */}
+                  <div className={styles['provider-settings__field-group']}>
+                    <label className={styles['provider-settings__field-label']}>
+                      Banner & Footer Theme Style
+                      <span className={styles['provider-settings__field-hint']}>Background and text color scheme for the client portal</span>
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={branding.banner_footer_theme || 'dark'}
+                        onChange={(e) => setBranding({ ...branding, banner_footer_theme: e.target.value as any })}
+                        className={styles['provider-settings__select']}
+                      >
+                        <option value="dark">Dark (Black background, light gray text) — Default</option>
+                        <option value="light">Light (White background, dark gray text)</option>
+                        <option value="primary_light_text">Brand Primary (Brand color background, light text)</option>
+                        <option value="primary_dark_text">Brand Primary (Brand color background, dark text)</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -337,19 +363,19 @@ export default function ProviderSettings({
                       Visual Media Assets (DigitalOcean Storage)
                     </h2>
                     <p className={styles['provider-settings__card-description']}>
-                      Sube y gestiona tus assets de marca corporativos. Se almacenan de forma segura en DigitalOcean Spaces y se aplican en tiempo real.
+                      Upload and manage your corporate brand assets. They are securely stored in DigitalOcean Spaces and applied in real time.
                     </p>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  {/* Logotipo Principal */}
+                  {/* Primary Logo */}
                   <BrandingAssetUploadCard
-                    title="Logotipo Principal"
+                    title="Primary Logo"
                     assetType="logo"
                     icon="image"
-                    badgeSpec="240×60 px · Máx 2MB · PNG/SVG/WEBP"
-                    helperText="Logo horizontal para barras de navegación, correos y facturas."
+                    badgeSpec="240×60 px · Max 2MB · PNG/SVG/WEBP"
+                    helperText="Horizontal logo for navigation bars, transactional emails, and invoices."
                     currentUrl={branding.logo_url}
                     allowedFormats={['.png', '.svg', '.webp', '.jpg', '.jpeg']}
                     maxSizeBytes={2 * 1024 * 1024}
@@ -360,13 +386,13 @@ export default function ProviderSettings({
                     onError={(msg) => showNotification('error', msg)}
                   />
 
-                  {/* Isotipo / Símbolo */}
+                  {/* Isotype / Symbol */}
                   <BrandingAssetUploadCard
-                    title="Isotipo / Símbolo"
+                    title="Isotype / Symbol"
                     assetType="isotype"
                     icon="token"
-                    badgeSpec="128×128 px (1:1) · Máx 2MB · PNG/SVG/WEBP"
-                    helperText="Ícono cuadrado para menús colapsados, avatares y móviles."
+                    badgeSpec="128×128 px (1:1) · Max 2MB · PNG/SVG/WEBP"
+                    helperText="Square icon for collapsed menus, avatars, and mobile navigation."
                     currentUrl={branding.isotype_url}
                     allowedFormats={['.png', '.svg', '.webp', '.jpg', '.jpeg']}
                     maxSizeBytes={2 * 1024 * 1024}
@@ -377,13 +403,13 @@ export default function ProviderSettings({
                     onError={(msg) => showNotification('error', msg)}
                   />
 
-                  {/* Favicon del Navegador */}
+                  {/* Browser Favicon */}
                   <BrandingAssetUploadCard
-                    title="Favicon del Navegador"
+                    title="Browser Favicon"
                     assetType="favicon"
                     icon="tab"
-                    badgeSpec="32×32 px · Máx 512KB · ICO/PNG/SVG"
-                    helperText="Ícono cuadrado visible en la pestaña del navegador de tus clientes."
+                    badgeSpec="32×32 px · Max 512KB · ICO/PNG/SVG"
+                    helperText="Square icon displayed in the browser tab for your clients."
                     currentUrl={branding.favicon_url}
                     allowedFormats={['.ico', '.png', '.svg']}
                     maxSizeBytes={512 * 1024}
@@ -403,13 +429,13 @@ export default function ProviderSettings({
                 <div className="flex items-center justify-between">
                   <span className={styles['provider-settings__preview-badge']}>
                     <Icon name="wb_sunny" className="text-xs text-amber-400" />
-                    Client-Facing Live Preview (Tema Claro)
+                    Client-Facing Live Preview (Light Theme)
                   </span>
                   <span className="text-[10px] text-slate-400 font-mono">White-Label Engine</span>
                 </div>
 
                 <p className="text-xs text-slate-400">
-                  El White-Label aplica exclusivamente a la experiencia de tus clientes (modo claro). Aquí puedes previsualizar cómo verán su portal con tus tokens aplicados.
+                  White-label branding applies exclusively to your clients&apos; experience (light mode). Preview how their portal renders with your customized tokens.
                 </p>
 
                 {/* Mock Client Portal Window (Light Theme) */}
@@ -453,7 +479,14 @@ export default function ProviderSettings({
                   {/* Portal Body (Light Theme Client Portal) */}
                   <div className={styles['provider-settings__preview-body']}>
                     {/* Mock Client Portal Navbar */}
-                    <div className={styles['provider-settings__preview-navbar']}>
+                    <div
+                      className={styles['provider-settings__preview-navbar']}
+                      style={{
+                        backgroundColor: previewThemeStyles['--banner-bg'],
+                        borderColor: previewThemeStyles['--banner-border'],
+                        color: previewThemeStyles['--banner-text'],
+                      }}
+                    >
                       <div className={styles['provider-settings__preview-brand']}>
                         {branding.logo_url ? (
                           /* eslint-disable-next-line @next/next/no-img-element */
@@ -480,7 +513,10 @@ export default function ProviderSettings({
                           </div>
                         )}
                         {(!branding.logo_url || branding.isotype_url) && (
-                          <span className="text-xs font-bold text-slate-800 tracking-tight">
+                          <span
+                            className="text-xs font-bold tracking-tight"
+                            style={{ color: previewThemeStyles['--banner-text'] }}
+                          >
                             {organization.trade_name || organization.legal_name || 'My Organization'}
                           </span>
                         )}
@@ -533,6 +569,36 @@ export default function ProviderSettings({
                           <Icon name="arrow_forward" className="text-xs" />
                         </button>
                       </div>
+
+                      {(branding.support_phone || organization.phone) && (
+                        <div className="pt-2 flex items-center justify-between border-t border-slate-100">
+                          <span className="text-[10px] text-slate-400">Support Channel</span>
+                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                            <Icon name="chat" className="text-xs" />
+                            WhatsApp: {branding.support_phone || organization.phone}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Mock Client Portal Footer */}
+                    <div
+                      className="flex items-center justify-between p-2.5 rounded-lg border text-[10px] transition-colors"
+                      style={{
+                        backgroundColor: previewThemeStyles['--footer-bg'],
+                        borderColor: previewThemeStyles['--footer-border'],
+                        color: previewThemeStyles['--footer-text'],
+                      }}
+                    >
+                      <div className="flex items-center gap-1.5 font-medium">
+                        <Icon name="hub" className="text-xs" style={{ color: branding.brand_primary_color || '#1978E5' }} />
+                        <span>© 2026 {organization.trade_name || organization.legal_name || '0nbording'}. All rights reserved.</span>
+                      </div>
+                      <div className="flex items-center gap-3 opacity-80">
+                        <span>Privacy</span>
+                        <span>Terms</span>
+                        <span>Support</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -540,7 +606,7 @@ export default function ProviderSettings({
                 <div className="p-3 rounded-xl bg-blue-950/30 border border-blue-900/50 flex items-start gap-2.5">
                   <Icon name="verified" className="text-blue-400 text-sm mt-0.5 flex-shrink-0" />
                   <p className="text-[11px] text-blue-200/90 leading-relaxed">
-                    Los tokens de White-label (logotipo, isotipo, favicon y colores) se aplican exclusivamente al portal del cliente final (tema claro) mediante <code>/settings/branding/:orgId</code>.
+                    White-label tokens (logo, isotype, favicon, and brand colors) are automatically served to the client portal via <code>/settings/branding/:orgId</code>.
                   </p>
                 </div>
               </div>
@@ -618,6 +684,25 @@ export default function ProviderSettings({
                     className={styles['provider-settings__input']}
                     placeholder="+57 300 000 0000"
                   />
+                </div>
+
+                <div className={styles['provider-settings__field-group']}>
+                  <label className={styles['provider-settings__field-label']}>
+                    Support Phone (WhatsApp)
+                    <span className={styles['provider-settings__field-hint']}>Direct client support channel in client portal</span>
+                  </label>
+                  <div className="relative flex items-center">
+                    <div className="absolute left-3 text-slate-400 pointer-events-none flex items-center">
+                      <Icon name="chat" className="text-sm text-emerald-500" />
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="+57 300 123 4567"
+                      value={branding.support_phone || ''}
+                      onChange={(e) => setBranding({ ...branding, support_phone: e.target.value })}
+                      className={`${styles['provider-settings__input']} pl-9`}
+                    />
+                  </div>
                 </div>
 
                 <div className={styles['provider-settings__field-group']}>

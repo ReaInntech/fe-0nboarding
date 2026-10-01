@@ -1,7 +1,10 @@
 @reference "tailwindcss";
 
 .nav {
-    @apply border-b border-slate-800 bg-[#0f1523] dark:bg-[#0f1523]/50 backdrop-blur-md fixed top-0 left-0 w-full z-50;
+    @apply border-b fixed top-0 left-0 w-full z-50 transition-colors duration-200;
+    background-color: var(--banner-bg, #0f1523);
+    border-color: var(--banner-border, #1e293b);
+    color: var(--banner-text, #cbd5e1);
 
     &__container {
         @apply max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between;
@@ -12,7 +15,7 @@
     }
 
     &__logo-link {
-        @apply transition-transform hover:scale-105 active:scale-95;
+        @apply transition-transform hover:scale-105 active:scale-95 flex items-center;
     }
 
     &__desktop-nav {
@@ -20,10 +23,16 @@
     }
 
     &__nav-link {
-        @apply text-sm font-semibold h-full flex items-center px-2 md:px-0 whitespace-nowrap transition-colors text-slate-400 hover:text-slate-100 border-b-2 border-transparent;
+        @apply text-sm font-semibold h-full flex items-center px-2 md:px-0 whitespace-nowrap transition-colors border-b-2 border-transparent;
+        color: var(--banner-text-muted, #94a3b8);
+
+        &:hover {
+            color: var(--banner-text, #ffffff);
+        }
 
         &--active {
-            @apply text-[#1978e5] border-b-2 border-[#1978e5];
+            color: var(--banner-active, #1978e5);
+            border-bottom-color: var(--banner-active, #1978e5);
         }
     }
 
@@ -36,19 +45,30 @@
     }
 
     &__mode-label {
-        @apply text-xs text-slate-400 font-medium uppercase tracking-wider mr-2;
+        @apply text-xs font-medium uppercase tracking-wider mr-2;
+        color: var(--banner-text-muted, #94a3b8);
     }
 
     &__mode-select {
-        @apply bg-slate-800/50 border border-slate-700 text-slate-200 text-sm rounded-md focus:ring-[#1978e5] focus:border-[#1978e5] block w-full p-1.5 focus:outline-none appearance-none pr-8 cursor-pointer;
+        @apply border text-sm rounded-md block w-full p-1.5 focus:outline-none appearance-none pr-8 cursor-pointer;
+        background-color: rgba(125, 125, 125, 0.12);
+        border-color: var(--banner-border, #334155);
+        color: var(--banner-text, #cbd5e1);
     }
 
     &__mode-icon {
-        @apply pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400;
+        @apply pointer-events-none absolute inset-y-0 right-0 flex items-center px-2;
+        color: var(--banner-text-muted, #94a3b8);
     }
 
     &__bell-btn {
-        @apply relative p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer flex items-center justify-center;
+        @apply relative p-1.5 rounded-lg transition-colors cursor-pointer flex items-center justify-center;
+        color: var(--banner-text-muted, #94a3b8);
+
+        &:hover {
+            color: var(--banner-text, #ffffff);
+            background-color: rgba(125, 125, 125, 0.1);
+        }
     }
 
     &__bell-badge {
@@ -56,7 +76,12 @@
     }
 
     &__logout-btn {
-        @apply hidden md:flex items-center text-slate-400 hover:text-white transition-colors cursor-pointer;
+        @apply hidden md:flex items-center transition-colors cursor-pointer;
+        color: var(--banner-text-muted, #94a3b8);
+
+        &:hover {
+            color: var(--banner-text, #ffffff);
+        }
     }
 
     &__logout-icon {
@@ -64,7 +89,12 @@
     }
 
     &__mobile-toggle {
-        @apply md:hidden text-slate-400 hover:text-white p-1 rounded transition-colors cursor-pointer;
+        @apply md:hidden p-1 rounded transition-colors cursor-pointer;
+        color: var(--banner-text-muted, #94a3b8);
+
+        &:hover {
+            color: var(--banner-text, #ffffff);
+        }
     }
 
     &__mobile-toggle-icon {
@@ -72,7 +102,9 @@
     }
 
     &__mobile-menu {
-        @apply md:hidden absolute top-16 left-0 w-full bg-[#0f1523] border-b border-slate-800 py-2 shadow-xl z-40;
+        @apply md:hidden absolute top-16 left-0 w-full border-b py-2 shadow-xl z-40 transition-colors duration-200;
+        background-color: var(--banner-bg, #0f1523);
+        border-color: var(--banner-border, #1e293b);
     }
 
     &__mobile-nav {
@@ -80,27 +112,41 @@
     }
 
     &__mobile-link {
-        @apply text-base font-semibold py-3 transition-colors border-b border-slate-800/50 last:border-0 text-slate-400 hover:text-slate-100;
+        @apply text-base font-semibold py-3 transition-colors border-b last:border-0;
+        color: var(--banner-text-muted, #94a3b8);
+        border-color: var(--banner-border, #1e293b);
+
+        &:hover {
+            color: var(--banner-text, #ffffff);
+        }
 
         &--active {
-            @apply text-[#1978e5];
+            color: var(--banner-active, #1978e5);
         }
     }
 
     &__mobile-mode {
-        @apply py-4 mt-2 border-t border-slate-800/50 flex items-center justify-between;
+        @apply py-4 mt-2 border-t flex items-center justify-between;
+        border-color: var(--banner-border, #1e293b);
     }
 
     &__mobile-mode-label {
-        @apply text-sm text-slate-400 font-medium uppercase tracking-wider;
+        @apply text-sm font-medium uppercase tracking-wider;
+        color: var(--banner-text-muted, #94a3b8);
     }
 
     &__mobile-mode-wrapper {
-        @apply relative flex items-center w-32;
+        @apply relative flex items-center w-36;
     }
 
     &__mobile-logout {
-        @apply py-4 mt-2 border-t border-slate-800/50 flex items-center text-slate-400 hover:text-slate-100 transition-colors cursor-pointer;
+        @apply py-4 mt-2 border-t flex items-center transition-colors cursor-pointer;
+        border-color: var(--banner-border, #1e293b);
+        color: var(--banner-text-muted, #94a3b8);
+
+        &:hover {
+            color: var(--banner-text, #ffffff);
+        }
     }
 
     &__mobile-logout-icon {

@@ -425,6 +425,8 @@ export async function createClientOrganization(token: string, orgId: string, dat
   });
 }
 
+export type BannerFooterTheme = 'dark' | 'light' | 'primary_light_text' | 'primary_dark_text';
+
 export interface ProviderSettingsBranding {
   logo_url?: string | null;
   isotype_url?: string | null;
@@ -432,6 +434,8 @@ export interface ProviderSettingsBranding {
   brand_primary_color?: string;
   brand_secondary_color?: string;
   brand_accent_color?: string;
+  banner_footer_theme?: BannerFooterTheme;
+  support_phone?: string | null;
 }
 
 export interface ProviderSettingsLocalization {
@@ -525,6 +529,8 @@ export async function getProviderSettings(token?: string, orgId?: string): Promi
       brand_primary_color: providerSettings?.brand_primary_color ?? '#1978e5',
       brand_secondary_color: providerSettings?.brand_secondary_color ?? '#0f172a',
       brand_accent_color: providerSettings?.brand_accent_color ?? '#38bdf8',
+      banner_footer_theme: providerSettings?.banner_footer_theme ?? 'dark',
+      support_phone: providerSettings?.support_phone ?? orgData?.phone ?? '',
     },
     localization: {
       currency: providerSettings?.currency ?? 'USD',
@@ -750,6 +756,8 @@ export interface PublicProviderBranding {
   brand_primary_color?: string;
   brand_secondary_color?: string;
   brand_accent_color?: string;
+  banner_footer_theme?: BannerFooterTheme;
+  support_phone?: string | null;
 }
 
 /**

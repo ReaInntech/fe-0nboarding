@@ -10,6 +10,7 @@ export interface SupportAccessProps {
     icon: string;
     accentColor: string;
     className?: string;
+    whatsappUrl?: string;
 }
 
 export default function SupportAccess({
@@ -18,7 +19,8 @@ export default function SupportAccess({
     buttonLabel,
     icon,
     accentColor,
-    className = ''
+    className = '',
+    whatsappUrl,
 }: SupportAccessProps) {
     // Determine background and border colors from accentColor
     // Assuming accentColor is a hex code like #1978e5
@@ -41,12 +43,24 @@ export default function SupportAccess({
                     <p className={styles['support-access__subtitle']}>{subtitle}</p>
                 </div>
             </div>
-            <Button 
-                variant="secondary" 
-                className={styles['support-access__button']}
-            >
-                {buttonLabel}
-            </Button>
+            {whatsappUrl ? (
+                <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg font-semibold text-xs transition-all shadow-sm bg-emerald-600 hover:bg-emerald-700 text-white shrink-0"
+                >
+                    <Icon name="chat" className="text-sm" />
+                    {buttonLabel}
+                </a>
+            ) : (
+                <Button 
+                    variant="secondary" 
+                    className={styles['support-access__button']}
+                >
+                    {buttonLabel}
+                </Button>
+            )}
         </div>
     );
 }

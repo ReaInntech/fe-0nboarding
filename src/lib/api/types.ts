@@ -41,6 +41,7 @@ export interface SubscriptionProvider {
   slug?: string;
   dominio?: string;
   logo_url?: string;
+  support_phone?: string | null;
 }
 
 export interface Subscription {

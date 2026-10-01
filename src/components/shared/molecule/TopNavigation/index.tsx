@@ -182,12 +182,15 @@ export default function TopNavigation({
                                             {branding.name.charAt(0).toUpperCase()}
                                         </div>
                                     )}
-                                    <span className="font-bold text-slate-800 text-sm tracking-tight">
+                                    <span
+                                        className="font-bold text-sm tracking-tight"
+                                        style={{ color: 'var(--banner-text)' }}
+                                    >
                                         {branding.name}
                                     </span>
                                 </div>
                             ) : (
-                                <Logo theme="dark" />
+                                <Logo theme={brandContext.styles.themeType === 'light' || brandContext.styles.themeType === 'primary_dark_text' ? 'light' : 'dark'} />
                             )}
                         </a>
                     </div>

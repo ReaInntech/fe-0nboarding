@@ -1,8 +1,9 @@
 import Dashboard from '@/src/components/features/Dashboard/Dashboard';
-import { getDashboardInit } from '@/src/lib/api/dashboard';
+import { getDashboardInit, getEffectiveProviders } from '@/src/lib/api/dashboard';
 import { Notification, Subscription } from '@/src/lib/api/types';
 import { getSessionUser } from '@/src/lib/firebase/auth-actions';
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 export const metadata = {
     title: 'Dashboard | 0nbording',
@@ -34,10 +35,18 @@ export default async function DashboardPage() {
         }
     }
 
+    // Smart Redirection:
+    // If the user only has subscriptions with 1 provider, redirect to /{providerSlug}/dashboard
+    const { singleProvider, providerSlug } = getEffectiveProviders(subscriptions);
+    if (singleProvider && providerSlug) {
+        redirect(`/${providerSlug}/dashboard`);
+    }
+
     return (
         <Dashboard
             notifications={notifications}
             subscriptions={subscriptions}
+            userProfile={sessionUser}
         />
     );
 }

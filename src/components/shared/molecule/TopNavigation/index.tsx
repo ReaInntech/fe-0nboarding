@@ -12,8 +12,11 @@ import {
   getNotifications,
   getUnreadNotificationsCount,
   markNotificationRead,
-  markAllNotificationsRead
+  markAllNotificationsRead,
+  EffectiveProvider
 } from '@/src/lib/api/dashboard';
+import { PublicProviderBranding } from '@/src/lib/api/provider';
+import { useProviderBranding } from '@/src/context/BrandContext';
 import styles from './index.module.scss';
 
 interface NavItem {
@@ -26,13 +29,29 @@ interface TopNavigationProps {
     onLogout?: () => void;
     activeTab?: string;
     userProfile?: any;
+    providerBranding?: PublicProviderBranding | null;
+    providerSlug?: string;
+    availableProviders?: EffectiveProvider[];
 }
 
-export default function TopNavigation({ isProvider, onLogout, activeTab: activeTabProp, userProfile }: TopNavigationProps) {
+export default function TopNavigation({
+    isProvider,
+    onLogout,
+    activeTab: activeTabProp,
+    userProfile,
+    providerBranding: propBranding,
+    providerSlug: propSlug,
+    availableProviders: propAvailableProviders,
+}: TopNavigationProps) {
     const pathname = usePathname();
     const router = useRouter();
     const { user: contextUser, signOut } = useApp();
+    const brandContext = useProviderBranding();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    const branding = propBranding !== undefined ? propBranding : brandContext.branding;
+    const effectiveSlug = propSlug !== undefined ? propSlug : brandContext.providerSlug;
+    const availableProviders = propAvailableProviders || brandContext.availableProviders || [];
 
     const user = userProfile || contextUser;
     const profile = user || { avatar_url: "", organization: { client_type: "" as any } };
@@ -48,13 +67,14 @@ export default function TopNavigation({ isProvider, onLogout, activeTab: activeT
     // 2FA OTP Modal state (RF-TR-03)
     const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
 
+    const basePath = effectiveSlug ? `/${effectiveSlug}` : '';
     const navItems: NavItem[] = [
-        { name: 'Services', path: '/dashboard' },
-        { name: 'Billing', path: '/billing' },
-        { name: 'Support', path: '/support' },
+        { name: 'Services', path: `${basePath}/dashboard` },
+        { name: 'Billing', path: `${basePath}/billing` },
+        { name: 'Support', path: `${basePath}/support` },
     ];
 
-    const activeTab = activeTabProp || (pathname?.startsWith('/subscriptions') ? 'Services' : navItems.find(item => pathname?.startsWith(item.path))?.name) || 'Services';
+    const activeTab = activeTabProp || (pathname?.includes('/subscriptions') ? 'Services' : navItems.find(item => pathname?.endsWith(item.name.toLowerCase()) || pathname?.includes(`/${item.name.toLowerCase()}`))?.name) || 'Services';
 
     // Fetch notifications
     useEffect(() => {
@@ -124,7 +144,7 @@ export default function TopNavigation({ isProvider, onLogout, activeTab: activeT
             router.push('/provider/dashboard');
         } else {
             setMode('client');
-            router.push('/dashboard');
+            router.push(effectiveSlug ? `/${effectiveSlug}/dashboard` : '/dashboard');
         }
     };
 
@@ -139,8 +159,36 @@ export default function TopNavigation({ isProvider, onLogout, activeTab: activeT
             <header className={styles.nav}>
                 <div className={styles['nav__container']}>
                     <div className={styles['nav__logo-wrapper']}>
-                        <a href="/" className={styles['nav__logo-link']}>
-                            <Logo theme="dark" />
+                        <a href={basePath ? `${basePath}/dashboard` : '/'} className={styles['nav__logo-link']}>
+                            {branding?.logo_url ? (
+                                <img
+                                    src={branding.logo_url}
+                                    alt={branding.name || 'Provider Logo'}
+                                    className="h-8 max-h-8 w-auto max-w-[150px] object-contain"
+                                />
+                            ) : branding?.name ? (
+                                <div className="flex items-center gap-2">
+                                    {branding.isotype_url ? (
+                                        <img
+                                            src={branding.isotype_url}
+                                            alt={branding.name}
+                                            className="h-7 w-7 object-contain"
+                                        />
+                                    ) : (
+                                        <div
+                                            className="h-7 w-7 rounded-md flex items-center justify-center font-bold text-white text-xs shadow-sm"
+                                            style={{ backgroundColor: branding.brand_primary_color || '#1978e5' }}
+                                        >
+                                            {branding.name.charAt(0).toUpperCase()}
+                                        </div>
+                                    )}
+                                    <span className="font-bold text-slate-800 text-sm tracking-tight">
+                                        {branding.name}
+                                    </span>
+                                </div>
+                            ) : (
+                                <Logo theme="dark" />
+                            )}
                         </a>
                     </div>
 
@@ -157,6 +205,31 @@ export default function TopNavigation({ isProvider, onLogout, activeTab: activeT
                     </nav>
 
                     <div className={styles['nav__controls']}>
+                        {availableProviders.length > 1 && (
+                            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100/90 border border-slate-200 text-xs font-medium text-slate-700">
+                                <span className="text-slate-400 text-[11px] hidden sm:inline">Provider:</span>
+                                <select
+                                    value={effectiveSlug || 'all'}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        if (val === 'all') {
+                                            router.push('/dashboard');
+                                        } else {
+                                            router.push(`/${val}/dashboard`);
+                                        }
+                                    }}
+                                    className="bg-transparent text-slate-800 font-semibold focus:outline-none cursor-pointer pr-1"
+                                >
+                                    <option value="all">0nbording (General)</option>
+                                    {availableProviders.map((p) => (
+                                        <option key={p.slug} value={p.slug}>
+                                            {p.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+
                         {!isNaturalPerson && (
                             <div className={styles['nav__mode-selector']}>
                                 <span className={styles['nav__mode-label']}>Mode:</span>
@@ -219,6 +292,37 @@ export default function TopNavigation({ isProvider, onLogout, activeTab: activeT
                                     {item.name}
                                 </a>
                             ))}
+
+                            {availableProviders.length > 1 && (
+                                <div className={styles['nav__mobile-mode']}>
+                                    <span className={styles['nav__mobile-mode-label']}>Provider</span>
+                                    <div className={styles['nav__mobile-mode-wrapper']}>
+                                        <select
+                                            value={effectiveSlug || 'all'}
+                                            onChange={(e) => {
+                                                setIsMobileMenuOpen(false);
+                                                const val = e.target.value;
+                                                if (val === 'all') {
+                                                    router.push('/dashboard');
+                                                } else {
+                                                    router.push(`/${val}/dashboard`);
+                                                }
+                                            }}
+                                            className={styles['nav__mode-select']}
+                                        >
+                                            <option value="all">0nbording (General)</option>
+                                            {availableProviders.map((p) => (
+                                                <option key={p.slug} value={p.slug}>
+                                                    {p.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <div className={styles['nav__mode-icon']}>
+                                            <Icon name="expand_more" />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
 
                             {!isNaturalPerson && (
                                 <div className={styles['nav__mobile-mode']}>

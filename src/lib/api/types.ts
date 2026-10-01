@@ -35,6 +35,14 @@ export interface ClientUser {
   avatarUrl?: string;
 }
 
+export interface SubscriptionProvider {
+  id: string;
+  name: string;
+  slug?: string;
+  dominio?: string;
+  logo_url?: string;
+}
+
 export interface Subscription {
   id: string;
   name?: string;
@@ -49,6 +57,7 @@ export interface Subscription {
   hasActionRequest?: boolean;
   currentStep?: number;
   totalSteps?: number;
+  provider?: SubscriptionProvider;
 
   // Provider-specific details (Aliased mapping)
   client?: {
@@ -162,6 +171,7 @@ export interface SubscriptionDTO {
     product_code: string;
     billing_model: string;
   };
+  provider?: SubscriptionProvider;
 }
 
 export interface TransactionDTO {

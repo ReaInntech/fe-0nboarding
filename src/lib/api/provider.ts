@@ -738,3 +738,39 @@ export async function bulkImportClients(clients: CreateClientDTO[], token?: stri
     headers: { 'Content-Type': 'application/json' },
   });
 }
+
+export interface PublicProviderBranding {
+  org_id: string;
+  name: string;
+  slug: string;
+  dominio?: string;
+  logo_url?: string | null;
+  isotype_url?: string | null;
+  favicon_url?: string | null;
+  brand_primary_color?: string;
+  brand_secondary_color?: string;
+  brand_accent_color?: string;
+}
+
+/**
+ * Fetch public provider branding by slug or org_id (Provider API)
+ */
+export async function getProviderBrandingByIdentifier(
+  identifier: string,
+  token?: string
+): Promise<PublicProviderBranding | null> {
+  try {
+    const data = await apiFetch<PublicProviderBranding>(
+      `/settings/branding/${encodeURIComponent(identifier)}`,
+      {
+        microservice: 'provider',
+        token,
+      }
+    );
+    return data;
+  } catch (err) {
+    console.error(`[ProviderAPI] Failed to get branding for identifier "${identifier}":`, err);
+    return null;
+  }
+}
+

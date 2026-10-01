@@ -2,6 +2,7 @@ import React from 'react';
 import Icon from '../../../shared/atoms/Icon';
 import Badge from '../../../shared/atoms/Badge';
 import { Subscription } from '@/src/lib/api/types';
+import { useProviderBranding } from '@/src/context/BrandContext';
 import styles from './index.module.scss';
 
 
@@ -11,6 +12,7 @@ export interface ServicesListProps {
 }
 
 export default function ServicesList({ subscriptions, className }: ServicesListProps) {
+    const { providerSlug } = useProviderBranding();
     return (
         <section className={`${styles['services-list']} ${className || ''}`}>
             <div className={styles['services-list__header']}>
@@ -94,7 +96,10 @@ export default function ServicesList({ subscriptions, className }: ServicesListP
                                         {sub.price}<span className={styles['services-list__cost-period']}>{sub.pricePeriod}</span>
                                     </span>
                                 </div>
-                                <a href={`/subscriptions/${sub.id}`} className={styles['services-list__manage-btn']}>
+                                <a
+                                    href={providerSlug ? `/${providerSlug}/subscriptions/${sub.id}` : (sub.provider?.slug ? `/${sub.provider.slug}/subscriptions/${sub.id}` : `/subscriptions/${sub.id}`)}
+                                    className={styles['services-list__manage-btn']}
+                                >
                                     Manage <Icon name="chevron_right" className={styles['services-list__manage-icon']} />
                                 </a>
                             </div>

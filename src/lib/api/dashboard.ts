@@ -34,6 +34,20 @@ export function mapSubscription(dto: any): Subscription {
       iconColor: dto.product?.icon_color || '',
     },
     
+    provider: dto.provider ? {
+      id: dto.provider.id,
+      name: dto.provider.name,
+      slug: dto.provider.slug,
+      dominio: dto.provider.dominio,
+      logo_url: dto.provider.logo_url,
+    } : (dto.product?.organization ? {
+      id: dto.product.organization.id,
+      name: dto.product.organization.trade_name || dto.product.organization.legal_name || 'Provider',
+      slug: dto.product.organization.slug,
+      dominio: dto.product.organization.dominio,
+      logo_url: dto.product.organization.logo_url,
+    } : undefined),
+
     // Map provider-specific aliased details
     client: dto.client ? {
       id: dto.client.id,
@@ -58,6 +72,52 @@ export function mapSubscription(dto: any): Subscription {
   };
 }
 
+export interface EffectiveProvider {
+  id: string;
+  name: string;
+  slug: string;
+  dominio?: string;
+  logo_url?: string;
+  subscriptionCount: number;
+}
+
+export function getEffectiveProviders(subscriptions: Subscription[]): {
+  providers: EffectiveProvider[];
+  singleProvider: boolean;
+  providerSlug?: string;
+  defaultProvider?: EffectiveProvider;
+} {
+  const providerMap = new Map<string, EffectiveProvider>();
+
+  for (const sub of subscriptions) {
+    if (sub.provider && sub.provider.slug) {
+      const existing = providerMap.get(sub.provider.slug);
+      if (existing) {
+        existing.subscriptionCount += 1;
+      } else {
+        providerMap.set(sub.provider.slug, {
+          id: sub.provider.id,
+          name: sub.provider.name,
+          slug: sub.provider.slug,
+          dominio: sub.provider.dominio,
+          logo_url: sub.provider.logo_url,
+          subscriptionCount: 1,
+        });
+      }
+    }
+  }
+
+  const providers = Array.from(providerMap.values());
+  const singleProvider = providers.length === 1;
+
+  return {
+    providers,
+    singleProvider,
+    providerSlug: singleProvider ? providers[0].slug : undefined,
+    defaultProvider: singleProvider ? providers[0] : undefined,
+  };
+}
+
 export async function getNotifications(token?: string, orgId?: string): Promise<Notification[]> {
   try {
     const data = await apiFetch<NotificationDTO[]>('/notifications', { token, orgId });
@@ -68,9 +128,20 @@ export async function getNotifications(token?: string, orgId?: string): Promise<
   }
 }
 
-export async function getSubscriptions(token?: string, orgId?: string): Promise<Subscription[]> {
+export async function getSubscriptions(
+  token?: string,
+  orgId?: string,
+  filters?: { providerId?: string; providerSlug?: string }
+): Promise<Subscription[]> {
   try {
-    const data = await apiFetch<SubscriptionDTO[]>('/subscriptions', { token, orgId });
+    let endpoint = '/subscriptions';
+    const params = new URLSearchParams();
+    if (filters?.providerId) params.append('providerId', filters.providerId);
+    if (filters?.providerSlug) params.append('providerSlug', filters.providerSlug);
+    const qs = params.toString();
+    if (qs) endpoint += `?${qs}`;
+
+    const data = await apiFetch<SubscriptionDTO[]>(endpoint, { token, orgId });
     return (data || []).map(mapSubscription);
   } catch (error) {
     console.error('[DashboardAPI] getSubscriptions failed:', error);
@@ -138,10 +209,14 @@ export async function verifyProviderOtp(code: string, token?: string) {
 /**
  * BFF Aggregator for Dashboard Initial State
  */
-export async function getDashboardInit(token: string, orgId: string) {
+export async function getDashboardInit(
+  token: string,
+  orgId: string,
+  filters?: { providerId?: string; providerSlug?: string }
+) {
   const [notifications, subscriptions] = await Promise.all([
     getNotifications(token, orgId),
-    getSubscriptions(token, orgId),
+    getSubscriptions(token, orgId, filters),
   ]);
 
   return {

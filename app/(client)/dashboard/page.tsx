@@ -47,6 +47,7 @@ export default async function DashboardPage() {
             notifications={notifications}
             subscriptions={subscriptions}
             userProfile={sessionUser}
+            isGeneral={true}
         />
     );
 }

@@ -71,7 +71,6 @@ export default function TopNavigation({
     const navItems: NavItem[] = [
         { name: 'Services', path: `${basePath}/dashboard` },
         { name: 'Billing', path: `${basePath}/billing` },
-        { name: 'Support', path: `${basePath}/support` },
     ];
 
     const activeTab = activeTabProp || (pathname?.includes('/subscriptions') ? 'Services' : navItems.find(item => pathname?.endsWith(item.name.toLowerCase()) || pathname?.includes(`/${item.name.toLowerCase()}`))?.name) || 'Services';

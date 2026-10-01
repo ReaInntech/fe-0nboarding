@@ -23,13 +23,18 @@ export default async function BrandedDashboardPage({ params }: BrandedDashboardP
 
   let notifications: Notification[] = [];
   let subscriptions: Subscription[] = [];
+  let branding: any = null;
 
   if (token) {
     try {
-      // Scoped fetch: only subscriptions belonging to this provider
-      const data = await getDashboardInit(token, orgId, { providerSlug });
+      // Scoped fetch: only subscriptions belonging to this provider and branding
+      const [data, brandData] = await Promise.all([
+        getDashboardInit(token, orgId, { providerSlug }),
+        getProviderBrandingByIdentifier(providerSlug),
+      ]);
       notifications = data.notifications || [];
       subscriptions = data.subscriptions || [];
+      branding = brandData;
     } catch (error) {
       console.error(`[BrandedDashboard] Error fetching subscriptions for provider "${providerSlug}":`, error);
     }
@@ -47,6 +52,10 @@ export default async function BrandedDashboardPage({ params }: BrandedDashboardP
       notifications={notifications}
       subscriptions={subscriptions}
       userProfile={sessionUser}
+      providerSlug={providerSlug}
+      supportPhone={branding?.support_phone}
+      providerName={branding?.name}
+      isGeneral={false}
     />
   );
 }

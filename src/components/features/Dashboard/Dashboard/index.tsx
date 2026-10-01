@@ -13,9 +13,21 @@ export interface DashboardProps {
     notifications?: Notification[];
     subscriptions?: Subscription[];
     userProfile?: any;
+    providerSlug?: string;
+    supportPhone?: string | null;
+    providerName?: string;
+    isGeneral?: boolean;
 }
 
-export default function Dashboard({ notifications = [], subscriptions = [], userProfile }: DashboardProps) {
+export default function Dashboard({
+    notifications = [],
+    subscriptions = [],
+    userProfile,
+    providerSlug,
+    supportPhone,
+    providerName,
+    isGeneral,
+}: DashboardProps) {
     const { user } = useApp();
 
     return (
@@ -27,7 +39,12 @@ export default function Dashboard({ notifications = [], subscriptions = [], user
                         <NotificationHero notifications={notifications} />
                     )}
                     <ServicesList subscriptions={subscriptions} />
-                    <SupportLinks />
+                    <SupportLinks 
+                        providerSlug={providerSlug}
+                        supportPhone={supportPhone}
+                        providerName={providerName}
+                        isGeneral={isGeneral}
+                    />
                 </main>
             </div>
             <Footer />

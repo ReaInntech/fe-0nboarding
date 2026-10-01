@@ -122,15 +122,46 @@
     }
 
     &__preview-mockup {
-        @apply rounded-xl border border-slate-800 bg-slate-900/50 p-5 space-y-4;
+        @apply rounded-xl border border-slate-700/80 bg-[#f8fafc] overflow-hidden shadow-2xl;
+    }
+
+    &__preview-browser-header {
+        @apply flex items-center gap-2 px-3 pt-2.5 pb-0 bg-slate-200/90 border-b border-slate-300/80;
+    }
+
+    &__preview-browser-dots {
+        @apply flex items-center gap-1.5 mr-2 mb-2;
+    }
+
+    &__preview-browser-dot {
+        @apply size-2.5 rounded-full;
+        &--red { @apply bg-[#ff5f56]; }
+        &--yellow { @apply bg-[#ffbd2e]; }
+        &--green { @apply bg-[#27c93f]; }
+    }
+
+    &__preview-browser-tab {
+        @apply flex items-center gap-2 px-3 py-1.5 bg-white rounded-t-lg border-t border-x border-slate-300/80 text-slate-800 text-[11px] font-semibold max-w-[210px] truncate shadow-xs;
+    }
+
+    &__preview-browser-favicon {
+        @apply size-3.5 object-contain flex-shrink-0 rounded-xs;
+    }
+
+    &__preview-browser-url {
+        @apply flex items-center gap-2 px-3 py-1.5 bg-slate-100 border-b border-slate-200 text-[10px] text-slate-500 font-mono;
+    }
+
+    &__preview-body {
+        @apply p-4 space-y-3.5 bg-[#f8fafc];
     }
 
     &__preview-navbar {
-        @apply flex items-center justify-between pb-3 border-b border-slate-800;
+        @apply flex items-center justify-between p-3 bg-white rounded-xl border border-slate-200/80 shadow-xs;
     }
 
     &__preview-brand {
-        @apply flex items-center gap-3;
+        @apply flex items-center gap-2.5;
     }
 
     &__preview-logo {
@@ -138,11 +169,11 @@
     }
 
     &__preview-isotype {
-        @apply size-7 rounded-lg flex items-center justify-center font-bold text-white text-xs shadow-md;
+        @apply size-7 rounded-lg flex items-center justify-center font-bold text-white text-xs shadow-xs overflow-hidden;
     }
 
     &__preview-client-badge {
-        @apply px-3 py-1 rounded-full text-[11px] font-semibold text-white shadow-sm;
+        @apply px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white shadow-xs;
     }
 
     /* Notification Toggles */

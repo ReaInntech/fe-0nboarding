@@ -16,6 +16,7 @@ import Button from '@/src/components/shared/atoms/Button';
 import Icon from '@/src/components/shared/atoms/Icon';
 import ProviderTopNavigation from '../../shared/molecule/ProviderTopNavigation';
 import Footer from '../../shared/molecule/Footer';
+import BrandingAssetUploadCard from './BrandingAssetUploadCard';
 import styles from './index.module.scss';
 
 export interface ProviderSettingsProps {
@@ -61,6 +62,26 @@ export default function ProviderSettings({
       showNotification('error', err?.message || 'Could not update branding. Please check your connection.');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleAssetChange = async (
+    field: 'logo_url' | 'isotype_url' | 'favicon_url',
+    newUrl: string | null
+  ) => {
+    const updatedBranding: ProviderSettingsBranding = {
+      ...branding,
+      [field]: newUrl ? newUrl : (null as any),
+    };
+    setBranding(updatedBranding);
+
+    try {
+      await updateProviderBranding(token, orgId, updatedBranding);
+      const label = field === 'logo_url' ? 'Logotipo' : field === 'isotype_url' ? 'Isotipo' : 'Favicon';
+      showNotification('success', `${label} ${newUrl ? 'guardado correctamente' : 'eliminado'}.`);
+    } catch (err: any) {
+      console.error(`Failed to auto-save ${field}:`, err);
+      showNotification('error', 'Asset subido, pero debes hacer clic en "Save Branding" para guardar los cambios.');
     }
   };
 
@@ -313,56 +334,65 @@ export default function ProviderSettings({
                   <div>
                     <h2 className={styles['provider-settings__card-title']}>
                       <Icon name="image" className="text-blue-400" />
-                      Visual Media Assets
+                      Visual Media Assets (DigitalOcean Storage)
                     </h2>
                     <p className={styles['provider-settings__card-description']}>
-                      URLs to your SVG or high-resolution PNG logos, isotypes, and browser favicon.
+                      Sube y gestiona tus assets de marca corporativos. Se almacenan de forma segura en DigitalOcean Spaces y se aplican en tiempo real.
                     </p>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <div className={styles['provider-settings__field-group']}>
-                    <label className={styles['provider-settings__field-label']}>
-                      Horizontal Logo URL
-                      <span className={styles['provider-settings__field-hint']}>Recommended 240x60px PNG or SVG</span>
-                    </label>
-                    <input
-                      type="url"
-                      placeholder="https://yourdomain.com/logo.svg"
-                      value={branding.logo_url || ''}
-                      onChange={(e) => setBranding({ ...branding, logo_url: e.target.value })}
-                      className={styles['provider-settings__input']}
-                    />
-                  </div>
+                  {/* Logotipo Principal */}
+                  <BrandingAssetUploadCard
+                    title="Logotipo Principal"
+                    assetType="logo"
+                    icon="image"
+                    badgeSpec="240×60 px · Máx 2MB · PNG/SVG/WEBP"
+                    helperText="Logo horizontal para barras de navegación, correos y facturas."
+                    currentUrl={branding.logo_url}
+                    allowedFormats={['.png', '.svg', '.webp', '.jpg', '.jpeg']}
+                    maxSizeBytes={2 * 1024 * 1024}
+                    recommendedAspect="wide"
+                    token={token}
+                    orgId={orgId}
+                    onAssetChange={(newUrl) => handleAssetChange('logo_url', newUrl)}
+                    onError={(msg) => showNotification('error', msg)}
+                  />
 
-                  <div className={styles['provider-settings__field-group']}>
-                    <label className={styles['provider-settings__field-label']}>
-                      Isotype / Symbol URL
-                      <span className={styles['provider-settings__field-hint']}>Square 64x64px icon</span>
-                    </label>
-                    <input
-                      type="url"
-                      placeholder="https://yourdomain.com/isotype.png"
-                      value={branding.isotype_url || ''}
-                      onChange={(e) => setBranding({ ...branding, isotype_url: e.target.value })}
-                      className={styles['provider-settings__input']}
-                    />
-                  </div>
+                  {/* Isotipo / Símbolo */}
+                  <BrandingAssetUploadCard
+                    title="Isotipo / Símbolo"
+                    assetType="isotype"
+                    icon="token"
+                    badgeSpec="128×128 px (1:1) · Máx 2MB · PNG/SVG/WEBP"
+                    helperText="Ícono cuadrado para menús colapsados, avatares y móviles."
+                    currentUrl={branding.isotype_url}
+                    allowedFormats={['.png', '.svg', '.webp', '.jpg', '.jpeg']}
+                    maxSizeBytes={2 * 1024 * 1024}
+                    recommendedAspect="square"
+                    token={token}
+                    orgId={orgId}
+                    onAssetChange={(newUrl) => handleAssetChange('isotype_url', newUrl)}
+                    onError={(msg) => showNotification('error', msg)}
+                  />
 
-                  <div className={styles['provider-settings__field-group']}>
-                    <label className={styles['provider-settings__field-label']}>
-                      Browser Favicon URL
-                      <span className={styles['provider-settings__field-hint']}>32x32px .ico or .png</span>
-                    </label>
-                    <input
-                      type="url"
-                      placeholder="https://yourdomain.com/favicon.ico"
-                      value={branding.favicon_url || ''}
-                      onChange={(e) => setBranding({ ...branding, favicon_url: e.target.value })}
-                      className={styles['provider-settings__input']}
-                    />
-                  </div>
+                  {/* Favicon del Navegador */}
+                  <BrandingAssetUploadCard
+                    title="Favicon del Navegador"
+                    assetType="favicon"
+                    icon="tab"
+                    badgeSpec="32×32 px · Máx 512KB · ICO/PNG/SVG"
+                    helperText="Ícono cuadrado visible en la pestaña del navegador de tus clientes."
+                    currentUrl={branding.favicon_url}
+                    allowedFormats={['.ico', '.png', '.svg']}
+                    maxSizeBytes={512 * 1024}
+                    recommendedAspect="square"
+                    token={token}
+                    orgId={orgId}
+                    onAssetChange={(newUrl) => handleAssetChange('favicon_url', newUrl)}
+                    onError={(msg) => showNotification('error', msg)}
+                  />
                 </div>
               </div>
             </div>
@@ -372,91 +402,145 @@ export default function ProviderSettings({
               <div className={styles['provider-settings__preview-card']}>
                 <div className="flex items-center justify-between">
                   <span className={styles['provider-settings__preview-badge']}>
-                    <Icon name="visibility" className="text-xs" />
-                    Client-Facing Live Preview
+                    <Icon name="wb_sunny" className="text-xs text-amber-400" />
+                    Client-Facing Live Preview (Tema Claro)
                   </span>
-                  <span className="text-[10px] text-slate-500 font-mono">White-Label Engine</span>
+                  <span className="text-[10px] text-slate-400 font-mono">White-Label Engine</span>
                 </div>
 
                 <p className="text-xs text-slate-400">
-                  This mock reflects the branding tokens your clients will experience inside their onboarding portal.
+                  El White-Label aplica exclusivamente a la experiencia de tus clientes (modo claro). Aquí puedes previsualizar cómo verán su portal con tus tokens aplicados.
                 </p>
 
-                {/* Mock Client Portal Navbar */}
+                {/* Mock Client Portal Window (Light Theme) */}
                 <div className={styles['provider-settings__preview-mockup']}>
-                  <div className={styles['provider-settings__preview-navbar']}>
-                    <div className={styles['provider-settings__preview-brand']}>
-                      {branding.logo_url ? (
+                  {/* Browser Window Header with Tab and Favicon */}
+                  <div className={styles['provider-settings__preview-browser-header']}>
+                    <div className={styles['provider-settings__preview-browser-dots']}>
+                      <span className={`${styles['provider-settings__preview-browser-dot']} ${styles['provider-settings__preview-browser-dot--red']}`} />
+                      <span className={`${styles['provider-settings__preview-browser-dot']} ${styles['provider-settings__preview-browser-dot--yellow']}`} />
+                      <span className={`${styles['provider-settings__preview-browser-dot']} ${styles['provider-settings__preview-browser-dot--green']}`} />
+                    </div>
+                    <div className={styles['provider-settings__preview-browser-tab']}>
+                      {branding.favicon_url ? (
                         /* eslint-disable-next-line @next/next/no-img-element */
                         <img
-                          src={branding.logo_url}
-                          alt="Brand Logo"
-                          className={styles['provider-settings__preview-logo']}
+                          src={branding.favicon_url}
+                          alt="Favicon"
+                          className={styles['provider-settings__preview-browser-favicon']}
                         />
                       ) : (
-                        <div
-                          className={styles['provider-settings__preview-isotype']}
-                          style={{ backgroundColor: branding.brand_primary_color || '#1978E5' }}
-                        >
-                          {organization.trade_name?.charAt(0) || '0'}
-                        </div>
+                        <Icon name="tab" className="text-slate-500 text-xs flex-shrink-0" />
                       )}
-                      <span className="text-xs font-bold text-white tracking-wide">
-                        {organization.trade_name || organization.legal_name || 'My Organization'}
+                      <span className="truncate">
+                        {organization.trade_name || organization.legal_name || 'Portal'} · Onboarding
                       </span>
                     </div>
-
-                    <span
-                      className={styles['provider-settings__preview-client-badge']}
-                      style={{ backgroundColor: branding.brand_secondary_color || '#10B981' }}
-                    >
-                      Active Onboarding
-                    </span>
                   </div>
 
-                  {/* Mock Onboarding Step Card */}
-                  <div className="p-4 rounded-lg bg-slate-950/70 border border-slate-800 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="size-6 rounded-md flex items-center justify-center text-xs font-bold text-white"
-                          style={{ backgroundColor: branding.brand_primary_color || '#1978E5' }}
-                        >
-                          1
-                        </span>
-                        <span className="text-xs font-semibold text-slate-200">Legal Agreement & SLA</span>
+                  {/* Browser URL Bar */}
+                  <div className={styles['provider-settings__preview-browser-url']}>
+                    <div className="flex items-center gap-1.5 flex-1 bg-white px-2 py-0.5 rounded border border-slate-200/80 shadow-2xs">
+                      <Icon name="lock" className="text-emerald-600 text-[11px]" />
+                      <span className="text-slate-400">https://</span>
+                      <span className="text-slate-700 font-medium">
+                        {(organization.trade_name || 'portal').toLowerCase().replace(/[^a-z0-9]/g, '')}.onboarding.com
+                      </span>
+                      <span className="text-slate-400">/welcome</span>
+                    </div>
+                  </div>
+
+                  {/* Portal Body (Light Theme Client Portal) */}
+                  <div className={styles['provider-settings__preview-body']}>
+                    {/* Mock Client Portal Navbar */}
+                    <div className={styles['provider-settings__preview-navbar']}>
+                      <div className={styles['provider-settings__preview-brand']}>
+                        {branding.logo_url ? (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img
+                            src={branding.logo_url}
+                            alt="Brand Logo"
+                            className={styles['provider-settings__preview-logo']}
+                          />
+                        ) : branding.isotype_url ? (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <div className={styles['provider-settings__preview-isotype']}>
+                            <img
+                              src={branding.isotype_url}
+                              alt="Isotype"
+                              className="size-full object-contain"
+                            />
+                          </div>
+                        ) : (
+                          <div
+                            className={styles['provider-settings__preview-isotype']}
+                            style={{ backgroundColor: branding.brand_primary_color || '#1978E5' }}
+                          >
+                            {organization.trade_name?.charAt(0) || '0'}
+                          </div>
+                        )}
+                        {(!branding.logo_url || branding.isotype_url) && (
+                          <span className="text-xs font-bold text-slate-800 tracking-tight">
+                            {organization.trade_name || organization.legal_name || 'My Organization'}
+                          </span>
+                        )}
                       </div>
+
                       <span
-                        className="text-[10px] px-2 py-0.5 rounded font-bold"
-                        style={{
-                          backgroundColor: `${branding.brand_accent_color || '#F59E0B'}20`,
-                          color: branding.brand_accent_color || '#F59E0B',
-                        }}
+                        className={styles['provider-settings__preview-client-badge']}
+                        style={{ backgroundColor: branding.brand_secondary_color || '#10B981' }}
                       >
-                        Pending Review
+                        Active Onboarding
                       </span>
                     </div>
 
-                    <p className="text-[11px] text-slate-400">
-                      Please review the attached contract document and provide corporate sign-off.
-                    </p>
+                    {/* Mock Onboarding Step Card (Client Light Theme) */}
+                    <div className="p-4 rounded-xl bg-white border border-slate-200/90 shadow-sm space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="size-6 rounded-md flex items-center justify-center text-xs font-bold text-white shadow-2xs"
+                            style={{ backgroundColor: branding.brand_primary_color || '#1978E5' }}
+                          >
+                            1
+                          </span>
+                          <span className="text-xs font-bold text-slate-800">Legal Agreement & SLA</span>
+                        </div>
+                        <span
+                          className="text-[10px] px-2 py-0.5 rounded-full font-bold border"
+                          style={{
+                            backgroundColor: `${branding.brand_accent_color || '#F59E0B'}15`,
+                            color: branding.brand_accent_color || '#B45309',
+                            borderColor: `${branding.brand_accent_color || '#F59E0B'}40`,
+                          }}
+                        >
+                          Pending Review
+                        </span>
+                      </div>
 
-                    <div className="pt-2 flex justify-end">
-                      <button
-                        type="button"
-                        className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white shadow-md transition-all cursor-default"
-                        style={{ backgroundColor: branding.brand_primary_color || '#1978E5' }}
-                      >
-                        Review Document
-                      </button>
+                      <p className="text-[11px] text-slate-500 leading-relaxed">
+                        Please review the service agreement and sign the corporate onboarding contract.
+                      </p>
+
+                      <div className="pt-1 flex items-center justify-between">
+                        <span className="text-[10px] text-slate-400 font-medium">Step 1 of 3</span>
+                        <button
+                          type="button"
+                          className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white shadow-sm transition-all cursor-default flex items-center gap-1.5"
+                          style={{ backgroundColor: branding.brand_primary_color || '#1978E5' }}
+                        >
+                          <span>Review Document</span>
+                          <Icon name="arrow_forward" className="text-xs" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 <div className="p-3 rounded-xl bg-blue-950/30 border border-blue-900/50 flex items-start gap-2.5">
-                  <Icon name="verified" className="text-blue-400 text-sm mt-0.5" />
+                  <Icon name="verified" className="text-blue-400 text-sm mt-0.5 flex-shrink-0" />
                   <p className="text-[11px] text-blue-200/90 leading-relaxed">
-                    Tokens are delivered directly through the microservice endpoint <code>/settings/branding/:orgId</code> without touching core database schemas.
+                    Los tokens de White-label (logotipo, isotipo, favicon y colores) se aplican exclusivamente al portal del cliente final (tema claro) mediante <code>/settings/branding/:orgId</code>.
                   </p>
                 </div>
               </div>

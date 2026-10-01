@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from '@storybook/react';
 import UnifiedProductView from '../UnifiedProductView';
 import { ProductHeaderProps } from '../ProductHeader';
 import { ServiceDetailsProps } from '../ServiceDetails';
-import { SupportAccessProps } from '../SupportAccess';
 import { LegalDocumentsProps } from '../LegalDocuments';
 import { ContractingProgressProps } from '../ContractingProgress';
 import { PaymentHistoryProps } from '../PaymentHistory';
@@ -53,13 +52,6 @@ const simpleServiceDetailsProps: ServiceDetailsProps = {
     ],
 };
 
-const simpleSupportAccessProps: SupportAccessProps = {
-    title: 'Workshop Contact',
-    subtitle: 'Mon–Sat: 8:00 AM – 6:00 PM',
-    buttonLabel: 'Call Workshop',
-    icon: 'support_agent',
-    accentColor: '#f59e0b',
-};
 
 const simpleLegalDocumentsProps: LegalDocumentsProps = {
     showModificationLink: true,
@@ -92,7 +84,6 @@ export const Simple: Story = {
         headerProps: simpleHeaderProps,
         showContractingProgress: false,
         serviceDetailsProps: simpleServiceDetailsProps,
-        supportAccessProps: simpleSupportAccessProps,
         legalDocumentsProps: simpleLegalDocumentsProps,
         showRequests: false,
     },
@@ -103,7 +94,6 @@ export const WithPaymentRequest: Story = {
         headerProps: simpleHeaderProps,
         showContractingProgress: false,
         serviceDetailsProps: simpleServiceDetailsProps,
-        supportAccessProps: simpleSupportAccessProps,
         legalDocumentsProps: simpleLegalDocumentsProps,
         showRequests: true,
         requestsProps: {
@@ -134,7 +124,6 @@ export const WithAllRequests: Story = {
         headerProps: simpleHeaderProps,
         showContractingProgress: false,
         serviceDetailsProps: simpleServiceDetailsProps,
-        supportAccessProps: simpleSupportAccessProps,
         legalDocumentsProps: simpleLegalDocumentsProps,
         showRequests: true,
         requestsProps: {
@@ -252,11 +241,6 @@ export const RealInnovationConsulting: Story = {
                 { icon: 'speed', label: 'Enfoque', value: 'Optimización de Procesos y Automatización' },
                 { icon: 'account_balance_wallet', label: 'Pago mensual', value: '$1.000.000' },
             ],
-        },
-        supportAccessProps: {
-            ...simpleSupportAccessProps,
-            title: 'Soporte Real Innovation',
-            accentColor: '#7ED957'
         },
         legalDocumentsProps: {
             showModificationLink: true,

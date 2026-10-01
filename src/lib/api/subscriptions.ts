@@ -110,15 +110,6 @@ export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps
                 ...mapProductMetadataToFields(sub.product_metadata_override, sub.product?.metadata),
             ],
         },
-        showSupportAccess: hasSupportPhone,
-        supportAccessProps: hasSupportPhone && whatsappUrl ? {
-            title: `${providerName} Soporte`,
-            subtitle: 'Atención directa vía WhatsApp',
-            buttonLabel: 'Contactar por WhatsApp',
-            icon: 'support_agent',
-            accentColor: '#10b981',
-            whatsappUrl: whatsappUrl,
-        } : undefined,
         legalDocumentsProps: {
             documents: documentsRaw.map((doc: any) => ({
                 icon: 'description',
@@ -134,17 +125,23 @@ export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps
         requestsProps: {
             requests: allRequestsRaw.map((req: any) => {
                 const action = req.action_request || {};
+                const reqData = req.data || {};
+                const effectiveStatus = reqData.clientStatus || req.status || 'pending';
                 return {
                     id: req.id,
+                    subscriptionId: sub.id,
                     type: action.request_type || 'document',
-                    status: req.status || 'pending',
+                    status: effectiveStatus,
                     title: action.title || 'Action Request',
                     documentTitle: action.title || 'Document Request', // Fallback for specific components
                     content: action.config?.content || '',
                     config: action.config || {},
                     templateFile: action.template_file,
+                    customDocumentPerUser: action.config?.customDocumentPerUser || false,
+                    waitingExplanationMessage: action.config?.waitingExplanationMessage,
                     checkboxes: action.config?.checkboxes || [],
-                    data: req.data, // Instance data for resolved requests
+                    data: reqData, // Instance data for resolved requests
+                    feedbackNotes: reqData.feedbackNotes || req.feedback_notes,
                 };
             }),
         },

@@ -6,7 +6,6 @@ import Footer from '../../../shared/molecule/Footer';
 import ProductHeader, { ProductHeaderProps } from '../ProductHeader';
 import ContractingProgress, { ContractingProgressProps } from '../ContractingProgress';
 import ServiceDetails, { ServiceDetailsProps } from '../ServiceDetails';
-import SupportAccess, { SupportAccessProps } from '../SupportAccess';
 import LegalDocuments, { LegalDocumentsProps } from '../LegalDocuments';
 import PaymentHistory, { PaymentHistoryProps } from '../PaymentHistory';
 import PaymentRequest, { PaymentRequestProps } from '../PaymentRequest';
@@ -28,8 +27,6 @@ export interface UnifiedProductViewProps {
     showContractingProgress?: boolean;
     contractingProgressProps?: ContractingProgressProps;
     serviceDetailsProps: ServiceDetailsProps;
-    supportAccessProps?: SupportAccessProps;
-    showSupportAccess?: boolean;
     legalDocumentsProps: LegalDocumentsProps;
     showRequests?: boolean;
     requestsProps?: { requests: RequestType[] };
@@ -44,8 +41,6 @@ export default function UnifiedProductView({
     showContractingProgress = true,
     contractingProgressProps,
     serviceDetailsProps,
-    supportAccessProps,
-    showSupportAccess = true,
     legalDocumentsProps,
     showRequests = true,
     requestsProps = { requests: [] },
@@ -71,10 +66,6 @@ export default function UnifiedProductView({
                     <div className={styles['unified-product-view__grid']}>
                         <div className={styles['unified-product-view__left-col']}>
                             <ServiceDetails {...serviceDetailsProps} />
-
-                            {showSupportAccess && supportAccessProps && (
-                                <SupportAccess {...supportAccessProps} />
-                            )}
 
                             <LegalDocuments {...legalDocumentsProps} />
                         </div>

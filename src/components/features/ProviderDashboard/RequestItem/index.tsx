@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Icon from '../../../shared/atoms/Icon';
 import Modal from '../../../shared/molecule/Modal';
 import RequestVerificationContent, { VerificationPayload } from './RequestVerificationContent';
+import { useFileUpload } from '../../../../libs/hooks/useFileUpload';
+import { useApp } from '@/src/context/AppContext';
+import { auth } from '@/src/lib/firebase/config';
 import styles from './index.module.scss';
 
 export interface Request {
     id?: string;
+    subscriptionId?: string;
     type: 'document_review' | 'other' | string;
     status: 'approved' | 'rejected' | 'pending';
     title: string;
@@ -14,14 +18,26 @@ export interface Request {
     metadata?: Array<{ label: string; value: string }>;
     payload?: VerificationPayload;
     rejectionReason?: string;
+    customDocumentPerUser?: boolean;
+    customDocumentFile?: string;
+    data?: any;
+    config?: any;
 }
 
 export interface RequestItemProps {
     req?: Request;
+    subscriptionId?: string;
     className?: string;
 }
 
-export default function RequestItem({ req, className }: RequestItemProps) {
+export default function RequestItem({ req, subscriptionId, className }: RequestItemProps) {
+    const { user } = useApp();
+    const { uploadFile, isUploading } = useFileUpload();
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [uploadedCustomFile, setUploadedCustomFile] = useState<string | null>(
+        req?.customDocumentFile || req?.data?.customDocumentFile || null
+    );
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isRejecting, setIsRejecting] = useState(false);
     const [feedback, setFeedback] = useState('');
@@ -51,6 +67,44 @@ export default function RequestItem({ req, className }: RequestItemProps) {
         // Here we would normally call an API
         console.log(`Rejected ${req.id} with feedback: ${feedback}`);
         handleCloseDetails();
+    };
+
+    const handleCustomDocFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        const effectiveSubId = subscriptionId || req.subscriptionId;
+        if (!file || !effectiveSubId || !req.id) return;
+
+        try {
+            const freshToken = await (auth.currentUser?.getIdToken() || Promise.resolve(user?.accessToken));
+            if (!freshToken) throw new Error('No authentication token available');
+
+            const orgId = user?.org_id || user?.organization?.id;
+            const uploadedKey = await uploadFile(file, 'documents', freshToken, orgId);
+
+            const baseUrl = process.env.NEXT_PUBLIC_CORE_API_URL || 'http://localhost:3001/api/v1/core';
+            const response = await fetch(`${baseUrl}/subscriptions/${effectiveSubId}/resolved-requests/${req.id}/custom-document`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${freshToken}`,
+                    ...(orgId ? { 'x-org-id': orgId } : {}),
+                },
+                body: JSON.stringify({ fileKey: uploadedKey, fileName: file.name }),
+            });
+
+            if (response.ok) {
+                setUploadedCustomFile(uploadedKey);
+                alert('Documento personalizado subido correctamente. El cliente ha sido notificado.');
+            } else {
+                const err = await response.json().catch(() => ({}));
+                throw new Error(err.message || 'Error al guardar el documento personalizado');
+            }
+        } catch (error: any) {
+            console.error('Failed to upload custom document:', error);
+            alert(`Error subiendo documento: ${error.message}`);
+        } finally {
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
     };
 
     return (
@@ -124,6 +178,38 @@ export default function RequestItem({ req, className }: RequestItemProps) {
                         <button className={`${styles['request-item__action-btn']} ${styles['request-item__action-btn--accept']}`}>
                             <Icon name="check" className="text-[14px]" />
                             Accept
+                        </button>
+                    </div>
+                )}
+
+                {req.type === 'document_review' && (req.customDocumentPerUser || req.config?.customDocumentPerUser) && (
+                    <div className="mt-3 flex items-center justify-between pt-2 border-t border-slate-200/60 dark:border-slate-800/60">
+                        {uploadedCustomFile ? (
+                            <div className="flex items-center gap-1.5 text-xs text-emerald-500 font-medium">
+                                <Icon name="check_circle" className="text-sm" />
+                                <span>Custom PDF Uploaded</span>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-1.5 text-xs text-amber-500 font-medium">
+                                <Icon name="hourglass_top" className="text-sm animate-pulse" />
+                                <span>Pending PDF Upload</span>
+                            </div>
+                        )}
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            accept="application/pdf"
+                            className="hidden"
+                            onChange={handleCustomDocFileChange}
+                        />
+                        <button
+                            type="button"
+                            disabled={isUploading}
+                            onClick={() => fileInputRef.current?.click()}
+                            className="px-2.5 py-1 text-xs rounded-md bg-blue-600 hover:bg-blue-700 text-white font-medium flex items-center gap-1 transition-colors"
+                        >
+                            <Icon name={isUploading ? 'sync' : 'upload_file'} className={isUploading ? 'animate-spin text-xs' : 'text-xs'} />
+                            <span>{isUploading ? 'Uploading...' : uploadedCustomFile ? 'Replace PDF' : 'Upload PDF'}</span>
                         </button>
                     </div>
                 )}

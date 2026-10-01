@@ -355,13 +355,6 @@ export const FALLBACK_SUBSCRIPTION_DETAIL_DATA: UnifiedProductViewProps = {
             { icon: 'account_balance_wallet', label: 'Pago mensual', value: '$1.000.000' },
         ],
     },
-    supportAccessProps: {
-        title: 'Soporte Real Innovation',
-        subtitle: 'Lunes a Viernes: 8:00 AM – 6:00 PM',
-        buttonLabel: 'Contactar Soporte',
-        icon: 'support_agent',
-        accentColor: '#7ED957',
-    },
     legalDocumentsProps: {
         showModificationLink: true,
         documents: [

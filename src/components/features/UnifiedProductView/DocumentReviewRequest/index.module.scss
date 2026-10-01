@@ -86,4 +86,28 @@
             @apply bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/30 text-red-800 dark:text-red-300;
         }
     }
+
+    &__in-prep-box {
+        @apply flex items-start gap-4 p-5 rounded-xl border border-amber-200/80 dark:border-amber-500/20 bg-amber-50/70 dark:bg-amber-950/20 transition-all;
+    }
+
+    &__in-prep-icon-wrapper {
+        @apply size-10 rounded-xl bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0 mt-0.5;
+    }
+
+    &__in-prep-icon {
+        @apply text-xl animate-pulse;
+    }
+
+    &__in-prep-content {
+        @apply space-y-1;
+    }
+
+    &__in-prep-title {
+        @apply text-sm font-bold text-amber-900 dark:text-amber-200 flex items-center gap-2;
+    }
+
+    &__in-prep-text {
+        @apply text-xs text-amber-800/90 dark:text-amber-300/80 leading-relaxed;
+    }
 }

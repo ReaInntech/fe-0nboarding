@@ -5,15 +5,21 @@ import Icon from '../../../shared/atoms/Icon';
 import Badge from '../../../shared/atoms/Badge';
 import Button from '../../../shared/atoms/Button';
 import Modal from '../../../shared/molecule/Modal';
+import { useApp } from '../../../../context/AppContext';
+import { auth } from '../../../../lib/firebase/config';
 import styles from './index.module.scss';
 
 export interface DocumentReviewRequestProps {
     id?: string;
+    subscriptionId?: string;
     documentTitle: string;
     instructions?: string;
     templateFile?: string | null;
     documentUrl?: string | null;
     fileName?: string;
+    customDocumentPerUser?: boolean;
+    waitingExplanationMessage?: string;
+    data?: any;
     status: 'pending' | 'approved' | 'rejected';
     feedbackNotes?: string;
     requiresApproval?: boolean;
@@ -24,11 +30,16 @@ export interface DocumentReviewRequestProps {
 }
 
 export default function DocumentReviewRequest({
+    id,
+    subscriptionId,
     documentTitle,
     instructions,
     templateFile,
     documentUrl,
     fileName,
+    customDocumentPerUser = false,
+    waitingExplanationMessage,
+    data,
     status = 'pending',
     feedbackNotes,
     requiresApproval = true,
@@ -37,37 +48,127 @@ export default function DocumentReviewRequest({
     onReject,
     className = '',
 }: DocumentReviewRequestProps) {
+    const { user } = useApp();
+    const [currentStatus, setCurrentStatus] = useState<'pending' | 'approved' | 'rejected'>(status);
+    const [currentFeedbackNotes, setCurrentFeedbackNotes] = useState<string | undefined>(feedbackNotes);
+
     const [isViewerOpen, setIsViewerOpen] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(documentUrl || null);
+    const [isLoadingPreview, setIsLoadingPreview] = useState(false);
+    const [previewError, setPreviewError] = useState<string | null>(null);
+
     const [showRejectPanel, setShowRejectPanel] = useState(false);
     const [rejectionComments, setRejectionComments] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const isApproved = status === 'approved';
-    const isRejected = status === 'rejected';
-    const isPending = status === 'pending';
+    const customDocumentFile = data?.customDocumentFile;
+    const isWaitingForCustomDoc = Boolean(customDocumentPerUser && !customDocumentFile);
+    const targetFileKey = customDocumentPerUser ? customDocumentFile : (templateFile || null);
+
+    const resolvedFileName =
+        fileName ||
+        data?.customDocumentFileName ||
+        (customDocumentFile ? customDocumentFile.split('/').pop() : null) ||
+        (templateFile ? templateFile.split('/').pop() : 'Proposal_Document.pdf');
+
+    const resolvedWaitingMessage =
+        waitingExplanationMessage?.trim() ||
+        'El proveedor está fabricando el documento que se requiere aprobar. Te notificaremos en cuanto esté disponible para su revisión.';
+
+    const isApproved = currentStatus === 'approved';
+    const isRejected = currentStatus === 'rejected';
+    const isPending = currentStatus === 'pending';
+
+    const handleOpenPreview = async () => {
+        setIsViewerOpen(true);
+        if (previewUrl || !targetFileKey) return;
+
+        setIsLoadingPreview(true);
+        setPreviewError(null);
+
+        try {
+            const freshToken = await (auth.currentUser?.getIdToken() || Promise.resolve(user?.accessToken));
+            if (!freshToken) throw new Error('No authentication token available');
+
+            const baseUrl = process.env.NEXT_PUBLIC_CORE_API_URL || 'http://localhost:3001/api/v1/core';
+            const response = await fetch(`${baseUrl}/storage/download-url?key=${encodeURIComponent(targetFileKey)}`, {
+                headers: { Authorization: `Bearer ${freshToken}` },
+            });
+
+            if (response.ok) {
+                const body = await response.json();
+                const url = body.data?.url || body.url;
+                setPreviewUrl(url);
+            } else {
+                const err = await response.json().catch(() => ({}));
+                throw new Error(err.message || 'Failed to get preview URL');
+            }
+        } catch (error: any) {
+            console.error('Preview failed:', error);
+            setPreviewError(error.message || 'Could not load document preview');
+        } finally {
+            setIsLoadingPreview(false);
+        }
+    };
 
     const handleApprove = async () => {
-        if (!onApprove) return;
         setIsSubmitting(true);
         try {
-            await onApprove();
+            if (onApprove) {
+                await onApprove();
+            } else if (subscriptionId && id) {
+                const freshToken = await (auth.currentUser?.getIdToken() || Promise.resolve(user?.accessToken));
+                const orgId = user?.org_id || user?.organization?.id;
+                const baseUrl = process.env.NEXT_PUBLIC_CORE_API_URL || 'http://localhost:3001/api/v1/core';
+                await fetch(`${baseUrl}/subscriptions/${subscriptionId}/resolved-requests/${id}/review`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${freshToken}`,
+                        ...(orgId ? { 'x-org-id': orgId } : {}),
+                    },
+                    body: JSON.stringify({ status: 'approved' }),
+                });
+            }
+            setCurrentStatus('approved');
+        } catch (error) {
+            console.error('Failed to approve document:', error);
+            alert('Failed to approve document. Please try again.');
         } finally {
             setIsSubmitting(false);
         }
     };
 
     const handleRejectSubmit = async () => {
-        if (!onReject || !rejectionComments.trim()) return;
+        if (!rejectionComments.trim()) return;
         setIsSubmitting(true);
         try {
-            await onReject(rejectionComments.trim());
+            if (onReject) {
+                await onReject(rejectionComments.trim());
+            } else if (subscriptionId && id) {
+                const freshToken = await (auth.currentUser?.getIdToken() || Promise.resolve(user?.accessToken));
+                const orgId = user?.org_id || user?.organization?.id;
+                const baseUrl = process.env.NEXT_PUBLIC_CORE_API_URL || 'http://localhost:3001/api/v1/core';
+                await fetch(`${baseUrl}/subscriptions/${subscriptionId}/resolved-requests/${id}/review`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${freshToken}`,
+                        ...(orgId ? { 'x-org-id': orgId } : {}),
+                    },
+                    body: JSON.stringify({ status: 'rejected', feedbackNotes: rejectionComments.trim() }),
+                });
+            }
+            setCurrentStatus('rejected');
+            setCurrentFeedbackNotes(rejectionComments.trim());
             setShowRejectPanel(false);
+        } catch (error) {
+            console.error('Failed to submit feedback:', error);
+            alert('Failed to submit feedback. Please try again.');
         } finally {
             setIsSubmitting(false);
         }
     };
-
-    const resolvedFileName = fileName || (templateFile ? templateFile.split('/').pop() : 'Proposal_Document.pdf');
 
     return (
         <div className={`${styles['doc-review-request']} ${className}`}>
@@ -81,7 +182,8 @@ export default function DocumentReviewRequest({
                 </h3>
                 {isApproved && <Badge variant="success">Approved</Badge>}
                 {isRejected && <Badge variant="error">Changes Requested</Badge>}
-                {isPending && <Badge variant="warning">Action Required</Badge>}
+                {isPending && isWaitingForCustomDoc && <Badge variant="warning">In Preparation</Badge>}
+                {isPending && !isWaitingForCustomDoc && <Badge variant="warning">Action Required</Badge>}
             </div>
 
             <div className={styles['doc-review-request__content']}>
@@ -94,41 +196,58 @@ export default function DocumentReviewRequest({
                             )}
                         </div>
 
-                        {/* Document File Card */}
-                        <div className={styles['doc-review-request__document-card']}>
-                            <div className={styles['doc-review-request__document-left']}>
-                                <div className={styles['doc-review-request__document-icon']}>
-                                    <Icon name="description" />
+                        {/* Custom Document In-Preparation State */}
+                        {isWaitingForCustomDoc ? (
+                            <div className={styles['doc-review-request__in-prep-box']}>
+                                <div className={styles['doc-review-request__in-prep-icon-wrapper']}>
+                                    <Icon name="pending_actions" className={styles['doc-review-request__in-prep-icon']} />
                                 </div>
-                                <div>
-                                    <p className={styles['doc-review-request__document-name']}>{resolvedFileName}</p>
-                                    <p className={styles['doc-review-request__document-hint']}>Review document before approving</p>
+                                <div className={styles['doc-review-request__in-prep-content']}>
+                                    <h4 className={styles['doc-review-request__in-prep-title']}>
+                                        Documento en preparación por el proveedor
+                                    </h4>
+                                    <p className={styles['doc-review-request__in-prep-text']}>
+                                        {resolvedWaitingMessage}
+                                    </p>
                                 </div>
                             </div>
+                        ) : (
+                            /* Regular Document File Card */
+                            <div className={styles['doc-review-request__document-card']}>
+                                <div className={styles['doc-review-request__document-left']}>
+                                    <div className={styles['doc-review-request__document-icon']}>
+                                        <Icon name="description" />
+                                    </div>
+                                    <div>
+                                        <p className={styles['doc-review-request__document-name']}>{resolvedFileName}</p>
+                                        <p className={styles['doc-review-request__document-hint']}>Review document before approving</p>
+                                    </div>
+                                </div>
 
-                            <div className={styles['doc-review-request__document-actions']}>
-                                {(documentUrl || templateFile) && (
-                                    <Button
-                                        variant="secondary"
-                                        size="sm"
-                                        onClick={() => setIsViewerOpen(true)}
-                                    >
-                                        <Icon name="visibility" className="mr-1 text-sm" /> Preview
-                                    </Button>
-                                )}
-                                {documentUrl && (
-                                    <a
-                                        href={documentUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        download
-                                        className="p-2 rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                                    >
-                                        <Icon name="download" />
-                                    </a>
-                                )}
+                                <div className={styles['doc-review-request__document-actions']}>
+                                    {(previewUrl || targetFileKey) && (
+                                        <Button
+                                            variant="secondary"
+                                            size="sm"
+                                            onClick={handleOpenPreview}
+                                        >
+                                            <Icon name="visibility" className="mr-1 text-sm" /> Preview
+                                        </Button>
+                                    )}
+                                    {previewUrl && (
+                                        <a
+                                            href={previewUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            download
+                                            className="p-2 rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                        >
+                                            <Icon name="download" />
+                                        </a>
+                                    )}
+                                </div>
                             </div>
-                        </div>
+                        )}
 
                         {/* Status Message Boxes */}
                         {isApproved && (
@@ -148,9 +267,9 @@ export default function DocumentReviewRequest({
                                 <Icon name="error" className="text-red-500 mt-0.5" />
                                 <div>
                                     <p className="font-bold text-sm">Feedback Sent to Provider</p>
-                                    {feedbackNotes ? (
+                                    {currentFeedbackNotes ? (
                                         <p className="text-xs opacity-90 mt-1 italic bg-white/40 dark:bg-black/20 p-2 rounded">
-                                            "{feedbackNotes}"
+                                            "{currentFeedbackNotes}"
                                         </p>
                                     ) : (
                                         <p className="text-xs opacity-80 mt-0.5">
@@ -161,8 +280,8 @@ export default function DocumentReviewRequest({
                             </div>
                         )}
 
-                        {/* Client Action Buttons (when pending) */}
-                        {isPending && requiresApproval && (
+                        {/* Client Action Buttons (when pending and NOT waiting for custom document) */}
+                        {isPending && requiresApproval && !isWaitingForCustomDoc && (
                             <div className="space-y-3">
                                 {!showRejectPanel ? (
                                     <div className={styles['doc-review-request__action-bar']}>
@@ -231,19 +350,34 @@ export default function DocumentReviewRequest({
                 isOpen={isViewerOpen}
                 onClose={() => setIsViewerOpen(false)}
                 title={documentTitle}
+                size='lg'
             >
                 <div className="h-[550px] w-full flex flex-col items-center justify-center bg-slate-100 dark:bg-slate-900 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800">
-                    {documentUrl ? (
+                    {isLoadingPreview ? (
+                        <div className="flex flex-col items-center gap-3">
+                            <Icon name="progress_activity" className="animate-spin text-3xl text-blue-500" />
+                            <p className="text-sm text-slate-500">Loading document preview...</p>
+                        </div>
+                    ) : previewUrl ? (
                         <iframe
-                            src={documentUrl}
+                            src={previewUrl}
                             className="w-full h-full border-none"
                             title="Document Preview"
                         />
+                    ) : previewError ? (
+                        <div className="text-center p-8 text-slate-500">
+                            <Icon name="error_outline" className="text-4xl text-red-500 mb-2" />
+                            <p className="font-semibold text-slate-800 dark:text-slate-200">Could not load preview</p>
+                            <p className="text-sm text-slate-400 mt-1">{previewError}</p>
+                            <Button variant="secondary" size="sm" className="mt-4" onClick={handleOpenPreview}>
+                                Try Again
+                            </Button>
+                        </div>
                     ) : (
                         <div className="text-center p-8 text-slate-500">
                             <Icon name="description" className="text-5xl text-blue-500 mb-3" />
                             <p className="font-semibold text-slate-800 dark:text-slate-200">{resolvedFileName}</p>
-                            <p className="text-sm text-slate-400 mt-1">Preview rendered securely in client viewer.</p>
+                            <p className="text-sm text-slate-400 mt-1">No document available to preview.</p>
                         </div>
                     )}
                 </div>

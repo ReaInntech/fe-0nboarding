@@ -197,7 +197,7 @@ export default function SubscriptionRow({ sub, className, initialExpanded = fals
                             )}
                         </div>
                     </div>
-                    <SubscriptionActionCenter steps={sub.steps} requests={sub.requests} />
+                    <SubscriptionActionCenter subscriptionId={sub.id} steps={sub.steps} requests={sub.requests} />
                 </>
             )}
         </div>

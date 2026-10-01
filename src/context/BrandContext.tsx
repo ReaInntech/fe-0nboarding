@@ -87,6 +87,18 @@ const BrandContext = createContext<BrandContextType>({
   styles: getBannerFooterStyles('dark'),
 });
 
+export function getContrastColor(hexColor?: string): string {
+  if (!hexColor || !hexColor.startsWith('#')) return '#ffffff';
+  let hex = hexColor.replace('#', '');
+  if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+  if (hex.length !== 6) return '#ffffff';
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+  return yiq >= 160 ? '#0f172a' : '#ffffff';
+}
+
 export function BrandProvider({
   children,
   branding,
@@ -99,12 +111,14 @@ export function BrandProvider({
   availableProviders?: EffectiveProvider[];
 }) {
   const primaryColor = branding?.brand_primary_color || '#1978E5';
+  const primaryContrast = getContrastColor(primaryColor);
   const themeStyles = getBannerFooterStyles(branding?.banner_footer_theme, primaryColor);
 
   useEffect(() => {
     if (branding) {
       if (branding.brand_primary_color) {
         document.documentElement.style.setProperty('--brand-primary', branding.brand_primary_color);
+        document.documentElement.style.setProperty('--brand-primary-contrast', getContrastColor(branding.brand_primary_color));
       }
       if (branding.brand_secondary_color) {
         document.documentElement.style.setProperty('--brand-secondary', branding.brand_secondary_color);
@@ -125,6 +139,7 @@ export function BrandProvider({
 
     return () => {
       document.documentElement.style.removeProperty('--brand-primary');
+      document.documentElement.style.removeProperty('--brand-primary-contrast');
       document.documentElement.style.removeProperty('--brand-secondary');
       document.documentElement.style.removeProperty('--brand-accent');
     };
@@ -137,6 +152,7 @@ export function BrandProvider({
         style={
           {
             '--brand-primary': primaryColor,
+            '--brand-primary-contrast': primaryContrast,
             '--brand-secondary': branding?.brand_secondary_color || '#0f172a',
             '--brand-accent': branding?.brand_accent_color || '#38bdf8',
             ...themeStyles,

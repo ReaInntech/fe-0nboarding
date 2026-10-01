@@ -184,10 +184,18 @@
     }
 
     &__manage-btn {
-        @apply inline-flex items-center gap-1.5 px-4 py-2 bg-[#1978e5] hover:bg-[#1565c0] text-sm font-semibold text-white rounded-lg transition-colors shadow-lg shadow-[#1978e5]/20;
+        @apply inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg transition-all shadow-md cursor-pointer no-underline;
+        background-color: var(--brand-primary, #1978e5);
+        color: var(--brand-primary-contrast, #ffffff);
+
+        &:hover {
+            filter: brightness(0.92);
+            box-shadow: 0 4px 14px var(--brand-primary, rgba(25, 120, 229, 0.25));
+        }
     }
 
     &__manage-icon {
         @apply text-base;
+        color: inherit;
     }
 }

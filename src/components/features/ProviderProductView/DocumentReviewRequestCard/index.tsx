@@ -14,6 +14,8 @@ export interface DocumentReviewRequestConfig {
     templateFile: string | null;
     requiresApproval: boolean;
     allowComments: boolean;
+    customDocumentPerUser?: boolean;
+    waitingExplanationMessage?: string;
 }
 
 export interface DocumentReviewRequestCardProps {
@@ -43,6 +45,8 @@ export default function DocumentReviewRequestCard({
         templateFile: null,
         requiresApproval: true,
         allowComments: true,
+        customDocumentPerUser: false,
+        waitingExplanationMessage: 'El proveedor está fabricando el documento que se requiere aprobar. Te notificaremos en cuanto esté disponible para su revisión.',
     });
 
     const [isSaving, setIsSaving] = useState(false);
@@ -296,6 +300,45 @@ export default function DocumentReviewRequestCard({
                         className={styles['doc-review-card__toggle-input']}
                     />
                 </div>
+
+                {/* Custom Document Toggle */}
+                <div className={styles['doc-review-card__toggle-row']}>
+                    <div>
+                        <p className={styles['doc-review-card__toggle-label']}>Custom Document per Client</p>
+                        <p className={styles['doc-review-card__toggle-subtext']}>Each subscribed client will require a unique document uploaded specifically for them</p>
+                    </div>
+                    <input
+                        type="checkbox"
+                        checked={config.customDocumentPerUser || false}
+                        onChange={(e) => {
+                            const newCfg = handleChange('customDocumentPerUser', e.target.checked);
+                            handleSave(newCfg);
+                        }}
+                        disabled={disabled}
+                        className={styles['doc-review-card__toggle-input']}
+                    />
+                </div>
+
+                {/* Explanatory Waiting Message for Client (only visible when customDocumentPerUser is true) */}
+                {config.customDocumentPerUser && (
+                    <div className={styles['doc-review-card__field']}>
+                        <label className={styles['doc-review-card__label']}>
+                            Mensaje de Espera para el Cliente
+                        </label>
+                        <textarea
+                            rows={3}
+                            value={config.waitingExplanationMessage ?? ''}
+                            onChange={(e) => handleChange('waitingExplanationMessage', e.target.value)}
+                            onBlur={() => handleSave()}
+                            placeholder="El proveedor está fabricando el documento que se requiere aprobar. Te notificaremos en cuanto esté disponible para su revisión."
+                            disabled={disabled}
+                            className={styles['doc-review-card__input']}
+                        />
+                        <p className="text-[11px] text-slate-400 mt-1">
+                            Este texto se mostrará al cliente mientras el documento personalizado está siendo elaborado por el proveedor.
+                        </p>
+                    </div>
+                )}
             </div>
 
             {/* Document Preview Modal */}
@@ -303,6 +346,7 @@ export default function DocumentReviewRequestCard({
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 title={config.documentTitle || 'Document Preview'}
+                size='lg'
             >
                 <div className="h-[550px] w-full flex items-center justify-center bg-slate-900 rounded-lg overflow-hidden">
                     {isLoadingPreview ? (

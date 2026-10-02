@@ -16,6 +16,8 @@ export interface SubscriptionRowProps {
 export default function SubscriptionRow({ sub, className, initialExpanded = false, onDelete, onDisable }: SubscriptionRowProps) {
     const [isExpanded, setIsExpanded] = useState(initialExpanded);
 
+    const pendingReviewCount = (sub.requests || []).filter(r => r.status === 'pending').length;
+
     let statusModifier = 'default';
     if (sub.status === 'active') statusModifier = 'active';
     else if (sub.status === 'in_progress') statusModifier = 'in_progress';
@@ -44,7 +46,18 @@ export default function SubscriptionRow({ sub, className, initialExpanded = fals
                 <div className={styles['subscription-row__product-info']}>
                     <Icon name={sub.product?.icon || 'category'} className={styles['subscription-row__product-icon']} style={{ color: sub.product?.iconColor }} />
                     <div className={styles['subscription-row__product-details']}>
-                        <span className={styles['subscription-row__product-name']}>{sub.product?.name}</span>
+                        <div className={styles['subscription-row__product-name-row']}>
+                            <span className={styles['subscription-row__product-name']}>{sub.product?.name}</span>
+                            {pendingReviewCount > 0 && (
+                                <span
+                                    className={styles['subscription-row__pending-badge']}
+                                    title={`${pendingReviewCount} action item${pendingReviewCount > 1 ? 's' : ''} require your review`}
+                                >
+                                    <span className={styles['subscription-row__pending-dot']} />
+                                    <span>{pendingReviewCount} {pendingReviewCount === 1 ? 'to review' : 'to review'}</span>
+                                </span>
+                            )}
+                        </div>
                         <span className={styles['subscription-row__product-tier']}>{sub.tierName}</span>
                     </div>
                 </div>

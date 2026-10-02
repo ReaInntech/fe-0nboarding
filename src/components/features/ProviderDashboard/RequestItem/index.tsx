@@ -10,12 +10,13 @@ import styles from './index.module.scss';
 export interface Request {
     id?: string;
     subscriptionId?: string;
-    type: 'document_review' | 'other' | string;
-    status: 'approved' | 'rejected' | 'pending';
+    type: 'document_review' | 'form' | 'document' | 'payment' | 'terms' | string;
+    status: 'approved' | 'rejected' | 'pending' | 'waiting_client';
     title: string;
     description?: string;
     dueDate?: string;
     metadata?: Array<{ label: string; value: string }>;
+    clientResponses?: Array<{ label: string; value: string }>;
     payload?: VerificationPayload;
     rejectionReason?: string;
     customDocumentPerUser?: boolean;
@@ -38,13 +39,41 @@ export default function RequestItem({ req, subscriptionId, className }: RequestI
         req?.customDocumentFile || req?.data?.customDocumentFile || null
     );
 
+    const [currentStatus, setCurrentStatus] = useState<string>(req?.status || 'pending');
+    const [currentRejectionReason, setCurrentRejectionReason] = useState<string | undefined>(req?.rejectionReason);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isRejecting, setIsRejecting] = useState(false);
     const [feedback, setFeedback] = useState('');
+    const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
     if (!req) return null;
 
-    const modifier = req.status === 'approved' ? 'approved' : req.status === 'rejected' ? 'rejected' : 'pending';
+    const modifier = currentStatus === 'approved'
+        ? 'approved'
+        : currentStatus === 'rejected'
+        ? 'rejected'
+        : currentStatus === 'waiting_client'
+        ? 'waiting_client'
+        : 'pending';
+
+    const getStatusBadgeLabel = (st: string) => {
+        switch (st) {
+            case 'approved': return 'APPROVED';
+            case 'rejected': return 'REJECTED';
+            case 'waiting_client': return 'AWAITING CLIENT';
+            case 'pending': return 'PENDING REVIEW';
+            default: return st.replace('_', ' ').toUpperCase();
+        }
+    };
+
+    const getRequestIcon = () => {
+        if (currentStatus === 'waiting_client') return 'schedule';
+        if (req.type === 'document_review') return 'plagiarism';
+        if (req.type === 'form') return 'assignment';
+        if (req.type === 'payment') return 'payments';
+        if (req.type === 'document') return 'upload_file';
+        return 'fact_check';
+    };
 
     const handleOpenDetails = () => {
         setIsRejecting(false);
@@ -57,16 +86,87 @@ export default function RequestItem({ req, subscriptionId, className }: RequestI
         setFeedback('');
     };
 
-    const handleStartRejection = () => setIsRejecting(true);
+    const handleStartRejection = () => {
+        setIsRejecting(true);
+        if (!isModalOpen) setIsModalOpen(true);
+    };
+
     const handleCancelRejection = () => {
         setIsRejecting(false);
         setFeedback('');
     };
 
-    const handleConfirmRejection = () => {
-        // Here we would normally call an API
-        console.log(`Rejected ${req.id} with feedback: ${feedback}`);
-        handleCloseDetails();
+    const handleApprove = async () => {
+        const effectiveSubId = subscriptionId || req.subscriptionId;
+        if (!effectiveSubId || !req.id) return;
+
+        setIsSubmittingReview(true);
+        try {
+            const freshToken = await (auth.currentUser?.getIdToken() || Promise.resolve(user?.accessToken));
+            if (!freshToken) throw new Error('No authentication token available');
+            const orgId = user?.org_id || user?.organization?.id;
+            const baseUrl = process.env.NEXT_PUBLIC_CORE_API_URL || 'http://localhost:3001/api/v1/core';
+
+            const response = await fetch(`${baseUrl}/subscriptions/${effectiveSubId}/resolved-requests/${req.id}/review`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${freshToken}`,
+                    ...(orgId ? { 'x-org-id': orgId } : {}),
+                },
+                body: JSON.stringify({ status: 'approved' }),
+            });
+
+            if (response.ok) {
+                setCurrentStatus('approved');
+                handleCloseDetails();
+            } else {
+                const err = await response.json().catch(() => ({}));
+                throw new Error(err.message || 'Error al aprobar la solicitud');
+            }
+        } catch (error: any) {
+            console.error('Failed to approve request:', error);
+            alert(`Error aprobando solicitud: ${error.message}`);
+        } finally {
+            setIsSubmittingReview(false);
+        }
+    };
+
+    const handleConfirmRejection = async () => {
+        const effectiveSubId = subscriptionId || req.subscriptionId;
+        if (!effectiveSubId || !req.id || !feedback.trim()) return;
+
+        setIsSubmittingReview(true);
+        try {
+            const freshToken = await (auth.currentUser?.getIdToken() || Promise.resolve(user?.accessToken));
+            if (!freshToken) throw new Error('No authentication token available');
+            const orgId = user?.org_id || user?.organization?.id;
+            const baseUrl = process.env.NEXT_PUBLIC_CORE_API_URL || 'http://localhost:3001/api/v1/core';
+
+            const response = await fetch(`${baseUrl}/subscriptions/${effectiveSubId}/resolved-requests/${req.id}/review`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${freshToken}`,
+                    ...(orgId ? { 'x-org-id': orgId } : {}),
+                },
+                body: JSON.stringify({ status: 'rejected', feedbackNotes: feedback.trim() }),
+            });
+
+            if (response.ok) {
+                setCurrentStatus('rejected');
+                setCurrentRejectionReason(feedback.trim());
+                handleCloseDetails();
+            } else {
+                const err = await response.json().catch(() => ({}));
+                throw new Error(err.message || 'Error al rechazar la solicitud');
+            }
+        } catch (error: any) {
+            console.error('Failed to reject request:', error);
+            alert(`Error rechazando solicitud: ${error.message}`);
+        } finally {
+            setIsSubmittingReview(false);
+        }
     };
 
     const handleCustomDocFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,6 +194,7 @@ export default function RequestItem({ req, subscriptionId, className }: RequestI
 
             if (response.ok) {
                 setUploadedCustomFile(uploadedKey);
+                setCurrentStatus('waiting_client');
                 alert('Documento personalizado subido correctamente. El cliente ha sido notificado.');
             } else {
                 const err = await response.json().catch(() => ({}));
@@ -107,26 +208,36 @@ export default function RequestItem({ req, subscriptionId, className }: RequestI
         }
     };
 
+    const isCustomDocPendingUpload = Boolean(
+        req.type === 'document_review' &&
+        (req.customDocumentPerUser || req.config?.customDocumentPerUser) &&
+        !uploadedCustomFile
+    );
+
+    const responsesList = req.clientResponses || (
+        req.payload?.data?.responses && typeof req.payload?.data?.responses === 'object'
+            ? Object.entries(req.payload.data.responses).map(([k, v]) => ({ label: k, value: String(v) }))
+            : undefined
+    );
+
     return (
         <>
             <div className={`${styles['request-item']} ${styles[`request-item--${modifier}`]} ${className || ''}`}>
                 <div className={styles['request-item__header']}>
                     <div className={styles['request-item__icon-wrapper']}>
-                        <Icon name={req.type === 'document_review' ? 'plagiarism' : 'fact_check'} className={`${styles['request-item__icon']} ${styles[`request-item__icon--${modifier}`]}`} />
+                        <Icon name={getRequestIcon()} className={`${styles['request-item__icon']} ${styles[`request-item__icon--${modifier}`]}`} />
                     </div>
                     <div className={styles['request-item__content']}>
                         <div className={styles['request-item__title-row']}>
                             <p className={styles['request-item__title']}>{req.title}</p>
-                            {req.status !== 'pending' && (
-                                <span className={`${styles['request-item__status-badge']} ${styles[`request-item__status-badge--${modifier}`]}`}>
-                                    {req.status}
-                                </span>
-                            )}
+                            <span className={`${styles['request-item__status-badge']} ${styles[`request-item__status-badge--${modifier}`]}`}>
+                                {getStatusBadgeLabel(currentStatus)}
+                            </span>
                         </div>
                         {req.description && (
                             <p className={styles['request-item__description']}>{req.description}</p>
                         )}
-                        {req.dueDate && req.status === 'pending' && (
+                        {req.dueDate && currentStatus === 'pending' && (
                             <p className={styles['request-item__due-date']}>
                                 <Icon name="schedule" className={styles['request-item__due-date-icon']} />
                                 Due: {new Date(req.dueDate).toLocaleDateString()}
@@ -135,17 +246,37 @@ export default function RequestItem({ req, subscriptionId, className }: RequestI
                     </div>
                 </div>
 
-                {req.status === 'rejected' && req.rejectionReason && (
+                {/* Rejection / Feedback Notes if rejected */}
+                {currentStatus === 'rejected' && currentRejectionReason && (
                     <div className={styles['request-item__rejection-info']}>
                         <Icon name="error_outline" className={styles['request-item__rejection-info-icon']} />
                         <div className={styles['request-item__rejection-info-text']}>
-                            <strong className="text-rose-500 text-[10px] uppercase font-bold mb-1 block">Feedback provided:</strong>
-                            {req.rejectionReason}
+                            <strong>Feedback / Observations:</strong>
+                            {currentRejectionReason}
                         </div>
                     </div>
                 )}
 
-                {req.metadata && req.metadata.length > 0 && (
+                {/* Client Submitted Responses (Form or Data) */}
+                {responsesList && responsesList.length > 0 && (
+                    <div className={styles['request-item__responses-box']}>
+                        <div className={styles['request-item__responses-header']}>
+                            <Icon name="assignment_turned_in" className="text-xs text-emerald-400" />
+                            <span>Client Submitted Responses</span>
+                        </div>
+                        <div className={styles['request-item__responses-list']}>
+                            {responsesList.map((item, idx) => (
+                                <div key={idx} className={styles['request-item__response-item']}>
+                                    <span className={styles['request-item__response-label']}>{item.label}:</span>
+                                    <span className={styles['request-item__response-value']}>{item.value}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Validation Metadata if any */}
+                {req.metadata && req.metadata.length > 0 && !responsesList && (
                     <div className={styles['request-item__metadata']}>
                         <p className={styles['request-item__metadata-title']}>Validation Details</p>
                         <div className={styles['request-item__metadata-grid']}>
@@ -159,29 +290,48 @@ export default function RequestItem({ req, subscriptionId, className }: RequestI
                     </div>
                 )}
 
+                {/* Note when waiting for client */}
+                {currentStatus === 'waiting_client' && (
+                    <div className={styles['request-item__waiting-note']}>
+                        <Icon name="hourglass_empty" className="text-xs" />
+                        <span>Awaiting client submission or approval</span>
+                    </div>
+                )}
+
+                {/* Modal View button if payload exists */}
                 {req.payload && (
                     <button 
                         className={`${styles['request-item__action-btn']} ${styles['request-item__action-btn--details']}`}
                         onClick={handleOpenDetails}
                     >
                         <Icon name="visibility" className="text-[14px]" />
-                        {req.status === 'pending' ? 'Review & Decision' : 'View Submission Details'}
+                        {currentStatus === 'pending' ? 'Review & Decision' : 'View Submission Details'}
                     </button>
                 )}
 
-                {req.status === 'pending' && !req.payload && (
+                {/* Accept / Reject Buttons: ONLY appear when status is pending AND not waiting for PDF upload */}
+                {currentStatus === 'pending' && !isCustomDocPendingUpload && !req.payload && (
                     <div className={`${styles['request-item__actions']} ${styles['request-item__actions--pending']}`}>
-                        <button className={`${styles['request-item__action-btn']} ${styles['request-item__action-btn--reject']}`}>
+                        <button 
+                            disabled={isSubmittingReview}
+                            onClick={handleStartRejection}
+                            className={`${styles['request-item__action-btn']} ${styles['request-item__action-btn--reject']}`}
+                        >
                             <Icon name="close" className="text-[14px]" />
                             Reject
                         </button>
-                        <button className={`${styles['request-item__action-btn']} ${styles['request-item__action-btn--accept']}`}>
+                        <button 
+                            disabled={isSubmittingReview}
+                            onClick={handleApprove}
+                            className={`${styles['request-item__action-btn']} ${styles['request-item__action-btn--accept']}`}
+                        >
                             <Icon name="check" className="text-[14px]" />
-                            Accept
+                            {isSubmittingReview ? 'Approving...' : 'Accept'}
                         </button>
                     </div>
                 )}
 
+                {/* Provider Custom Document Upload Flow */}
                 {req.type === 'document_review' && (req.customDocumentPerUser || req.config?.customDocumentPerUser) && (
                     <div className="mt-3 flex items-center justify-between pt-2 border-t border-slate-200/60 dark:border-slate-800/60">
                         {uploadedCustomFile ? (
@@ -215,73 +365,79 @@ export default function RequestItem({ req, subscriptionId, className }: RequestI
                 )}
             </div>
 
-            {req.payload && (
-                <Modal
-                    isOpen={isModalOpen}
-                    onClose={handleCloseDetails}
-                    title={isRejecting ? 'Rejecting: ' + req.title : 'Verifying: ' + req.title}
-                    size="lg"
-                    footer={
-                        req.status === 'pending' ? (
-                            isRejecting ? (
-                                <>
-                                    <button 
-                                        className={`${styles['request-item__action-btn']} ${styles['request-item__action-btn--details']}`}
-                                        onClick={handleCancelRejection}
-                                    >
-                                        Back to Details
-                                    </button>
-                                    <button 
-                                        className={`${styles['request-item__action-btn']} ${styles['request-item__action-btn--reject']}`}
-                                        onClick={handleConfirmRejection}
-                                        disabled={!feedback.trim()}
-                                    >
-                                        <Icon name="report" /> Confirm Rejection
-                                    </button>
-                                </>
-                            ) : (
-                                <>
-                                    <button 
-                                        className={`${styles['request-item__action-btn']} ${styles['request-item__action-btn--reject']}`}
-                                        onClick={handleStartRejection}
-                                    >
-                                        <Icon name="close" /> Reject Request
-                                    </button>
-                                    <button 
-                                        className={`${styles['request-item__action-btn']} ${styles['request-item__action-btn--accept']}`}
-                                        onClick={handleCloseDetails}
-                                    >
-                                        <Icon name="check" /> Approve Request
-                                    </button>
-                                </>
-                            )
-                        ) : null
-                    }
-                >
-                    {isRejecting ? (
-                        <div className="space-y-4">
-                            <div className="p-4 bg-rose-500/5 border border-rose-500/10 rounded-xl">
-                                <h4 className="text-rose-400 font-bold text-sm mb-2 flex items-center gap-2">
-                                    <Icon name="info" className="text-base" />
-                                    Why are you rejecting this?
-                                </h4>
-                                <p className="text-xs text-slate-400 mb-4">
-                                    This feedback will be shown to the client so they can correct the issue and re-submit.
-                                </p>
-                                <textarea 
-                                    className={styles['verification-feedback-input']}
-                                    placeholder="Example: The document is blurry, please re-scan..."
-                                    value={feedback}
-                                    onChange={(e) => setFeedback(e.target.value)}
-                                    autoFocus
-                                />
-                            </div>
+            {/* Modal for detailed verification or entering rejection feedback */}
+            <Modal
+                isOpen={isModalOpen}
+                onClose={handleCloseDetails}
+                title={isRejecting ? 'Rejecting: ' + req.title : 'Verifying: ' + req.title}
+                size="lg"
+                footer={
+                    currentStatus === 'pending' ? (
+                        isRejecting ? (
+                            <>
+                                <button 
+                                    className={`${styles['request-item__action-btn']} ${styles['request-item__action-btn--details']}`}
+                                    onClick={handleCancelRejection}
+                                    disabled={isSubmittingReview}
+                                >
+                                    Back
+                                </button>
+                                <button 
+                                    className={`${styles['request-item__action-btn']} ${styles['request-item__action-btn--reject']}`}
+                                    onClick={handleConfirmRejection}
+                                    disabled={!feedback.trim() || isSubmittingReview}
+                                >
+                                    <Icon name="report" /> {isSubmittingReview ? 'Rejecting...' : 'Confirm Rejection'}
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <button 
+                                    className={`${styles['request-item__action-btn']} ${styles['request-item__action-btn--reject']}`}
+                                    onClick={handleStartRejection}
+                                    disabled={isSubmittingReview}
+                                >
+                                    <Icon name="close" /> Reject Request
+                                </button>
+                                <button 
+                                    className={`${styles['request-item__action-btn']} ${styles['request-item__action-btn--accept']}`}
+                                    onClick={handleApprove}
+                                    disabled={isSubmittingReview}
+                                >
+                                    <Icon name="check" /> {isSubmittingReview ? 'Approving...' : 'Approve Request'}
+                                </button>
+                            </>
+                        )
+                    ) : null
+                }
+            >
+                {isRejecting ? (
+                    <div className="space-y-4">
+                        <div className="p-4 bg-rose-500/5 border border-rose-500/10 rounded-xl">
+                            <h4 className="text-rose-400 font-bold text-sm mb-2 flex items-center gap-2">
+                                <Icon name="info" className="text-base" />
+                                Why are you rejecting this?
+                            </h4>
+                            <p className="text-xs text-slate-400 mb-4">
+                                This feedback will be shown to the client so they can correct the issue and re-submit.
+                            </p>
+                            <textarea 
+                                className={styles['verification-feedback-input']}
+                                placeholder="Example: The document is blurry, or the phone number format is invalid..."
+                                value={feedback}
+                                onChange={(e) => setFeedback(e.target.value)}
+                                autoFocus
+                            />
                         </div>
-                    ) : (
-                        <RequestVerificationContent payload={req.payload} />
-                    )}
-                </Modal>
-            )}
+                    </div>
+                ) : req.payload ? (
+                    <RequestVerificationContent payload={req.payload} />
+                ) : (
+                    <div className="text-xs text-slate-400 p-4">
+                        No additional submission payload available.
+                    </div>
+                )}
+            </Modal>
         </>
     );
 }

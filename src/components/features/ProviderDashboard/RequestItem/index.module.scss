@@ -15,6 +15,10 @@
         @apply bg-amber-500/10 border-amber-500/20 text-amber-500;
     }
 
+    &--waiting_client {
+        @apply bg-slate-900/50 border-slate-800 text-slate-400;
+    }
+
     &__header {
         @apply flex items-start gap-3;
     }
@@ -37,6 +41,10 @@
         &--pending {
             @apply text-amber-500;
         }
+
+        &--waiting_client {
+            @apply text-slate-400;
+        }
     }
 
     &__content {
@@ -55,11 +63,19 @@
         @apply text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full;
 
         &--approved {
-            @apply bg-emerald-500/20;
+            @apply bg-emerald-500/20 text-emerald-300;
         }
 
         &--rejected {
-            @apply bg-rose-500/20;
+            @apply bg-rose-500/20 text-rose-300;
+        }
+
+        &--pending {
+            @apply bg-amber-500/20 text-amber-300;
+        }
+
+        &--waiting_client {
+            @apply bg-slate-800 text-slate-400 border border-slate-700/60;
         }
     }
 
@@ -93,6 +109,34 @@
 
     &__metadata-value {
         @apply font-mono font-medium text-slate-200;
+    }
+
+    &__responses-box {
+        @apply mt-2.5 pt-2.5 border-t border-white/5 flex flex-col gap-1.5;
+    }
+
+    &__responses-header {
+        @apply flex items-center gap-1.5 text-[10px] font-bold text-slate-300 uppercase tracking-wider;
+    }
+
+    &__responses-list {
+        @apply flex flex-col gap-1 mt-0.5;
+    }
+
+    &__response-item {
+        @apply flex items-start justify-between text-xs py-1 px-2 bg-white/5 rounded gap-2;
+    }
+
+    &__response-label {
+        @apply text-slate-400 font-medium shrink-0;
+    }
+
+    &__response-value {
+        @apply text-slate-200 text-right font-normal break-all;
+    }
+
+    &__waiting-note {
+        @apply mt-2 pt-2 border-t border-slate-800/80 flex items-center gap-1.5 text-[11px] text-slate-500 font-medium;
     }
 
     &__due-date-icon {

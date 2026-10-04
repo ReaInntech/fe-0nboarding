@@ -1,5 +1,4 @@
 import { apiFetch } from './config';
-import { Subscription, SubscriptionDTO } from './types';
 import { UnifiedProductViewProps } from '@/src/components/features/UnifiedProductView/UnifiedProductView';
 
 /**
@@ -48,10 +47,15 @@ export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps
     };
 
     // Calculate Payment Metrics
-    const totalAmount = sub.price || 0;
+    const totalAmount = Number(sub.price) || Number(sub.product?.price) || 0;
     const paidAmount = payments
         .filter((p: any) => p.status === 'Paid')
-        .reduce((sum: number, p: any) => sum + (p.amount_cents ? p.amount_cents / 100 : 0), 0);
+        .reduce((sum: number, p: any) => {
+            const val = p.amount !== undefined && p.amount !== null
+                ? Number(p.amount)
+                : (p.amount_cents ? p.amount_cents / 100 : 0);
+            return sum + (isNaN(val) ? 0 : val);
+        }, 0);
 
     // Support WhatsApp Phone Integration
     const provOrg = sub.provider || sub.product?.provider || sub.product?.organization;
@@ -126,12 +130,53 @@ export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps
             requests: allRequestsRaw.map((req: any) => {
                 const action = req.action_request || {};
                 const reqData = req.data || {};
-                const effectiveStatus = reqData.clientStatus || req.status || 'pending';
+                const reviewedAtTime = reqData.reviewedAt
+                    ? new Date(reqData.reviewedAt).getTime()
+                    : (req.reviewed_at ? new Date(req.reviewed_at).getTime() : 0);
+
+                const uploadedAtTime = reqData.uploadedAt
+                    ? new Date(reqData.uploadedAt).getTime()
+                    : (reqData.updatedAt ? new Date(reqData.updatedAt).getTime() : 0);
+
+                const hasEvidenceSinceReview = Boolean(
+                    reviewedAtTime > 0 && uploadedAtTime > reviewedAtTime
+                );
+
+                const isExplicitlyPending = (reqData.status === 'pending' || req.status === 'pending') && reqData.providerStatus !== 'rejected';
+
+                const isApproved =
+                    reqData.status === 'approved' ||
+                    reqData.providerStatus === 'approved' ||
+                    reqData.clientStatus === 'approved' ||
+                    req.status === 'approved';
+
+                const isRejectedCandidate =
+                    reqData.status === 'rejected' ||
+                    reqData.providerStatus === 'rejected' ||
+                    reqData.clientStatus === 'rejected' ||
+                    req.status === 'rejected';
+
+                const isRejected = !isApproved && isRejectedCandidate && !hasEvidenceSinceReview && !isExplicitlyPending;
+
+                let effectiveStatus = 'pending';
+                if (isApproved) {
+                    effectiveStatus = 'approved';
+                } else if (isRejected) {
+                    effectiveStatus = 'rejected';
+                } else if (reqData.clientStatus) {
+                    effectiveStatus = reqData.clientStatus;
+                } else if (reqData.receiptFile || reqData.receiptUrl) {
+                    effectiveStatus = 'processing';
+                } else if (reqData.status) {
+                    effectiveStatus = reqData.status;
+                } else {
+                    effectiveStatus = req.status || 'pending';
+                }
                 return {
                     id: req.id,
                     subscriptionId: sub.id,
                     type: action.request_type || 'document',
-                    status: effectiveStatus,
+                    status: effectiveStatus as any,
                     title: action.title || 'Action Request',
                     documentTitle: action.title || 'Document Request', // Fallback for specific components
                     content: action.config?.content || '',
@@ -141,8 +186,8 @@ export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps
                     waitingExplanationMessage: action.config?.waitingExplanationMessage,
                     checkboxes: action.config?.checkboxes || [],
                     data: reqData, // Instance data for resolved requests
-                    feedbackNotes: reqData.feedbackNotes || req.feedback_notes,
-                };
+                    feedbackNotes: effectiveStatus === 'rejected' ? (reqData.feedbackNotes || req.feedback_notes) : undefined,
+                } as any;
             }),
         },
         showPaymentHistory: !!payments.length,
@@ -150,10 +195,15 @@ export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps
             title: 'Payment History',
             showDownloadAll: true,
             payments: payments.map((p: any) => ({
-                date: p.processed_at ? new Date(p.processed_at).toLocaleDateString('en-US') : 'N/A',
+                date: p.processed_at ? new Date(p.processed_at).toLocaleDateString('en-US') : (p.date || 'N/A'),
                 description: p.description || 'Service Payment',
-                amount: formatCurrency(p.amount_cents ? p.amount_cents / 100 : 0),
+                amount: formatCurrency(
+                    p.amount !== undefined && p.amount !== null
+                        ? Number(p.amount)
+                        : (p.amount_cents ? p.amount_cents / 100 : 0)
+                ),
                 status: p.status || 'Pending',
+                receiptUrl: p.receipt_url || p.receiptUrl,
             })),
         },
     };
@@ -175,23 +225,34 @@ export async function getSubscriptionResolvedRequests(id: string, token: string,
     return apiFetch(`/subscriptions/${id}/resolved-requests`, { token, orgId });
 }
 
+export async function getSubscriptionPayments(id: string, token: string, orgId: string): Promise<any[]> {
+    try {
+        return await apiFetch(`/subscriptions/${id}/payments`, { token, orgId });
+    } catch {
+        return [];
+    }
+}
+
 /**
  * BFF Aggregator for Subscription Detail
  * Aggregates main subscription data with sub-resources (requests, documents, etc.)
  */
 export async function getSubscriptionDetailInit(id: string, token: string, orgId: string): Promise<UnifiedProductViewProps> {
-    const [subscription, statusRequests, resolvedRequests, documents] = await Promise.all([
+    const [subscription, statusRequests, resolvedRequests, documents, payments] = await Promise.all([
         getSubscriptionDetail(id, token, orgId),
         getSubscriptionRequests(id, token, orgId),
         getSubscriptionResolvedRequests(id, token, orgId),
-        getSubscriptionDocuments(id, token, orgId)
+        getSubscriptionDocuments(id, token, orgId),
+        getSubscriptionPayments(id, token, orgId),
     ]);
-    console.log('requests', statusRequests, resolvedRequests);
+
+    const allPayments = (payments && payments.length > 0) ? payments : (subscription?.payments || []);
+
     return mapSubscriptionToUnifiedView({
         subscription,
         requests: statusRequests,
         resolvedRequests: resolvedRequests,
         documents,
-        payments: subscription.payments || []
+        payments: allPayments
     });
 }

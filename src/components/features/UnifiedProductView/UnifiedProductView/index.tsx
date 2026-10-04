@@ -73,7 +73,7 @@ export default function UnifiedProductView({
                             {
                                 showRequests && requestsProps?.requests?.map((req: any, index) => {
                                     // Flatten config into the top-level props for the components
-                                    const componentProps = { ...req, ...req.config };
+                                    const componentProps = { ...req.config, ...req, data: req.data || req.config?.data };
 
                                     switch (req.type) {
                                         case 'payment':

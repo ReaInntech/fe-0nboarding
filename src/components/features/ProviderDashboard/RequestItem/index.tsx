@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Icon from '../../../shared/atoms/Icon';
 import Modal from '../../../shared/molecule/Modal';
 import RequestVerificationContent, { VerificationPayload } from './RequestVerificationContent';
@@ -45,6 +45,13 @@ export default function RequestItem({ req, subscriptionId, className }: RequestI
     const [isRejecting, setIsRejecting] = useState(false);
     const [feedback, setFeedback] = useState('');
     const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
+    useEffect(() => {
+        if (req?.status) {
+            setCurrentStatus(req.status);
+        }
+        setCurrentRejectionReason(req?.rejectionReason);
+    }, [req?.status, req?.rejectionReason]);
 
     if (!req) return null;
 
@@ -310,7 +317,7 @@ export default function RequestItem({ req, subscriptionId, className }: RequestI
                 )}
 
                 {/* Accept / Reject Buttons: ONLY appear when status is pending AND not waiting for PDF upload */}
-                {currentStatus === 'pending' && !isCustomDocPendingUpload && !req.payload && (
+                {currentStatus === 'pending' && !isCustomDocPendingUpload && (
                     <div className={`${styles['request-item__actions']} ${styles['request-item__actions--pending']}`}>
                         <button 
                             disabled={isSubmittingReview}

@@ -8,6 +8,8 @@ export interface PaymentEntry {
     description: string;
     amount: string;
     status: 'Paid' | 'Pending' | string;
+    receiptUrl?: string;
+    invoiceNumber?: string;
 }
 
 export interface PaymentHistoryProps {
@@ -61,9 +63,22 @@ export default function PaymentHistory({
                                     </Badge>
                                 </td>
                                 <td className={`${styles['payment-history__td']} ${styles['payment-history__td--center']}`}>
-                                    <button className={styles['payment-history__download-btn']}>
-                                        <Icon name="download" className="text-[20px]" />
-                                    </button>
+                                    {payment.receiptUrl ? (
+                                        <a
+                                            href={payment.receiptUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            download
+                                            className={styles['payment-history__download-btn']}
+                                            title="Descargar comprobante"
+                                        >
+                                            <Icon name="download" className="text-[20px]" />
+                                        </a>
+                                    ) : (
+                                        <button className={styles['payment-history__download-btn']} title="Comprobante no disponible" disabled>
+                                            <Icon name="download" className="text-[20px] opacity-40" />
+                                        </button>
+                                    )}
                                 </td>
                             </tr>
                         ))}

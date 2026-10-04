@@ -130,7 +130,11 @@
     }
 
     &__instruction-box {
-        @apply mt-2 text-xs text-slate-500 p-2 bg-amber-50 dark:bg-amber-500/10 rounded border border-amber-100 dark:border-amber-500/20;
+        @apply mt-2 mb-4 text-xs text-slate-600 dark:text-slate-300 p-3 bg-amber-50/80 dark:bg-amber-500/10 rounded-lg border border-amber-200/70 dark:border-amber-500/20 flex items-center justify-center text-center gap-2 font-medium;
+    }
+
+    &__cert-btn {
+        @apply w-full flex items-center justify-center gap-2 py-2 px-3 text-xs font-semibold text-[#1978e5] bg-[#1978e5]/5 hover:bg-[#1978e5]/10 rounded-lg border border-[#1978e5]/20 transition-all cursor-pointer;
     }
 
     &__upload-dropzone {
@@ -151,6 +155,50 @@
 
     &__upload-subtext {
         @apply text-[10px] text-slate-500 mt-1;
+    }
+
+    &__receipt-card {
+        @apply p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/80 flex flex-col gap-3;
+    }
+
+    &__receipt-header {
+        @apply flex items-center justify-between gap-2;
+    }
+
+    &__receipt-file-info {
+        @apply flex items-center gap-3 min-w-0;
+    }
+
+    &__receipt-icon-box {
+        @apply size-10 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-[#1978e5] flex items-center justify-center flex-shrink-0;
+    }
+
+    &__receipt-name {
+        @apply text-xs font-bold text-slate-900 dark:text-slate-100 truncate;
+    }
+
+    &__receipt-meta {
+        @apply text-[10px] text-slate-400 dark:text-slate-500 mt-0.5;
+    }
+
+    &__receipt-actions {
+        @apply flex items-center gap-2 pt-2 border-t border-slate-200/60 dark:border-slate-700/60;
+    }
+
+    &__receipt-btn {
+        @apply flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-medium rounded-lg transition-colors cursor-pointer border;
+        
+        &--primary {
+            @apply bg-[#1978e5] text-white border-transparent hover:bg-[#1567c5];
+        }
+
+        &--secondary {
+            @apply bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/80;
+        }
+    }
+
+    &__rejection-box {
+        @apply p-3 rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 text-xs text-red-600 dark:text-red-400 flex items-start gap-2;
     }
 
     &__uploaded-card {

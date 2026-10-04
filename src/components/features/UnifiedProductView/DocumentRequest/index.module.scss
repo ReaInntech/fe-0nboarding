@@ -57,10 +57,18 @@
         &--error {
             @apply bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20 text-red-700 dark:text-red-400;
         }
+
+        &--warning {
+            @apply bg-amber-50 dark:bg-amber-500/10 border-amber-100 dark:border-amber-500/20 text-amber-700 dark:text-amber-400;
+        }
+    }
+
+    &__view-btn {
+        @apply mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-[#1978e5] hover:underline cursor-pointer;
     }
 
     &__status-text-box {
-        @apply flex flex-col;
+        @apply flex flex-col flex-1;
     }
 
     &__status-title {
@@ -68,7 +76,7 @@
     }
 
     &__status-subtext {
-        @apply text-[10px] opacity-70 mt-0.5;
+        @apply text-[11px] opacity-80 mt-0.5;
     }
 
     &__upload-section {
@@ -77,6 +85,14 @@
 
     &__dropzone {
         @apply border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-6 flex flex-col items-center justify-center text-center hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:border-amber-400 transition-all cursor-pointer;
+
+        &--dragging {
+            @apply border-[#1978e5] bg-blue-50/50 dark:bg-blue-900/20;
+        }
+
+        &--disabled {
+            @apply opacity-50 cursor-not-allowed pointer-events-none;
+        }
     }
 
     &__upload-icon-box {

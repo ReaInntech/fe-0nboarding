@@ -163,9 +163,18 @@ export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps
                     effectiveStatus = 'approved';
                 } else if (isRejected) {
                     effectiveStatus = 'rejected';
+                } else if (action.request_type === 'document_review') {
+                    // Document review awaiting client approval/review
+                    effectiveStatus = 'pending';
                 } else if (reqData.clientStatus) {
                     effectiveStatus = reqData.clientStatus;
-                } else if (reqData.receiptFile || reqData.receiptUrl) {
+                } else if (
+                    reqData.receiptFile ||
+                    reqData.receiptUrl ||
+                    reqData.fileKey ||
+                    reqData.fileUrl ||
+                    reqData.fileName
+                ) {
                     effectiveStatus = 'processing';
                 } else if (reqData.status) {
                     effectiveStatus = reqData.status;
@@ -178,7 +187,9 @@ export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps
                     type: action.request_type || 'document',
                     status: effectiveStatus as any,
                     title: action.title || 'Action Request',
-                    documentTitle: action.title || 'Document Request', // Fallback for specific components
+                    documentTitle: action.config?.documentTitle || action.title || 'Document Request', // Fallback for specific components
+                    instructions: action.config?.instructions || action.description || action.config?.content || '',
+                    allowedFormats: action.config?.allowedFormats || action.config?.fileTypes || ['pdf', 'png', 'jpg'],
                     content: action.config?.content || '',
                     config: action.config || {},
                     templateFile: action.template_file,

@@ -77,7 +77,7 @@ export default function DocumentReviewRequest({
 
     const isApproved = currentStatus === 'approved';
     const isRejected = currentStatus === 'rejected';
-    const isPending = currentStatus === 'pending';
+    const isPending = currentStatus === 'pending' || (currentStatus as string) === 'ready_for_review';
 
     const handleOpenPreview = async () => {
         setIsViewerOpen(true);
@@ -120,7 +120,7 @@ export default function DocumentReviewRequest({
                 const freshToken = await (auth.currentUser?.getIdToken() || Promise.resolve(user?.accessToken));
                 const orgId = user?.org_id || user?.organization?.id;
                 const baseUrl = process.env.NEXT_PUBLIC_CORE_API_URL || 'http://localhost:3001/api/v1/core';
-                await fetch(`${baseUrl}/subscriptions/${subscriptionId}/resolved-requests/${id}/review`, {
+                const response = await fetch(`${baseUrl}/subscriptions/${subscriptionId}/resolved-requests/${id}/review`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -129,11 +129,16 @@ export default function DocumentReviewRequest({
                     },
                     body: JSON.stringify({ status: 'approved' }),
                 });
+
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({}));
+                    throw new Error(err.message || 'Error al aprobar el documento');
+                }
             }
             setCurrentStatus('approved');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to approve document:', error);
-            alert('Failed to approve document. Please try again.');
+            alert(`Error al aprobar el documento: ${error.message || 'Intente nuevamente'}`);
         } finally {
             setIsSubmitting(false);
         }
@@ -149,7 +154,7 @@ export default function DocumentReviewRequest({
                 const freshToken = await (auth.currentUser?.getIdToken() || Promise.resolve(user?.accessToken));
                 const orgId = user?.org_id || user?.organization?.id;
                 const baseUrl = process.env.NEXT_PUBLIC_CORE_API_URL || 'http://localhost:3001/api/v1/core';
-                await fetch(`${baseUrl}/subscriptions/${subscriptionId}/resolved-requests/${id}/review`, {
+                const response = await fetch(`${baseUrl}/subscriptions/${subscriptionId}/resolved-requests/${id}/review`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -158,13 +163,18 @@ export default function DocumentReviewRequest({
                     },
                     body: JSON.stringify({ status: 'rejected', feedbackNotes: rejectionComments.trim() }),
                 });
+
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({}));
+                    throw new Error(err.message || 'Error al enviar observaciones');
+                }
             }
             setCurrentStatus('rejected');
             setCurrentFeedbackNotes(rejectionComments.trim());
             setShowRejectPanel(false);
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to submit feedback:', error);
-            alert('Failed to submit feedback. Please try again.');
+            alert(`Error al enviar observaciones: ${error.message || 'Intente nuevamente'}`);
         } finally {
             setIsSubmitting(false);
         }

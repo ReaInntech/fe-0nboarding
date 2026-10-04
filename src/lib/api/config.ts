@@ -83,6 +83,7 @@ export async function apiFetch<T>(endpoint: string, options: ApiOptions = {}): P
   }
 
   let response = await fetch(`${baseUrl}${endpoint}`, {
+    cache: typeof window === 'undefined' ? 'no-store' : (fetchOptions.cache || 'default'),
     ...fetchOptions,
     headers,
   });

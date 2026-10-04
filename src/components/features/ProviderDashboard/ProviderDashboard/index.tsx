@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useApp } from '@/src/context/AppContext';
 import ProviderTopNavigation from '../../../shared/molecule/ProviderTopNavigation';
 import Footer from '../../../shared/molecule/Footer';
@@ -33,6 +34,7 @@ export default function ProviderDashboard({
     allExpanded = false,
     activeTab = "Dashboard"
 }: ProviderDashboardProps) {
+    const router = useRouter();
     const { user } = useApp();
     const token = user?.accessToken;
     const orgId = user?.org_id || user?.organization?.id || 'org-prov-1';
@@ -42,6 +44,22 @@ export default function ProviderDashboard({
     useEffect(() => {
         setSubList(subscriptions);
     }, [subscriptions]);
+
+    // Auto-refresh when tab gains focus or every 15s to reflect client actions
+    useEffect(() => {
+        const handleFocus = () => {
+            router.refresh();
+        };
+        window.addEventListener('focus', handleFocus);
+        const interval = setInterval(() => {
+            router.refresh();
+        }, 15000);
+
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+            clearInterval(interval);
+        };
+    }, [router]);
 
     // View tab state: 'subscriptions' vs 'users'
     const [activeView, setActiveView] = useState<'subscriptions' | 'users'>('subscriptions');

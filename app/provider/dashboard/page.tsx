@@ -4,6 +4,9 @@ import { Subscription } from '@/src/lib/api/types';
 import { getSessionUser } from '@/src/lib/firebase/auth-actions';
 import { cookies } from 'next/headers';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export const metadata = {
     title: 'Provider Dashboard | 0nbording',
     description: 'Manage client subscriptions and documents.',

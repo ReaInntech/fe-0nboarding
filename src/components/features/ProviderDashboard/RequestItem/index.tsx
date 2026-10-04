@@ -74,6 +74,8 @@ export default function RequestItem({ req, subscriptionId, className }: RequestI
     };
 
     const getRequestIcon = () => {
+        if (currentStatus === 'approved') return 'check_circle';
+        if (currentStatus === 'rejected') return 'error';
         if (currentStatus === 'waiting_client') return 'schedule';
         if (req.type === 'document_review') return 'plagiarism';
         if (req.type === 'form') return 'assignment';
@@ -83,6 +85,7 @@ export default function RequestItem({ req, subscriptionId, className }: RequestI
     };
 
     const handleOpenDetails = () => {
+        if (currentStatus === 'waiting_client') return;
         setIsRejecting(false);
         setIsModalOpen(true);
     };
@@ -308,7 +311,11 @@ export default function RequestItem({ req, subscriptionId, className }: RequestI
                 {/* Modal View button if payload exists */}
                 {req.payload && (
                     <button 
-                        className={`${styles['request-item__action-btn']} ${styles['request-item__action-btn--details']}`}
+                        disabled={currentStatus === 'waiting_client'}
+                        className={`${styles['request-item__action-btn']} ${styles['request-item__action-btn--details']} ${
+                            currentStatus === 'waiting_client' ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''
+                        }`}
+                        title={currentStatus === 'waiting_client' ? 'Awaiting client submission' : undefined}
                         onClick={handleOpenDetails}
                     >
                         <Icon name="visibility" className="text-[14px]" />
@@ -341,7 +348,12 @@ export default function RequestItem({ req, subscriptionId, className }: RequestI
                 {/* Provider Custom Document Upload Flow */}
                 {req.type === 'document_review' && (req.customDocumentPerUser || req.config?.customDocumentPerUser) && (
                     <div className="mt-3 flex items-center justify-between pt-2 border-t border-slate-200/60 dark:border-slate-800/60">
-                        {uploadedCustomFile ? (
+                        {currentStatus === 'approved' ? (
+                            <div className="flex items-center gap-1.5 text-xs text-emerald-500 font-medium">
+                                <Icon name="verified" className="text-sm" />
+                                <span>Documento aprobado por el cliente</span>
+                            </div>
+                        ) : uploadedCustomFile ? (
                             <div className="flex items-center gap-1.5 text-xs text-emerald-500 font-medium">
                                 <Icon name="check_circle" className="text-sm" />
                                 <span>Custom PDF Uploaded</span>
@@ -352,22 +364,26 @@ export default function RequestItem({ req, subscriptionId, className }: RequestI
                                 <span>Pending PDF Upload</span>
                             </div>
                         )}
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            accept="application/pdf"
-                            className="hidden"
-                            onChange={handleCustomDocFileChange}
-                        />
-                        <button
-                            type="button"
-                            disabled={isUploading}
-                            onClick={() => fileInputRef.current?.click()}
-                            className="px-2.5 py-1 text-xs rounded-md bg-blue-600 hover:bg-blue-700 text-white font-medium flex items-center gap-1 transition-colors"
-                        >
-                            <Icon name={isUploading ? 'sync' : 'upload_file'} className={isUploading ? 'animate-spin text-xs' : 'text-xs'} />
-                            <span>{isUploading ? 'Uploading...' : uploadedCustomFile ? 'Replace PDF' : 'Upload PDF'}</span>
-                        </button>
+                        {currentStatus !== 'approved' && (
+                            <>
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    accept="application/pdf"
+                                    className="hidden"
+                                    onChange={handleCustomDocFileChange}
+                                />
+                                <button
+                                    type="button"
+                                    disabled={isUploading}
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="px-2.5 py-1 text-xs rounded-md bg-blue-600 hover:bg-blue-700 text-white font-medium flex items-center gap-1 transition-colors"
+                                >
+                                    <Icon name={isUploading ? 'sync' : 'upload_file'} className={isUploading ? 'animate-spin text-xs' : 'text-xs'} />
+                                    <span>{isUploading ? 'Uploading...' : uploadedCustomFile ? 'Replace PDF' : 'Upload PDF'}</span>
+                                </button>
+                            </>
+                        )}
                     </div>
                 )}
             </div>

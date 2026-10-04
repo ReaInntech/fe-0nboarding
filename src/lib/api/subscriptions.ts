@@ -144,7 +144,18 @@ export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps
 
                 const isExplicitlyPending = (reqData.status === 'pending' || req.status === 'pending') && reqData.providerStatus !== 'rejected';
 
+                const hasFormResponses = Boolean(
+                    reqData.responses || reqData.formData || reqData.submittedAt
+                );
+
+                const isFormApproved = action.request_type === 'form' && (
+                    hasFormResponses ||
+                    reqData.status === 'approved' ||
+                    req.status === 'approved'
+                );
+
                 const isApproved =
+                    isFormApproved ||
                     reqData.status === 'approved' ||
                     reqData.providerStatus === 'approved' ||
                     reqData.clientStatus === 'approved' ||
@@ -188,6 +199,7 @@ export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps
                     status: effectiveStatus as any,
                     title: action.title || 'Action Request',
                     documentTitle: action.config?.documentTitle || action.title || 'Document Request', // Fallback for specific components
+                    formTitle: action.config?.formTitle || action.title || 'Form Request',
                     instructions: action.config?.instructions || action.description || action.config?.content || '',
                     allowedFormats: action.config?.allowedFormats || action.config?.fileTypes || ['pdf', 'png', 'jpg'],
                     content: action.config?.content || '',
@@ -196,6 +208,16 @@ export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps
                     customDocumentPerUser: action.config?.customDocumentPerUser || false,
                     waitingExplanationMessage: action.config?.waitingExplanationMessage,
                     checkboxes: action.config?.checkboxes || [],
+                    fields: action.config?.fields || [],
+                    submitDate: reqData.submittedAt
+                        ? new Date(reqData.submittedAt).toLocaleDateString('es-CO', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                        })
+                        : undefined,
                     data: reqData, // Instance data for resolved requests
                     feedbackNotes: effectiveStatus === 'rejected' ? (reqData.feedbackNotes || req.feedback_notes) : undefined,
                 } as any;

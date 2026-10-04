@@ -112,22 +112,48 @@ export default function RequestVerificationContent({ payload }: RequestVerificat
     const { type, data } = payload;
 
     switch (type) {
-        case 'form':
+        case 'form': {
+            const fields: any[] = Array.isArray(data?.fields) ? data.fields : [];
+            const responses: Record<string, any> = (data?.responses && typeof data.responses === 'object') ? data.responses : {};
+
             return (
                 <div className="space-y-6">
                     <div className={styles['verification-section']}>
-                        <h4 className={styles['verification-subtitle']}>Form Responses</h4>
+                        <h4 className={styles['verification-subtitle']}>Respuestas del Formulario</h4>
                         <div className={styles['verification-table']}>
-                            {data.fields.map((field: any) => (
-                                <div key={field.id} className={styles['verification-row']}>
-                                    <span className={styles['verification-label']}>{field.label}</span>
-                                    <span className={styles['verification-value']}>{data.responses[field.id] || 'N/A'}</span>
+                            {fields.length > 0 ? (
+                                fields.map((field: any) => {
+                                    const val = responses[field.id] ?? responses[String(field.id)] ?? responses[field.label];
+                                    return (
+                                        <div key={field.id} className={styles['verification-row']}>
+                                            <span className={styles['verification-label']}>{field.label || `Campo ${field.id}`}</span>
+                                            <span className={styles['verification-value']}>
+                                                {val !== undefined && val !== null && String(val).trim() !== '' ? String(val) : 'N/A'}
+                                            </span>
+                                        </div>
+                                    );
+                                })
+                            ) : Object.keys(responses).length > 0 ? (
+                                Object.entries(responses)
+                                    .filter(([k]) => !['status', 'clientStatus', 'providerStatus', 'submittedAt', 'uploadedAt', 'feedbackNotes'].includes(k))
+                                    .map(([key, val]) => (
+                                        <div key={key} className={styles['verification-row']}>
+                                            <span className={styles['verification-label']}>{key}</span>
+                                            <span className={styles['verification-value']}>
+                                                {val !== undefined && val !== null ? String(val) : 'N/A'}
+                                            </span>
+                                        </div>
+                                    ))
+                            ) : (
+                                <div className="p-4 text-center text-slate-400 text-xs">
+                                    No hay respuestas registradas para este formulario.
                                 </div>
-                            ))}
+                            )}
                         </div>
                     </div>
                 </div>
             );
+        }
 
         case 'payment':
             return (

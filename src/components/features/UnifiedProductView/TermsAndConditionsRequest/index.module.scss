@@ -23,6 +23,38 @@
         @apply font-bold text-slate-900 dark:text-slate-100 text-lg;
     }
 
+    &__document-container {
+        @apply mb-6 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden bg-slate-50 dark:bg-slate-950/40;
+    }
+
+    &__document-header {
+        @apply px-4 py-2.5 bg-slate-100/70 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center;
+    }
+
+    &__iframe-box {
+        @apply w-full h-[460px] relative bg-white dark:bg-slate-950 flex flex-col justify-center items-center;
+    }
+
+    &__iframe {
+        @apply w-full h-full border-0;
+    }
+
+    &__iframe-loading {
+        @apply flex flex-col items-center justify-center p-8 text-center;
+    }
+
+    &__iframe-error {
+        @apply flex flex-col items-center justify-center p-8 text-center text-rose-500 w-full;
+    }
+
+    &__iframe-empty {
+        @apply flex flex-col items-center justify-center p-8 text-center text-slate-400 w-full;
+    }
+
+    &__prose-container {
+        @apply p-5 max-h-[460px] overflow-y-auto w-full;
+    }
+
     &__reader {
         @apply bg-slate-50 dark:bg-slate-950/50 rounded-lg p-5 border border-slate-200 dark:border-slate-800 h-64 overflow-y-auto mb-6;
     }
@@ -33,7 +65,7 @@
     }
 
     &__accepted-view {
-        @apply bg-emerald-50 dark:bg-emerald-500/10 rounded-lg p-5 border border-emerald-100 dark:border-emerald-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4;
+        @apply bg-emerald-50 dark:bg-emerald-500/10 rounded-lg p-5 border border-emerald-100 dark:border-emerald-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4;
     }
 
     &__accepted-info {
@@ -52,8 +84,12 @@
         @apply text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-white/50 dark:bg-emerald-500/10 px-3 py-1.5 rounded-md self-start sm:self-auto;
     }
 
+    &__accepted-clauses {
+        @apply p-4 rounded-lg bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800;
+    }
+
     &__checkboxes-list {
-        @apply space-y-3;
+        @apply space-y-3 mb-6;
     }
 
     &__checkbox-label {
@@ -73,7 +109,7 @@
     }
 
     &__checkbox-custom {
-        @apply size-5 rounded border flex items-center justify-center transition-all bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600;
+        @apply size-5 rounded border flex items-center justify-center transition-all bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 flex-shrink-0;
 
         &--checked {
             @apply bg-emerald-500 border-emerald-500;
@@ -89,7 +125,7 @@
     }
 
     &__accept-btn {
-        @apply bg-emerald-600 hover:bg-emerald-700 text-white;
+        @apply bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition-all;
         
         &:disabled {
             @apply opacity-50 cursor-not-allowed bg-slate-400 hover:bg-slate-400;

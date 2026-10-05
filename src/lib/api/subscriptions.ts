@@ -154,8 +154,17 @@ export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps
                     req.status === 'approved'
                 );
 
+                const isTermsAccepted = action.request_type === 'terms' && (
+                    Boolean(reqData.acceptedAt) ||
+                    reqData.status === 'approved' ||
+                    reqData.status === 'accepted' ||
+                    req.status === 'approved' ||
+                    req.status === 'accepted'
+                );
+
                 const isApproved =
                     isFormApproved ||
+                    isTermsAccepted ||
                     reqData.status === 'approved' ||
                     reqData.providerStatus === 'approved' ||
                     reqData.clientStatus === 'approved' ||
@@ -170,7 +179,9 @@ export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps
                 const isRejected = !isApproved && isRejectedCandidate && !hasEvidenceSinceReview && !isExplicitlyPending;
 
                 let effectiveStatus = 'pending';
-                if (isApproved) {
+                if (isTermsAccepted) {
+                    effectiveStatus = 'accepted';
+                } else if (isApproved) {
                     effectiveStatus = 'approved';
                 } else if (isRejected) {
                     effectiveStatus = 'rejected';
@@ -204,13 +215,22 @@ export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps
                     allowedFormats: action.config?.allowedFormats || action.config?.fileTypes || ['pdf', 'png', 'jpg'],
                     content: action.config?.content || '',
                     config: action.config || {},
-                    templateFile: action.template_file,
+                    templateFile: action.template_file || action.config?.templateFile || null,
                     customDocumentPerUser: action.config?.customDocumentPerUser || false,
                     waitingExplanationMessage: action.config?.waitingExplanationMessage,
                     checkboxes: action.config?.checkboxes || [],
                     fields: action.config?.fields || [],
                     submitDate: reqData.submittedAt
                         ? new Date(reqData.submittedAt).toLocaleDateString('es-CO', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                        })
+                        : undefined,
+                    acceptDate: reqData.acceptedAt
+                        ? new Date(reqData.acceptedAt).toLocaleDateString('es-CO', {
                             year: 'numeric',
                             month: 'short',
                             day: 'numeric',

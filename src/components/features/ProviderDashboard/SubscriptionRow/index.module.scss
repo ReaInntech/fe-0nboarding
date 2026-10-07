@@ -3,6 +3,11 @@
 .subscription-row {
     @apply border border-slate-800 bg-[#151c2c] rounded-lg overflow-hidden transition-colors hover:border-slate-700;
 
+    &--highlighted {
+        border-color: #1978e5 !important;
+        box-shadow: 0 0 0 2px rgba(25, 120, 229, 0.4), 0 8px 24px rgba(25, 120, 229, 0.18);
+    }
+
     &__header {
         @apply p-4 flex flex-col md:flex-row md:items-center justify-between cursor-pointer gap-4;
     }

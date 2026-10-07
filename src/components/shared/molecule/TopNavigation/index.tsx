@@ -10,9 +10,8 @@ import NotificationDrawer, { NotificationItemData } from '../NotificationDrawer'
 import OtpModal from '../OtpModal';
 import {
   getNotifications,
-  getUnreadNotificationsCount,
-  markNotificationRead,
-  markAllNotificationsRead,
+  deleteNotification,
+  clearAllNotifications,
   EffectiveProvider
 } from '@/src/lib/api/dashboard';
 import { PublicProviderBranding } from '@/src/lib/api/provider';
@@ -62,7 +61,7 @@ export default function TopNavigation({
     // Notifications state
     const [isNotificationDrawerOpen, setIsNotificationDrawerOpen] = useState(false);
     const [notifications, setNotifications] = useState<NotificationItemData[]>([]);
-    const [unreadCount, setUnreadCount] = useState(0);
+
 
     // 2FA OTP Modal state (RF-TR-03)
     const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
@@ -83,9 +82,6 @@ export default function TopNavigation({
             try {
                 const token = user.accessToken;
                 const orgId = user.org_id || user.organization?.id;
-                const count = await getUnreadNotificationsCount(token, orgId);
-                if (isMounted) setUnreadCount(count);
-
                 const data = await getNotifications(token, orgId);
                 if (isMounted && data) {
                     const mapped: NotificationItemData[] = data.map((n: any) => ({
@@ -95,6 +91,9 @@ export default function TopNavigation({
                         variant: n.variant || 'info',
                         is_read: n.is_read ?? n.read ?? false,
                         time: n.time || n.created_at,
+                        subscription_id: n.subscription_id || n.subscriptionId || n.metadata?.subscription_id,
+                        action_url: n.action_url || n.actionUrl,
+                        metadata: n.metadata,
                     }));
                     setNotifications(mapped);
                 }
@@ -106,23 +105,62 @@ export default function TopNavigation({
         return () => { isMounted = false; };
     }, [user?.accessToken, user?.org_id, user?.organization?.id]);
 
-    const handleMarkRead = async (id: string) => {
-        try {
-            await markNotificationRead(id, user?.accessToken, user?.org_id || user?.organization?.id);
-            setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
-            setUnreadCount(prev => Math.max(0, prev - 1));
-        } catch (err) {
-            console.error('Error marking notification as read:', err);
+    // Synchronize with external notification events (e.g. from NotificationHero)
+    useEffect(() => {
+        const handleCleared = () => {
+            setNotifications([]);
+        };
+        const handleDeleted = (e: any) => {
+            const deletedId = e.detail?.id;
+            if (deletedId) {
+                setNotifications(prev => prev.filter(n => n.id !== deletedId));
+            }
+        };
+        window.addEventListener("notifications-cleared", handleCleared);
+        window.addEventListener("notification-deleted", handleDeleted);
+        return () => {
+            window.removeEventListener("notifications-cleared", handleCleared);
+            window.removeEventListener("notification-deleted", handleDeleted);
+        };
+    }, []);
+
+
+
+    const handleNotificationClick = (item: NotificationItemData) => {
+        setIsNotificationDrawerOpen(false);
+        if (item.subscription_id) {
+            const targetUrl = effectiveSlug
+                ? `/${effectiveSlug}/subscriptions/${item.subscription_id}`
+                : `/subscriptions/${item.subscription_id}`;
+            router.push(targetUrl);
+        } else if (item.action_url) {
+            router.push(item.action_url);
+        } else {
+            router.push(basePath ? `${basePath}/dashboard` : '/dashboard');
         }
     };
 
-    const handleMarkAllRead = async () => {
+    const handleDeleteNotification = async (id: string) => {
         try {
-            await markAllNotificationsRead(user?.accessToken, user?.org_id || user?.organization?.id);
-            setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
-            setUnreadCount(0);
+            setNotifications(prev => prev.filter(n => n.id !== id));
+            window.dispatchEvent(new CustomEvent("notification-deleted", { detail: { id } }));
+            const token = user?.accessToken;
+            const orgId = user?.org_id || user?.organization?.id;
+            await deleteNotification(id, token, orgId);
         } catch (err) {
-            console.error('Error marking all notifications as read:', err);
+            console.error("Error deleting notification:", err);
+        }
+    };
+
+    const handleClearAll = async () => {
+        try {
+            setNotifications([]);
+            window.dispatchEvent(new CustomEvent("notifications-cleared"));
+            const token = user?.accessToken;
+            const orgId = user?.org_id || user?.organization?.id;
+            await clearAllNotifications(token, orgId);
+        } catch (err) {
+            console.error("Error clearing notifications:", err);
         }
     };
 
@@ -258,9 +296,9 @@ export default function TopNavigation({
                             aria-label="View notifications"
                         >
                             <Icon name="notifications" />
-                            {unreadCount > 0 && (
+                            {notifications.length > 0 && (
                                 <span className={styles['nav__bell-badge']}>
-                                    {unreadCount > 9 ? '9+' : unreadCount}
+                                    {notifications.length > 9 ? '9+' : notifications.length}
                                 </span>
                             )}
                         </button>
@@ -359,9 +397,10 @@ export default function TopNavigation({
                 isOpen={isNotificationDrawerOpen}
                 onClose={() => setIsNotificationDrawerOpen(false)}
                 notifications={notifications}
-                unreadCount={unreadCount}
-                onMarkRead={handleMarkRead}
-                onMarkAllRead={handleMarkAllRead}
+                onNotificationClick={handleNotificationClick}
+                onDeleteNotification={handleDeleteNotification}
+                onClearAll={handleClearAll}
+                isClientView={true}
             />
 
             {/* 2FA OTP Modal for Provider Mode (RF-TR-03) */}

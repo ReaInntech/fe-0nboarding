@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import Icon from '../../atoms/Icon';
 import styles from './index.module.scss';
 
@@ -9,18 +9,25 @@ export interface NotificationItemData {
   title: string;
   message: string;
   variant?: 'info' | 'warning' | 'success' | 'error';
-  is_read: boolean;
+  is_read?: boolean;
   created_at?: string;
   time?: string;
+  subscription_id?: string;
+  action_url?: string;
+  metadata?: Record<string, any>;
 }
 
 export interface NotificationDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   notifications: NotificationItemData[];
-  unreadCount: number;
-  onMarkRead: (id: string) => void;
-  onMarkAllRead: () => void;
+  unreadCount?: number;
+  onMarkRead?: (id: string) => void;
+  onMarkAllRead?: () => void;
+  onNotificationClick?: (item: NotificationItemData) => void;
+  onDeleteNotification?: (id: string) => void;
+  onClearAll?: () => void;
+  isClientView?: boolean;
 }
 
 const variantIcons: Record<string, string> = {
@@ -45,6 +52,148 @@ function formatRelativeTime(dateStr?: string): string {
   }
 }
 
+interface SwipeableNotificationItemProps {
+  item: NotificationItemData;
+  onItemClick: (item: NotificationItemData) => void;
+  onDelete?: (id: string) => void;
+}
+
+function SwipeableNotificationItem({
+  item,
+  onItemClick,
+  onDelete,
+}: SwipeableNotificationItemProps) {
+  const [dragX, setDragX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const startXRef = useRef<number | null>(null);
+
+  const THRESHOLD = 75; // px to trigger delete
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    startXRef.current = e.touches[0].clientX;
+    setIsDragging(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (startXRef.current === null) return;
+    const diff = e.touches[0].clientX - startXRef.current;
+    if (diff > 0) {
+      setDragX(Math.min(diff, 180));
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (dragX >= THRESHOLD && onDelete) {
+      triggerDelete();
+    } else {
+      setDragX(0);
+    }
+    startXRef.current = null;
+    setIsDragging(false);
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    startXRef.current = e.clientX;
+    setIsDragging(true);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (startXRef.current === null || !isDragging) return;
+    const diff = e.clientX - startXRef.current;
+    if (diff > 0) {
+      setDragX(Math.min(diff, 180));
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (dragX >= THRESHOLD && onDelete) {
+      triggerDelete();
+    } else {
+      setDragX(0);
+    }
+    startXRef.current = null;
+    setIsDragging(false);
+  };
+
+  const triggerDelete = () => {
+    setIsDeleting(true);
+    setDragX(350);
+    setTimeout(() => {
+      onDelete?.(item.id);
+    }, 220);
+  };
+
+  const handleClick = () => {
+    if (dragX > 8) return;
+    onItemClick(item);
+  };
+
+  const variant = item.variant || 'info';
+  const iconName = variantIcons[variant] || 'notifications';
+
+  return (
+    <div
+      className={styles['notification-drawer__swipe-wrapper']}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={() => {
+        if (isDragging) {
+          if (dragX >= THRESHOLD && onDelete) {
+            triggerDelete();
+          } else {
+            setDragX(0);
+          }
+          startXRef.current = null;
+          setIsDragging(false);
+        }
+      }}
+    >
+
+
+      {/* Draggable Card Ticket */}
+      <div
+        onClick={handleClick}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onMouseDown={handleMouseDown}
+        style={{
+          transform: `translateX(${dragX}px)`,
+          opacity: isDeleting ? 0 : isDragging ? Math.max(0.15, 1 - (dragX / 140) * 0.85) : 1,
+        }}
+        className={`${styles['notification-drawer__item']} ${
+          isDragging ? styles['notification-drawer__item--swiping'] : ''
+        } ${isDeleting ? styles['notification-drawer__item--deleting'] : ''}`}
+      >
+
+
+        <div
+          className={`${styles['notification-drawer__item-icon-box']} ${
+            styles[`notification-drawer__item-icon-box--${variant}`] || ''
+          }`}
+        >
+          <Icon name={iconName} />
+        </div>
+
+        <div className={styles['notification-drawer__item-content']}>
+          <div className={styles['notification-drawer__item-header']}>
+            <span className={styles['notification-drawer__item-title']}>
+              {item.title}
+            </span>
+            <span className={styles['notification-drawer__item-time']}>
+              {item.time || formatRelativeTime(item.created_at)}
+            </span>
+          </div>
+          <p className={styles['notification-drawer__item-message']}>
+            {item.message}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function NotificationDrawer({
   isOpen,
   onClose,
@@ -52,8 +201,16 @@ export default function NotificationDrawer({
   unreadCount,
   onMarkRead,
   onMarkAllRead,
+  onNotificationClick,
+  onDeleteNotification,
+  onClearAll,
+  isClientView = false,
 }: NotificationDrawerProps) {
   if (!isOpen) return null;
+
+  const handleItemClick = (item: NotificationItemData) => {
+    onNotificationClick?.(item);
+  };
 
   return (
     <div className={styles['notification-drawer']}>
@@ -71,23 +228,25 @@ export default function NotificationDrawer({
           <div className={styles['notification-drawer__title-box']}>
             <Icon name="notifications" className={styles['notification-drawer__icon']} />
             <h2 className={styles['notification-drawer__title']}>Notifications</h2>
-            {unreadCount > 0 && (
+            {notifications.length > 0 && (
               <span className={styles['notification-drawer__badge']}>
-                {unreadCount} new
+                {notifications.length}
               </span>
             )}
           </div>
 
           <div className={styles['notification-drawer__actions']}>
-            {unreadCount > 0 && (
+            {isClientView && onClearAll && notifications.length > 0 && (
               <button
                 type="button"
-                onClick={onMarkAllRead}
-                className={styles['notification-drawer__mark-all-btn']}
+                onClick={onClearAll}
+                className={styles['notification-drawer__clear-btn']}
+                title="Permanently remove all notifications"
               >
-                Mark all as read
+                Clear all
               </button>
             )}
+
             <button
               type="button"
               onClick={onClose}
@@ -102,46 +261,14 @@ export default function NotificationDrawer({
         {/* Notifications List */}
         {notifications.length > 0 ? (
           <div className={styles['notification-drawer__list']}>
-            {notifications.map((item) => {
-              const variant = item.variant || 'info';
-              const iconName = variantIcons[variant] || 'notifications';
-
-              return (
-                <div
-                  key={item.id}
-                  onClick={() => onMarkRead(item.id)}
-                  className={`${styles['notification-drawer__item']} ${
-                    !item.is_read ? styles['notification-drawer__item--unread'] : ''
-                  }`}
-                >
-                  {!item.is_read && (
-                    <span className={styles['notification-drawer__item-indicator']} />
-                  )}
-
-                  <div
-                    className={`${styles['notification-drawer__item-icon-box']} ${
-                      styles[`notification-drawer__item-icon-box--${variant}`] || ''
-                    }`}
-                  >
-                    <Icon name={iconName} />
-                  </div>
-
-                  <div className={styles['notification-drawer__item-content']}>
-                    <div className={styles['notification-drawer__item-header']}>
-                      <span className={styles['notification-drawer__item-title']}>
-                        {item.title}
-                      </span>
-                      <span className={styles['notification-drawer__item-time']}>
-                        {item.time || formatRelativeTime(item.created_at)}
-                      </span>
-                    </div>
-                    <p className={styles['notification-drawer__item-message']}>
-                      {item.message}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
+            {notifications.map((item) => (
+              <SwipeableNotificationItem
+                key={item.id}
+                item={item}
+                onItemClick={handleItemClick}
+                onDelete={onDeleteNotification}
+              />
+            ))}
           </div>
         ) : (
           <div className={styles['notification-drawer__empty']}>
@@ -160,3 +287,4 @@ export default function NotificationDrawer({
     </div>
   );
 }
+

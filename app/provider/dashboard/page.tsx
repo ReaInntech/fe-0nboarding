@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import ProviderDashboard from '@/src/components/features/ProviderDashboard/ProviderDashboard';
 import { getProviderDashboardInit } from '@/src/lib/api/provider';
 import { Subscription } from '@/src/lib/api/types';
@@ -12,7 +13,11 @@ export const metadata = {
     description: 'Manage client subscriptions and documents.',
 };
 
-export default async function ProviderDashboardPage() {
+export default async function ProviderDashboardPage({
+    searchParams,
+}: {
+    searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
     // SSR Fetching with Auth Token
     const cookieStore = await cookies();
     const token = cookieStore.get('id_token')?.value;
@@ -33,11 +38,20 @@ export default async function ProviderDashboardPage() {
         console.error('[ProviderDashboardPage] API failed:', error);
     }
 
+    const resolvedParams = searchParams ? await searchParams : {};
+    const targetSubscriptionId = typeof resolvedParams.subscriptionId === 'string'
+        ? resolvedParams.subscriptionId
+        : undefined;
+
     return (
-        <ProviderDashboard
-            subscriptions={subscriptions}
-            stats={stats}
-            userProfile={sessionUser}
-        />
+        <Suspense fallback={null}>
+            <ProviderDashboard
+                subscriptions={subscriptions}
+                stats={stats}
+                userProfile={sessionUser}
+                targetSubscriptionId={targetSubscriptionId}
+            />
+        </Suspense>
     );
 }
+

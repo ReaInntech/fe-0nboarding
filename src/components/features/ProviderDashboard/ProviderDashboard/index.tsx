@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useApp } from '@/src/context/AppContext';
 import ProviderTopNavigation from '../../../shared/molecule/ProviderTopNavigation';
 import Footer from '../../../shared/molecule/Footer';
@@ -25,6 +25,7 @@ export interface ProviderDashboardProps {
     userProfile?: any;
     allExpanded?: boolean;
     activeTab?: string;
+    targetSubscriptionId?: string;
 }
 
 export default function ProviderDashboard({
@@ -32,9 +33,14 @@ export default function ProviderDashboard({
     className,
     userProfile,
     allExpanded = false,
-    activeTab = "Dashboard"
+    activeTab = "Dashboard",
+    targetSubscriptionId
 }: ProviderDashboardProps) {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const querySubId = searchParams?.get('subscriptionId') || undefined;
+    const effectiveTargetSubId = targetSubscriptionId || querySubId;
+
     const { user } = useApp();
     const token = user?.accessToken;
     const orgId = user?.org_id || user?.organization?.id || 'org-prov-1';
@@ -44,6 +50,23 @@ export default function ProviderDashboard({
     useEffect(() => {
         setSubList(subscriptions);
     }, [subscriptions]);
+
+    // View tab state: 'subscriptions' vs 'users'
+    const [activeView, setActiveView] = useState<'subscriptions' | 'users'>('subscriptions');
+
+    // Deep-linking: auto-switch to subscriptions view and scroll into targeted subscription row
+    useEffect(() => {
+        if (effectiveTargetSubId) {
+            setActiveView('subscriptions');
+            const timer = setTimeout(() => {
+                const element = document.getElementById(`subscription-row-${effectiveTargetSubId}`);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 250);
+            return () => clearTimeout(timer);
+        }
+    }, [effectiveTargetSubId]);
 
     // Auto-refresh when tab gains focus or every 15s to reflect client actions
     useEffect(() => {
@@ -60,9 +83,6 @@ export default function ProviderDashboard({
             clearInterval(interval);
         };
     }, [router]);
-
-    // View tab state: 'subscriptions' vs 'users'
-    const [activeView, setActiveView] = useState<'subscriptions' | 'users'>('subscriptions');
 
     // Unique clients count for tab badge
     const uniqueClientsCount = useMemo(() => {
@@ -227,6 +247,7 @@ export default function ProviderDashboard({
                     <SubscriptionList
                         subscriptions={subList}
                         allExpanded={allExpanded}
+                        targetSubscriptionId={effectiveTargetSubId}
                         onDelete={(sub) => setSubToDelete(sub)}
                         onDisable={(sub) => setSubToDisable(sub)}
                     />

@@ -9,9 +9,7 @@ import Avatar from '../../atoms/Avatar';
 import NotificationDrawer, { NotificationItemData } from '../NotificationDrawer';
 import {
   getNotifications,
-  getUnreadNotificationsCount,
-  markNotificationRead,
-  markAllNotificationsRead
+  deleteNotification,
 } from '@/src/lib/api/dashboard';
 import styles from './index.module.scss';
 
@@ -41,7 +39,7 @@ export default function ProviderTopNavigation({ onLogout, activeTab: activeTabPr
     // Notification State
     const [isNotificationDrawerOpen, setIsNotificationDrawerOpen] = useState(false);
     const [notifications, setNotifications] = useState<NotificationItemData[]>([]);
-    const [unreadCount, setUnreadCount] = useState(0);
+
 
     const navItems: NavItem[] = [
         { name: 'Dashboard', path: '/provider/dashboard' },
@@ -60,9 +58,6 @@ export default function ProviderTopNavigation({ onLogout, activeTab: activeTabPr
             try {
                 const token = user.accessToken;
                 const orgId = user.org_id || user.organization?.id;
-                const count = await getUnreadNotificationsCount(token, orgId);
-                if (isMounted) setUnreadCount(count);
-
                 const data = await getNotifications(token, orgId);
                 if (isMounted && data) {
                     const mapped: NotificationItemData[] = data.map((n: any) => ({
@@ -72,6 +67,9 @@ export default function ProviderTopNavigation({ onLogout, activeTab: activeTabPr
                         variant: n.variant || 'info',
                         is_read: n.is_read ?? n.read ?? false,
                         time: n.time || n.created_at,
+                        subscription_id: n.subscription_id || n.subscriptionId || n.metadata?.subscription_id,
+                        action_url: n.action_url || n.actionUrl,
+                        metadata: n.metadata,
                     }));
                     setNotifications(mapped);
                 }
@@ -83,23 +81,27 @@ export default function ProviderTopNavigation({ onLogout, activeTab: activeTabPr
         return () => { isMounted = false; };
     }, [user?.accessToken, user?.org_id, user?.organization?.id]);
 
-    const handleMarkRead = async (id: string) => {
-        try {
-            await markNotificationRead(id, user?.accessToken, user?.org_id || user?.organization?.id);
-            setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
-            setUnreadCount(prev => Math.max(0, prev - 1));
-        } catch (err) {
-            console.error('Error marking notification as read:', err);
+
+
+    const handleNotificationClick = (item: NotificationItemData) => {
+        setIsNotificationDrawerOpen(false);
+        if (item.subscription_id) {
+            router.push(`/provider/dashboard?subscriptionId=${item.subscription_id}`);
+        } else if (item.action_url) {
+            router.push(item.action_url);
+        } else {
+            router.push('/provider/dashboard');
         }
     };
 
-    const handleMarkAllRead = async () => {
+    const handleDeleteNotification = async (id: string) => {
         try {
-            await markAllNotificationsRead(user?.accessToken, user?.org_id || user?.organization?.id);
-            setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
-            setUnreadCount(0);
+            const token = user?.accessToken;
+            const orgId = user?.org_id || user?.organization?.id;
+            setNotifications(prev => prev.filter(n => n.id !== id));
+            await deleteNotification(id, token, orgId);
         } catch (err) {
-            console.error('Error marking all notifications as read:', err);
+            console.error('Error deleting notification:', err);
         }
     };
 
@@ -167,9 +169,9 @@ export default function ProviderTopNavigation({ onLogout, activeTab: activeTabPr
                             aria-label="View notifications"
                         >
                             <Icon name="notifications" />
-                            {unreadCount > 0 && (
+                            {notifications.length > 0 && (
                                 <span className={styles['nav__bell-badge']}>
-                                    {unreadCount > 9 ? '9+' : unreadCount}
+                                    {notifications.length > 9 ? '9+' : notifications.length}
                                 </span>
                             )}
                         </button>
@@ -237,9 +239,8 @@ export default function ProviderTopNavigation({ onLogout, activeTab: activeTabPr
                 isOpen={isNotificationDrawerOpen}
                 onClose={() => setIsNotificationDrawerOpen(false)}
                 notifications={notifications}
-                unreadCount={unreadCount}
-                onMarkRead={handleMarkRead}
-                onMarkAllRead={handleMarkAllRead}
+                onNotificationClick={handleNotificationClick}
+                onDeleteNotification={handleDeleteNotification}
             />
         </>
     );

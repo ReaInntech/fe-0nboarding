@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Icon from '../../../shared/atoms/Icon';
 import SubscriptionActionCenter from '../SubscriptionActionCenter';
 import { Subscription } from '@/src/lib/api/types';
@@ -6,15 +6,31 @@ export type SubscriptionData = Subscription;
 import styles from './index.module.scss';
 
 export interface SubscriptionRowProps {
+    id?: string;
     sub: SubscriptionData;
     className?: string;
     initialExpanded?: boolean;
+    isHighlighted?: boolean;
     onDelete?: (sub: SubscriptionData) => void;
     onDisable?: (sub: SubscriptionData) => void;
 }
 
-export default function SubscriptionRow({ sub, className, initialExpanded = false, onDelete, onDisable }: SubscriptionRowProps) {
+export default function SubscriptionRow({
+    id,
+    sub,
+    className,
+    initialExpanded = false,
+    isHighlighted = false,
+    onDelete,
+    onDisable
+}: SubscriptionRowProps) {
     const [isExpanded, setIsExpanded] = useState(initialExpanded);
+
+    useEffect(() => {
+        if (initialExpanded) {
+            setIsExpanded(true);
+        }
+    }, [initialExpanded]);
 
     const pendingReviewCount = (sub.requests || []).filter(r => r.status === 'pending').length;
 
@@ -25,7 +41,10 @@ export default function SubscriptionRow({ sub, className, initialExpanded = fals
     else if (sub.status === 'cancelled') statusModifier = 'cancelled';
 
     return (
-        <div className={`${styles['subscription-row']} ${className || ''}`}>
+        <div
+            id={id}
+            className={`${styles['subscription-row']} ${isHighlighted ? styles['subscription-row--highlighted'] : ''} ${className || ''}`}
+        >
             {/* Header / Condensed Row */}
             <div
                 className={`group ${styles['subscription-row__header']}`}

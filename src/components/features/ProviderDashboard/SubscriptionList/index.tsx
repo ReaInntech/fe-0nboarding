@@ -7,6 +7,7 @@ export interface SubscriptionListProps {
     subscriptions: SubscriptionData[];
     className?: string;
     allExpanded?: boolean;
+    targetSubscriptionId?: string;
     onDelete?: (sub: SubscriptionData) => void;
     onDisable?: (sub: SubscriptionData) => void;
 }
@@ -15,6 +16,7 @@ export default function SubscriptionList({
     subscriptions = [],
     className,
     allExpanded = false,
+    targetSubscriptionId,
     onDelete,
     onDisable,
 }: SubscriptionListProps) {
@@ -28,6 +30,11 @@ export default function SubscriptionList({
 
     const filteredSubscriptions = useMemo(() => {
         return subscriptions.filter(sub => {
+            // Always keep the target subscription visible when deep-linked from notification
+            if (targetSubscriptionId && sub.id === targetSubscriptionId) {
+                return true;
+            }
+
             const matchesSearch =
                 (sub.client?.legalName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 sub.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -37,7 +44,7 @@ export default function SubscriptionList({
 
             return matchesSearch && matchesProduct;
         });
-    }, [subscriptions, searchQuery, productFilter]);
+    }, [subscriptions, searchQuery, productFilter, targetSubscriptionId]);
 
     return (
         <div className={`${styles['subscription-list']} ${className || ''}`}>
@@ -78,8 +85,10 @@ export default function SubscriptionList({
                     filteredSubscriptions.map(sub => (
                         <SubscriptionRow
                             key={sub.id}
+                            id={`subscription-row-${sub.id}`}
                             sub={sub}
-                            initialExpanded={allExpanded}
+                            initialExpanded={allExpanded || (Boolean(targetSubscriptionId) && sub.id === targetSubscriptionId)}
+                            isHighlighted={Boolean(targetSubscriptionId) && sub.id === targetSubscriptionId}
                             onDelete={onDelete}
                             onDisable={onDisable}
                         />

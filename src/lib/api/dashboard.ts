@@ -1,18 +1,39 @@
 import { apiFetch } from './config';
 import { Notification, NotificationDTO, Subscription, SubscriptionDTO } from './types';
 
+function formatRelativeTime(dateStr?: string): string {
+  if (!dateStr) return 'Just now';
+  try {
+    const d = new Date(dateStr);
+    const now = new Date();
+    const diffSec = Math.floor((now.getTime() - d.getTime()) / 1000);
+    if (diffSec < 60) return 'Just now';
+    if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
+    if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
+    return `${Math.floor(diffSec / 86400)}d ago`;
+  } catch {
+    return 'Recently';
+  }
+}
+
 export function mapNotification(dto: NotificationDTO): Notification {
-  // Use a safer variant cast with a fallback
-  const validVariants = ['critical', 'warning', 'info', 'success'] as const;
-  const variant = validVariants.includes(dto.priority as any)
-    ? (dto.priority as Notification['variant'])
+  const validVariants = ['critical', 'warning', 'info', 'success', 'error'] as const;
+  const rawVariant = dto.variant || dto.priority;
+  const variant = validVariants.includes(rawVariant as any)
+    ? (rawVariant as any)
     : 'info';
 
   return {
+    id: dto.id,
     title: dto.title,
-    time: dto.created_at, // Ideally format this to "X mins ago"
+    time: formatRelativeTime(dto.created_at),
     message: dto.message,
     variant,
+    is_read: dto.is_read ?? false,
+    subscription_id: dto.subscription_id,
+    action_url: dto.action_url,
+    metadata: dto.metadata,
+    created_at: dto.created_at,
   };
 }
 
@@ -176,6 +197,30 @@ export async function getUnreadNotificationsCount(token?: string, orgId?: string
 export async function markAllNotificationsRead(token?: string, orgId?: string) {
   return apiFetch('/notifications/read-all', {
     method: 'PATCH',
+    microservice: 'core',
+    token,
+    orgId,
+  });
+}
+
+/**
+ * Delete a single notification (invoked on Swipe Right)
+ */
+export async function deleteNotification(id: string, token?: string, orgId?: string) {
+  return apiFetch(`/notifications/${id}`, {
+    method: 'DELETE',
+    microservice: 'core',
+    token,
+    orgId,
+  });
+}
+
+/**
+ * Permanently delete all notifications (invoked on Clear All in Client view)
+ */
+export async function clearAllNotifications(token?: string, orgId?: string) {
+  return apiFetch('/notifications/clear-all', {
+    method: 'DELETE',
     microservice: 'core',
     token,
     orgId,

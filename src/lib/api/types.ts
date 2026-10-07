@@ -20,10 +20,16 @@ export interface UserProfile {
 }
 
 export interface Notification {
+  id?: string;
   title: string;
   time: string;
   message: string;
   variant?: 'critical' | 'warning' | 'info' | 'success';
+  is_read?: boolean;
+  subscription_id?: string;
+  action_url?: string;
+  metadata?: Record<string, any>;
+  created_at?: string;
 }
 
 export interface ClientUser {
@@ -147,9 +153,13 @@ export interface NotificationDTO {
   id: string;
   title: string;
   message: string;
-  priority: string;
+  priority?: string;
+  variant?: string;
   created_at: string;
   is_read: boolean;
+  subscription_id?: string;
+  action_url?: string;
+  metadata?: Record<string, any>;
 }
 
 export interface SubscriptionDTO {

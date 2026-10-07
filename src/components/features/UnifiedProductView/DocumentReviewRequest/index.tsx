@@ -73,7 +73,7 @@ export default function DocumentReviewRequest({
 
     const resolvedWaitingMessage =
         waitingExplanationMessage?.trim() ||
-        'El proveedor está fabricando el documento que se requiere aprobar. Te notificaremos en cuanto esté disponible para su revisión.';
+        'The provider is preparing the document required for review. We will notify you once it becomes available.';
 
     const isApproved = currentStatus === 'approved';
     const isRejected = currentStatus === 'rejected';
@@ -132,13 +132,13 @@ export default function DocumentReviewRequest({
 
                 if (!response.ok) {
                     const err = await response.json().catch(() => ({}));
-                    throw new Error(err.message || 'Error al aprobar el documento');
+                    throw new Error(err.message || 'Failed to approve document');
                 }
             }
             setCurrentStatus('approved');
         } catch (error: any) {
             console.error('Failed to approve document:', error);
-            alert(`Error al aprobar el documento: ${error.message || 'Intente nuevamente'}`);
+            alert(`Error approving document: ${error.message || 'Please try again'}`);
         } finally {
             setIsSubmitting(false);
         }
@@ -166,7 +166,7 @@ export default function DocumentReviewRequest({
 
                 if (!response.ok) {
                     const err = await response.json().catch(() => ({}));
-                    throw new Error(err.message || 'Error al enviar observaciones');
+                    throw new Error(err.message || 'Failed to submit feedback');
                 }
             }
             setCurrentStatus('rejected');
@@ -174,7 +174,7 @@ export default function DocumentReviewRequest({
             setShowRejectPanel(false);
         } catch (error: any) {
             console.error('Failed to submit feedback:', error);
-            alert(`Error al enviar observaciones: ${error.message || 'Intente nuevamente'}`);
+            alert(`Error submitting feedback: ${error.message || 'Please try again'}`);
         } finally {
             setIsSubmitting(false);
         }
@@ -214,7 +214,7 @@ export default function DocumentReviewRequest({
                                 </div>
                                 <div className={styles['doc-review-request__in-prep-content']}>
                                     <h4 className={styles['doc-review-request__in-prep-title']}>
-                                        Documento en preparación por el proveedor
+                                        Document being prepared by provider
                                     </h4>
                                     <p className={styles['doc-review-request__in-prep-text']}>
                                         {resolvedWaitingMessage}

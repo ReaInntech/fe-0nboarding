@@ -58,20 +58,20 @@ const simpleLegalDocumentsProps: LegalDocumentsProps = {
     documents: [
         {
             icon: 'article',
-            name: 'Contrato de Adhesión',
-            description: 'Términos generales del servicio de mantenimiento y reparación vehicular.',
+            name: 'Service Agreement',
+            description: 'General terms of vehicular maintenance and repair service.',
             createdAt: 'Feb 28, 2026',
             approvedAt: 'Mar 01, 2026',
-            step: 'Contratación',
+            step: 'Contracting',
             format: 'PDF',
         },
         {
             icon: 'gavel',
-            name: 'Poliza de Garantía',
-            description: 'Cobertura y alcance de la garantía para repuestos originales.',
+            name: 'Warranty Policy',
+            description: 'Coverage and scope of the warranty for original replacement parts.',
             createdAt: 'Mar 02, 2026',
             approvedAt: 'Mar 02, 2026',
-            step: 'Entrega',
+            step: 'Delivery',
             format: 'Digital',
         },
     ],
@@ -173,51 +173,51 @@ export const WithAllRequests: Story = {
 const realInnovationHeaderProps: ProductHeaderProps = {
     icon: 'lightbulb',
     iconColor: '#7ED957',
-    title: 'Consultoría en Innovación',
-    badgeText: 'En Diagnóstico',
+    title: 'Innovation Consulting',
+    badgeText: 'In Diagnostic',
     badgeVariant: 'info',
     productId: 'RI-CONS-2024-001',
     meta: [
-        { icon: 'calendar_today', text: 'Iniciado Mar 15, 2026' },
+        { icon: 'calendar_today', text: 'Started Mar 15, 2026' },
         { icon: 'business', text: 'Real Innovation Tech' },
-        { icon: 'location_on', text: 'Remoto / Híbrido' },
+        { icon: 'location_on', text: 'Remote / Hybrid' },
     ],
     actions: [
-        { label: 'Agendar Sesión', icon: 'event', variant: 'primary' },
-        { label: 'Contactar Consultor', icon: 'chat', variant: 'secondary' }
+        { label: 'Schedule Session', icon: 'event', variant: 'primary' },
+        { label: 'Contact Consultant', icon: 'chat', variant: 'secondary' }
     ],
 };
 
 const realInnovationContractingProgressProps: ContractingProgressProps = {
-    currentPhase: 'Diagnóstico',
+    currentPhase: 'Diagnostic',
     steps: [
         { label: 'Discovery', status: 'completed', icon: 'search' },
-        { label: 'Diagnóstico', status: 'active', icon: 'monitor_heart' },
-        { label: 'Prototipado', status: 'pending', icon: 'design_services' },
-        { label: 'Desarrollo', status: 'pending', icon: 'developer_mode' },
-        { label: 'Impacto', status: 'pending', icon: 'trending_up' },
+        { label: 'Diagnostic', status: 'active', icon: 'monitor_heart' },
+        { label: 'Prototyping', status: 'pending', icon: 'design_services' },
+        { label: 'Development', status: 'pending', icon: 'developer_mode' },
+        { label: 'Impact', status: 'pending', icon: 'trending_up' },
     ]
 };
 
 const realInnovationPaymentHistoryProps: PaymentHistoryProps = {
-    title: 'Historial de Pagos',
+    title: 'Payment History',
     showDownloadAll: true,
     payments: [
         {
             date: 'Mar 15, 2025',
-            description: 'Anticipo - Consultoría en Innovación Potenciada con IA',
+            description: 'Deposit - AI-Powered Innovation Consulting',
             amount: '$2,500.00',
             status: 'Paid',
         },
         {
             date: 'Mar 28, 2025',
-            description: 'Hito 1 - Diagnóstico y Roadmap Estratégico',
+            description: 'Milestone 1 - Diagnostic & Strategic Roadmap',
             amount: '$1,800.00',
             status: 'Paid',
         },
         {
-            date: 'Abr 05, 2025',
-            description: 'Suscripción Mensual - Acompañamiento IA',
+            date: 'Apr 05, 2025',
+            description: 'Monthly Subscription - AI Advisory',
             amount: '$450.00',
             status: 'Paid',
         }
@@ -230,16 +230,16 @@ export const RealInnovationConsulting: Story = {
         showContractingProgress: true,
         contractingProgressProps: realInnovationContractingProgressProps,
         serviceDetailsProps: {
-            title: 'Detalles de la Consultoría',
+            title: 'Consulting Details',
             titleIcon: 'psychology',
             titleIconColor: '#7ED957',
             totalAmount: 10000000,
             paidAmount: 4300000,
             fields: [
-                { icon: 'info', label: 'Tipo de Servicio', value: 'Consultoría en Innovación' },
-                { icon: 'groups', label: 'Consultor', value: 'Daniel Bernal' },
-                { icon: 'speed', label: 'Enfoque', value: 'Optimización de Procesos y Automatización' },
-                { icon: 'account_balance_wallet', label: 'Pago mensual', value: '$1.000.000' },
+                { icon: 'info', label: 'Service Type', value: 'Innovation Consulting' },
+                { icon: 'groups', label: 'Consultant', value: 'Daniel Bernal' },
+                { icon: 'speed', label: 'Focus', value: 'Process Optimization & Automation' },
+                { icon: 'account_balance_wallet', label: 'Monthly Payment', value: '$1,000,000' },
             ],
         },
         legalDocumentsProps: {
@@ -247,8 +247,8 @@ export const RealInnovationConsulting: Story = {
             documents: [
                 {
                     icon: 'gavel',
-                    name: 'Acuerdo de Confidencialidad (NDA)',
-                    description: 'Protección de propiedad intelectual y datos sensibles compartidos durante la consultoría.',
+                    name: 'Non-Disclosure Agreement (NDA)',
+                    description: 'Intellectual property and data protection shared during the consulting process.',
                     createdAt: 'Mar 10, 2026',
                     approvedAt: 'Mar 10, 2026',
                     step: 'Discovery',
@@ -256,11 +256,11 @@ export const RealInnovationConsulting: Story = {
                 },
                 {
                     icon: 'description',
-                    name: 'Contrato de Consultoría Estratégica',
-                    description: 'Definición de alcances, entregables y cronograma de la implementación de IA.',
+                    name: 'Strategic Consulting Contract',
+                    description: 'Scope, deliverables, and timeline for AI implementation.',
                     createdAt: 'Mar 12, 2026',
-                    approvedAt: 'Pendiente',
-                    step: 'Contratación',
+                    approvedAt: 'Pending',
+                    step: 'Contracting',
                     format: 'DOCX',
                 }
             ]
@@ -270,10 +270,10 @@ export const RealInnovationConsulting: Story = {
             requests: [
                 {
                     type: 'terms',
-                    documentTitle: 'Términos y Condiciones',
-                    content: 'He leído y acepto los términos y condiciones del servicio de consultoría...',
+                    documentTitle: 'Terms & Conditions',
+                    content: 'I have read and accept the terms and conditions of the consulting service...',
                     status: 'pending',
-                    checkboxes: [{ id: '1', text: 'He leído y acepto los términos y condiciones del servicio de consultoría.' }]
+                    checkboxes: [{ id: '1', text: 'I have read and accept the terms and conditions of the consulting service.' }]
                 }
             ]
         },

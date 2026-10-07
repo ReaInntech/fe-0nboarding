@@ -46,7 +46,7 @@ export default function DocumentReviewRequestCard({
         requiresApproval: true,
         allowComments: true,
         customDocumentPerUser: false,
-        waitingExplanationMessage: 'El proveedor está fabricando el documento que se requiere aprobar. Te notificaremos en cuanto esté disponible para su revisión.',
+        waitingExplanationMessage: 'The provider is preparing the document required for review. We will notify you once it becomes available.',
     });
 
     const [isSaving, setIsSaving] = useState(false);
@@ -323,19 +323,19 @@ export default function DocumentReviewRequestCard({
                 {config.customDocumentPerUser && (
                     <div className={styles['doc-review-card__field']}>
                         <label className={styles['doc-review-card__label']}>
-                            Mensaje de Espera para el Cliente
+                            Client Waiting Message
                         </label>
                         <textarea
                             rows={3}
                             value={config.waitingExplanationMessage ?? ''}
                             onChange={(e) => handleChange('waitingExplanationMessage', e.target.value)}
                             onBlur={() => handleSave()}
-                            placeholder="El proveedor está fabricando el documento que se requiere aprobar. Te notificaremos en cuanto esté disponible para su revisión."
+                            placeholder="The provider is preparing the document required for review. We will notify you once it becomes available."
                             disabled={disabled}
                             className={styles['doc-review-card__input']}
                         />
                         <p className="text-[11px] text-slate-400 mt-1">
-                            Este texto se mostrará al cliente mientras el documento personalizado está siendo elaborado por el proveedor.
+                            This text will be shown to the client while the custom document is being prepared by the provider.
                         </p>
                     </div>
                 )}

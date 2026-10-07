@@ -47,7 +47,7 @@ export default function TermsAndConditionsRequest({
 }: TermsAndConditionsRequestProps) {
     const { user } = useApp();
 
-    const displayTitle = documentTitle || title || 'Términos y Condiciones';
+    const displayTitle = documentTitle || title || 'Terms and Conditions';
     const displayCheckboxes: TermsCheckbox[] = (checkboxes && checkboxes.length > 0)
         ? checkboxes
         : (data?.checkboxes && Array.isArray(data.checkboxes) ? data.checkboxes : []);
@@ -56,7 +56,7 @@ export default function TermsAndConditionsRequest({
 
     const [currentStatus, setCurrentStatus] = useState<string>(isInitialAccepted ? 'accepted' : status);
     const [currentAcceptDate, setCurrentAcceptDate] = useState<string | undefined>(
-        acceptDate || (data?.acceptedAt ? new Date(data.acceptedAt).toLocaleDateString('es-CO', {
+        acceptDate || (data?.acceptedAt ? new Date(data.acceptedAt).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
             day: 'numeric',
@@ -95,7 +95,7 @@ export default function TermsAndConditionsRequest({
         }
         if (acceptDate || data?.acceptedAt) {
             setCurrentAcceptDate(
-                acceptDate || (data?.acceptedAt ? new Date(data.acceptedAt).toLocaleDateString('es-CO', {
+                acceptDate || (data?.acceptedAt ? new Date(data.acceptedAt).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'short',
                     day: 'numeric',
@@ -132,7 +132,7 @@ export default function TermsAndConditionsRequest({
                 }
             } catch (error: any) {
                 console.error("Preview failed:", error);
-                if (isMounted) setPreviewError("No se pudo cargar la vista previa del documento.");
+                if (isMounted) setPreviewError("Could not load document preview.");
             } finally {
                 if (isMounted) setIsLoadingPreview(false);
             }
@@ -157,7 +157,7 @@ export default function TermsAndConditionsRequest({
             const nowIso = new Date().toISOString();
             if (subscriptionId && id) {
                 const freshToken = await (auth.currentUser?.getIdToken() || Promise.resolve(user?.accessToken));
-                if (!freshToken) throw new Error('No se encontró sesión activa');
+                if (!freshToken) throw new Error('No active session found');
                 const orgId = user?.org_id || user?.organization?.id;
                 const baseUrl = process.env.NEXT_PUBLIC_CORE_API_URL || 'http://localhost:3001/api/v1/core';
 
@@ -182,12 +182,12 @@ export default function TermsAndConditionsRequest({
 
                 if (!res.ok) {
                     const err = await res.json().catch(() => ({}));
-                    throw new Error(err.message || 'Error al aceptar los términos y condiciones');
+                    throw new Error(err.message || 'Failed to accept terms and conditions');
                 }
             }
 
             setCurrentStatus('accepted');
-            setCurrentAcceptDate(new Date().toLocaleDateString('es-CO', {
+            setCurrentAcceptDate(new Date().toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'short',
                 day: 'numeric',
@@ -203,7 +203,7 @@ export default function TermsAndConditionsRequest({
             }
         } catch (err: any) {
             console.error('Failed to accept terms:', err);
-            setSubmitError(err.message || 'Error al aceptar los términos. Por favor intenta nuevamente.');
+            setSubmitError(err.message || 'Failed to accept terms. Please try again.');
         } finally {
             setIsSubmitting(false);
         }
@@ -226,7 +226,7 @@ export default function TermsAndConditionsRequest({
                             onClick={() => setIsModalOpen(true)}
                             className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded flex items-center gap-1 hover:bg-emerald-500/20 transition-colors"
                         >
-                            <Icon name="picture_as_pdf" style={{ fontSize: 10 }} /> Ver PDF Completo
+                            <Icon name="picture_as_pdf" style={{ fontSize: 10 }} /> View Full PDF
                         </button>
                     )}
                 </div>
@@ -256,7 +256,7 @@ export default function TermsAndConditionsRequest({
                             <div className="flex items-center gap-1.5">
                                 <Icon name="description" className="text-emerald-500 text-sm" />
                                 <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                                    Documento Legal Adjunto
+                                    Attached Legal Document
                                 </span>
                             </div>
                             {previewUrl && (
@@ -266,7 +266,7 @@ export default function TermsAndConditionsRequest({
                                         onClick={() => setIsModalOpen(true)}
                                         className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
                                     >
-                                        <Icon name="fullscreen" style={{ fontSize: 13 }} /> Pantalla Completa
+                                        <Icon name="fullscreen" style={{ fontSize: 13 }} /> Fullscreen
                                     </button>
                                     <a
                                         href={previewUrl}
@@ -274,7 +274,7 @@ export default function TermsAndConditionsRequest({
                                         rel="noopener noreferrer"
                                         className="text-[11px] font-semibold text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 flex items-center gap-1"
                                     >
-                                        <Icon name="open_in_new" style={{ fontSize: 13 }} /> Abrir
+                                        <Icon name="open_in_new" style={{ fontSize: 13 }} /> Open
                                     </a>
                                 </div>
                             )}
@@ -284,7 +284,7 @@ export default function TermsAndConditionsRequest({
                             {isLoadingPreview ? (
                                 <div className={styles['terms-request__iframe-loading']}>
                                     <div className="size-8 border-2 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin mb-3" />
-                                    <p className="text-xs text-slate-500">Cargando documento de términos y condiciones...</p>
+                                    <p className="text-xs text-slate-500">Loading terms and conditions document...</p>
                                 </div>
                             ) : previewUrl ? (
                                 <iframe
@@ -309,7 +309,7 @@ export default function TermsAndConditionsRequest({
                             ) : (
                                 <div className={styles['terms-request__iframe-empty']}>
                                     <Icon name="description" className="text-2xl text-slate-400 mb-1" />
-                                    <p className="text-xs text-slate-400">Documento no disponible.</p>
+                                    <p className="text-xs text-slate-400">Document not available.</p>
                                 </div>
                             )}
                         </div>
@@ -317,7 +317,7 @@ export default function TermsAndConditionsRequest({
                 ) : (
                     <div className={styles['terms-request__reader']}>
                         <div className={styles['terms-request__prose']}>
-                            {content || 'Por favor lea y acepte los términos y condiciones antes de continuar.'}
+                            {content || 'Please read and accept the terms and conditions before continuing.'}
                         </div>
                     </div>
                 )}
@@ -328,15 +328,15 @@ export default function TermsAndConditionsRequest({
                             <div className={styles['terms-request__accepted-info']}>
                                 <Icon name="verified" className="text-emerald-500 text-2xl flex-shrink-0" />
                                 <div>
-                                    <h5 className={styles['terms-request__accepted-title']}>Términos Aceptados</h5>
+                                    <h5 className={styles['terms-request__accepted-title']}>Terms Accepted</h5>
                                     <p className={styles['terms-request__accepted-subtext']}>
-                                        Has aceptado todos los términos y condiciones del servicio.
+                                        You have accepted all terms and conditions for this service.
                                     </p>
                                 </div>
                             </div>
                             {currentAcceptDate && (
                                 <div className={styles['terms-request__accepted-date']}>
-                                    Aceptado el {currentAcceptDate}
+                                    Accepted on {currentAcceptDate}
                                 </div>
                             )}
                         </div>
@@ -344,7 +344,7 @@ export default function TermsAndConditionsRequest({
                         {displayCheckboxes.length > 0 && (
                             <div className={styles['terms-request__accepted-clauses']}>
                                 <p className="text-xs font-bold text-slate-600 dark:text-slate-400 mb-2.5">
-                                    Cláusulas confirmadas:
+                                    Confirmed clauses:
                                 </p>
                                 <div className="space-y-2">
                                     {displayCheckboxes.map(cb => (
@@ -403,12 +403,12 @@ export default function TermsAndConditionsRequest({
                                 {isSubmitting ? (
                                     <>
                                         <Icon name="progress_activity" className="text-sm mr-2 animate-spin" />
-                                        Aceptando términos...
+                                        Accepting terms...
                                     </>
                                 ) : (
                                     <>
                                         <Icon name="task_alt" className="text-sm mr-2" />
-                                        Aceptar Términos
+                                        Accept Terms
                                     </>
                                 )}
                             </Button>
@@ -420,14 +420,14 @@ export default function TermsAndConditionsRequest({
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                title={displayTitle || "Términos y Condiciones (PDF)"}
+                title={displayTitle || "Terms and Conditions (PDF)"}
                 size="lg"
             >
                 <div className="bg-surface rounded-xl overflow-hidden w-full h-[65vh] flex justify-center items-center">
                     {isLoadingPreview ? (
                         <div className="flex flex-col items-center text-slate-400">
                             <div className="size-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin mb-4" />
-                            <p className="text-sm">Abriendo documento...</p>
+                            <p className="text-sm">Opening document...</p>
                         </div>
                     ) : previewUrl ? (
                         <iframe 
@@ -436,7 +436,7 @@ export default function TermsAndConditionsRequest({
                             title="PDF Preview"
                         />
                     ) : (
-                        <p className="text-rose-400">No se pudo cargar la vista previa del documento.</p>
+                        <p className="text-rose-400">Could not load document preview.</p>
                     )}
                 </div>
             </Modal>

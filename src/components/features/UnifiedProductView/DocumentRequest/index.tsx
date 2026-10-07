@@ -48,7 +48,7 @@ export default function DocumentRequest({
     // Initial document state from data
     const initialDoc = (data?.fileKey || data?.fileUrl || data?.fileName) ? {
         fileKey: data.fileKey || data.fileUrl || '',
-        fileName: data.fileName || (data.fileKey ? data.fileKey.split('/').pop() : 'Documento.pdf'),
+        fileName: data.fileName || (data.fileKey ? data.fileKey.split('/').pop() : 'Document.pdf'),
         uploadedAt: data.uploadedAt || uploadDate,
     } : null;
 
@@ -77,7 +77,7 @@ export default function DocumentRequest({
         if (data?.fileKey || data?.fileUrl || data?.fileName) {
             setUploadedDoc({
                 fileKey: data.fileKey || data.fileUrl || '',
-                fileName: data.fileName || (data.fileKey ? data.fileKey.split('/').pop() : 'Documento.pdf'),
+                fileName: data.fileName || (data.fileKey ? data.fileKey.split('/').pop() : 'Document.pdf'),
                 uploadedAt: data.uploadedAt || uploadDate,
             });
         }
@@ -91,7 +91,7 @@ export default function DocumentRequest({
     const acceptAttr = normalizedFormats.map(f => `.${f}`).join(',');
 
     const displayTitle = documentTitle || title || 'Document Request';
-    const displayInstructions = instructions || content || 'Por favor sube el documento solicitado a continuación.';
+    const displayInstructions = instructions || content || 'Please upload the requested document below.';
     const displayFeedbackNotes = feedbackNotes || data?.feedbackNotes;
 
     const isApproved = currentStatus === 'approved';
@@ -100,7 +100,7 @@ export default function DocumentRequest({
     const isUnderReview = isUploaded && !isApproved && !isRejected;
 
     const formattedUploadDate = uploadedDoc?.uploadedAt
-        ? new Date(uploadedDoc.uploadedAt).toLocaleDateString('es-CO', {
+        ? new Date(uploadedDoc.uploadedAt).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
             day: 'numeric',
@@ -153,7 +153,7 @@ export default function DocumentRequest({
         const ext = file.name.split('.').pop()?.toLowerCase() || '';
         if (normalizedFormats.length > 0 && !normalizedFormats.includes(ext)) {
             setValidationError(
-                `Formato de archivo no válido (.${ext}). Los formatos permitidos son: ${normalizedFormats.map(f => f.toUpperCase()).join(', ')}`
+                `Invalid file format (.${ext}). Allowed formats are: ${normalizedFormats.map(f => f.toUpperCase()).join(', ')}`
             );
             if (fileInputRef.current) fileInputRef.current.value = '';
             return;
@@ -164,7 +164,7 @@ export default function DocumentRequest({
 
         try {
             const freshToken = await (auth.currentUser?.getIdToken() || Promise.resolve(user?.accessToken));
-            if (!freshToken) throw new Error('No se encontró sesión activa');
+            if (!freshToken) throw new Error('No active session found');
             const orgId = user?.org_id || user?.organization?.id;
 
             // 1. Upload to DigitalOcean Spaces via Core API S3 presigned URL
@@ -215,7 +215,7 @@ export default function DocumentRequest({
             }
         } catch (err: any) {
             console.error('Failed to upload document:', err);
-            setValidationError(err.message || 'Error al subir el documento. Por favor intenta de nuevo.');
+            setValidationError(err.message || 'Error uploading document. Please try again.');
         } finally {
             setIsSubmitting(false);
             if (fileInputRef.current) fileInputRef.current.value = '';
@@ -299,7 +299,7 @@ export default function DocumentRequest({
                             <div className={`${styles['document-request__status-box']} ${styles['document-request__status-box--warning']}`}>
                                 <Icon name="warning" className="text-amber-500 text-lg flex-shrink-0" />
                                 <div className={styles['document-request__status-text-box']}>
-                                    <p className={styles['document-request__status-title']}>Formato No Válido</p>
+                                    <p className={styles['document-request__status-title']}>Invalid Format</p>
                                     <p className={styles['document-request__status-subtext']}>{validationError}</p>
                                 </div>
                             </div>
@@ -311,11 +311,11 @@ export default function DocumentRequest({
                                 <Icon name="check_circle" className="text-emerald-500 text-lg flex-shrink-0" />
                                 <div className={styles['document-request__status-text-box']}>
                                     <p className={styles['document-request__status-title']}>
-                                        {isApproved ? 'Documento Aprobado' : 'Documento Subido Correctamente'}
+                                        {isApproved ? 'Document Approved' : 'Document Successfully Uploaded'}
                                     </p>
                                     <p className={styles['document-request__status-subtext']}>
-                                        {uploadedDoc?.fileName || 'Documento adjunto'}
-                                        {formattedUploadDate && ` • Subido el ${formattedUploadDate}`}
+                                        {uploadedDoc?.fileName || 'Attached document'}
+                                        {formattedUploadDate && ` • Uploaded on ${formattedUploadDate}`}
                                     </p>
                                     {uploadedDoc?.fileKey && (
                                         <button 
@@ -323,7 +323,7 @@ export default function DocumentRequest({
                                             className={styles['document-request__view-btn']}
                                             onClick={handleViewDocument}
                                         >
-                                            <Icon name="visibility" className="text-sm" /> Ver documento
+                                            <Icon name="visibility" className="text-sm" /> View document
                                         </button>
                                     )}
                                 </div>
@@ -335,11 +335,11 @@ export default function DocumentRequest({
                             <div className={`${styles['document-request__status-box']} ${styles['document-request__status-box--error']}`}>
                                 <Icon name="error" className="text-red-500 text-lg flex-shrink-0" />
                                 <div className={styles['document-request__status-text-box']}>
-                                    <p className={styles['document-request__status-title']}>Documento Rechazado</p>
+                                    <p className={styles['document-request__status-title']}>Document Rejected</p>
                                     <p className={styles['document-request__status-subtext']}>
                                         {displayFeedbackNotes 
-                                            ? `Observaciones del proveedor: "${displayFeedbackNotes}"`
-                                            : 'Por favor revisa las instrucciones y sube un reemplazo.'}
+                                            ? `Provider notes: "${displayFeedbackNotes}"`
+                                            : 'Please review instructions and upload a replacement.'}
                                     </p>
                                     {uploadedDoc?.fileKey && (
                                         <button 
@@ -347,7 +347,7 @@ export default function DocumentRequest({
                                             className={styles['document-request__view-btn']}
                                             onClick={handleViewDocument}
                                         >
-                                            <Icon name="visibility" className="text-sm" /> Ver documento rechazado
+                                            <Icon name="visibility" className="text-sm" /> View rejected document
                                         </button>
                                     )}
                                 </div>
@@ -384,15 +384,15 @@ export default function DocumentRequest({
                                 </div>
                                 <span className={styles['document-request__upload-label']}>
                                     {isSubmitting || isUploading 
-                                        ? 'Subiendo documento...' 
+                                        ? 'Uploading document...' 
                                         : isUploaded || isRejected 
-                                            ? 'Subir Reemplazo' 
-                                            : 'Explorar Archivos'}
+                                            ? 'Upload Replacement' 
+                                            : 'Browse Files'}
                                 </span>
                                 <span className={styles['document-request__upload-hint']}>
                                     {isSubmitting || isUploading 
-                                        ? 'Por favor espera' 
-                                        : 'o arrastra y suelta aquí'}
+                                        ? 'Please wait' 
+                                        : 'or drag and drop here'}
                                 </span>
                             </div>
                         )}
@@ -416,10 +416,10 @@ export default function DocumentRequest({
                                 download
                                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#1978e5] text-white text-xs font-semibold hover:bg-[#1567c5] transition-colors"
                             >
-                                <Icon name="download" className="text-sm" /> Descargar Archivo
+                                <Icon name="download" className="text-sm" /> Download File
                             </a>
                             <Button variant="secondary" size="sm" onClick={() => setIsViewerOpen(false)}>
-                                Cerrar
+                                Close
                             </Button>
                         </div>
                     ) : undefined
@@ -429,7 +429,7 @@ export default function DocumentRequest({
                     {isLoadingViewer ? (
                         <div className="flex flex-col items-center gap-3">
                             <Icon name="progress_activity" className="animate-spin text-3xl text-blue-500" />
-                            <p className="text-sm text-slate-500">Cargando vista previa...</p>
+                            <p className="text-sm text-slate-500">Loading preview...</p>
                         </div>
                     ) : viewerUrl ? (
                         <iframe
@@ -440,14 +440,14 @@ export default function DocumentRequest({
                     ) : viewerError ? (
                         <div className="text-center p-8 text-slate-500">
                             <Icon name="error_outline" className="text-4xl text-red-500 mb-2" />
-                            <p className="font-semibold text-slate-800 dark:text-slate-200">No se pudo cargar la vista previa</p>
+                            <p className="font-semibold text-slate-800 dark:text-slate-200">Could not load preview</p>
                             <p className="text-sm text-slate-400 mt-1">{viewerError}</p>
                         </div>
                     ) : (
                         <div className="text-center p-8 text-slate-500">
                             <Icon name="description" className="text-5xl text-blue-500 mb-3" />
                             <p className="font-semibold text-slate-800 dark:text-slate-200">{viewerTitle}</p>
-                            <p className="text-sm text-slate-400 mt-1">No hay documento disponible.</p>
+                            <p className="text-sm text-slate-400 mt-1">No document available.</p>
                         </div>
                     )}
                 </div>

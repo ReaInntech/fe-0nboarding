@@ -132,11 +132,11 @@ export default function RequestItem({ req, subscriptionId, className }: RequestI
                 handleCloseDetails();
             } else {
                 const err = await response.json().catch(() => ({}));
-                throw new Error(err.message || 'Error al aprobar la solicitud');
+                throw new Error(err.message || 'Failed to approve request');
             }
         } catch (error: any) {
             console.error('Failed to approve request:', error);
-            alert(`Error aprobando solicitud: ${error.message}`);
+            alert(`Error approving request: ${error.message}`);
         } finally {
             setIsSubmittingReview(false);
         }
@@ -169,11 +169,11 @@ export default function RequestItem({ req, subscriptionId, className }: RequestI
                 handleCloseDetails();
             } else {
                 const err = await response.json().catch(() => ({}));
-                throw new Error(err.message || 'Error al rechazar la solicitud');
+                throw new Error(err.message || 'Failed to reject request');
             }
         } catch (error: any) {
             console.error('Failed to reject request:', error);
-            alert(`Error rechazando solicitud: ${error.message}`);
+            alert(`Error rejecting request: ${error.message}`);
         } finally {
             setIsSubmittingReview(false);
         }
@@ -205,14 +205,14 @@ export default function RequestItem({ req, subscriptionId, className }: RequestI
             if (response.ok) {
                 setUploadedCustomFile(uploadedKey);
                 setCurrentStatus('waiting_client');
-                alert('Documento personalizado subido correctamente. El cliente ha sido notificado.');
+                alert('Custom document uploaded successfully. Client has been notified.');
             } else {
                 const err = await response.json().catch(() => ({}));
-                throw new Error(err.message || 'Error al guardar el documento personalizado');
+                throw new Error(err.message || 'Failed to save custom document');
             }
         } catch (error: any) {
             console.error('Failed to upload custom document:', error);
-            alert(`Error subiendo documento: ${error.message}`);
+            alert(`Error uploading document: ${error.message}`);
         } finally {
             if (fileInputRef.current) fileInputRef.current.value = '';
         }
@@ -351,7 +351,7 @@ export default function RequestItem({ req, subscriptionId, className }: RequestI
                         {currentStatus === 'approved' ? (
                             <div className="flex items-center gap-1.5 text-xs text-emerald-500 font-medium">
                                 <Icon name="verified" className="text-sm" />
-                                <span>Documento aprobado por el cliente</span>
+                                <span>Document approved by client</span>
                             </div>
                         ) : uploadedCustomFile ? (
                             <div className="flex items-center gap-1.5 text-xs text-emerald-500 font-medium">

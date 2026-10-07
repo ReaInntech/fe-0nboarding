@@ -21,10 +21,38 @@ export default function ContractingProgress({
     steps = [],
     className = ''
 }: ContractingProgressProps) {
-    const activeIndex = steps.findIndex((s) => s.status === 'active');
-    const progressWidth = steps.length > 1 && activeIndex >= 0
-        ? `${(activeIndex / (steps.length - 1)) * 100}%`
-        : steps.every(s => s.status === 'completed') ? '100%' : '0%';
+    if (!steps || steps.length === 0) return null;
+
+    const hasCompletedStep = steps.some(s => s.label.trim().toLowerCase() === 'completed');
+    const allRealStepsCompleted = steps.every(s => s.status === 'completed');
+
+    const displaySteps: ContractingStep[] = hasCompletedStep
+        ? steps
+        : [
+            ...steps,
+            {
+                label: 'Completed',
+                status: allRealStepsCompleted ? 'completed' : 'pending',
+                icon: 'task_alt',
+            },
+        ];
+
+    const activeIndex = displaySteps.findIndex((s) => s.status === 'active');
+    const lastCompletedIndex = displaySteps.findLastIndex((s) => s.status === 'completed');
+    const allCompleted = displaySteps.length > 0 && displaySteps.every((s) => s.status === 'completed');
+
+    let lineProgressIndex = 0;
+    if (allCompleted) {
+        lineProgressIndex = displaySteps.length - 1;
+    } else if (activeIndex !== -1) {
+        lineProgressIndex = activeIndex;
+    } else if (lastCompletedIndex !== -1) {
+        lineProgressIndex = lastCompletedIndex;
+    }
+
+    const progressWidth = displaySteps.length > 1
+        ? `${(lineProgressIndex / (displaySteps.length - 1)) * 100}%`
+        : allCompleted ? '100%' : '0%';
 
     return (
         <section className={`${styles['contracting-progress']} ${className}`}>
@@ -34,7 +62,9 @@ export default function ContractingProgress({
                         <Icon name="analytics" className={styles['contracting-progress__icon']} />
                         Contracting Progress
                     </h3>
-                    <Badge variant="primary">Current Phase: {currentPhase}</Badge>
+                    <Badge variant={allCompleted ? 'success' : 'primary'}>
+                        Current Phase: {allCompleted ? 'Completed' : currentPhase}
+                    </Badge>
                 </div>
                 <div className={styles['contracting-progress__steps-container']}>
                     <div className={styles['contracting-progress__line-bg']}></div>
@@ -42,7 +72,7 @@ export default function ContractingProgress({
                         className={styles['contracting-progress__line-progress']} 
                         style={{ width: progressWidth }}
                     ></div>
-                    {steps.map((step, idx) => {
+                    {displaySteps.map((step, idx) => {
                         const isCompleted = step.status === 'completed';
                         const isActive = step.status === 'active';
                         
@@ -59,7 +89,7 @@ export default function ContractingProgress({
                         return (
                             <div key={idx} className={styles['contracting-progress__step']}>
                                 <div className={circleClass}>
-                                    <Icon name={step.icon} className={styles['contracting-progress__step-icon']} />
+                                    <Icon name={isCompleted ? 'check' : step.icon} className={styles['contracting-progress__step-icon']} />
                                 </div>
                                 <span className={labelClass}>
                                     {step.label}

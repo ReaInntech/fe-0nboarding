@@ -69,10 +69,41 @@ export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps
         const cleanPhone = String(supportPhone).replace(/[^0-9]/g, '');
         if (cleanPhone.length >= 7) {
             hasSupportPhone = true;
-            const message = `Hola, requiero soporte para mi servicio "${sub.product?.name || sub.name || 'Servicio'}" (ID: ${sub.id})`;
+            const message = `Hello, I need support for my service "${sub.product?.name || sub.name || 'Service'}" (ID: ${sub.id})`;
             whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
         }
     }
+
+    const rawSteps = sub.contracting_steps || sub.steps || [];
+    const isSubActive = sub.status === 'active';
+    const currentStepIdx = rawSteps.findIndex((s: any) => s.is_current || s.id === sub.current_step_id);
+
+    const mappedSteps = rawSteps.map((step: any, idx: number) => {
+        let status: 'completed' | 'active' | 'pending' = 'pending';
+        if (isSubActive) {
+            status = 'completed';
+        } else if (step.status) {
+            status = step.status;
+        } else if (currentStepIdx !== -1) {
+            if (idx < currentStepIdx) {
+                status = 'completed';
+            } else if (idx === currentStepIdx) {
+                status = 'active';
+            } else {
+                status = 'pending';
+            }
+        } else if (step.is_current) {
+            status = 'active';
+        } else if (idx === 0) {
+            status = 'active';
+        }
+
+        return {
+            label: step.label || step.name,
+            status,
+            icon: step.icon || 'circle',
+        };
+    });
 
     return {
         headerProps: {
@@ -88,17 +119,13 @@ export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps
                 { icon: 'category', text: sub.product?.billing_model || 'Subscription' },
             ],
             actions: hasSupportPhone && whatsappUrl ? [
-                { label: 'Soporte WhatsApp', icon: 'support_agent', variant: 'secondary', href: whatsappUrl },
+                { label: 'WhatsApp Support', icon: 'support_agent', variant: 'secondary', href: whatsappUrl },
             ] : [],
         },
-        showContractingProgress: !!(sub.contracting_steps || sub.steps)?.length,
+        showContractingProgress: !!rawSteps.length,
         contractingProgressProps: {
-            currentPhase: sub.progress_label || 'In Progress',
-            steps: (sub.contracting_steps || sub.steps || []).map((step: any) => ({
-                label: step.label || step.name,
-                status: (step.is_current ? 'active' : step.status || 'pending') as 'completed' | 'active' | 'pending',
-                icon: step.icon || 'circle',
-            })),
+            currentPhase: isSubActive ? 'Completed' : (sub.progress_label || sub.current_step?.label || 'In Progress'),
+            steps: mappedSteps,
         },
         serviceDetailsProps: {
             title: 'Service Details',
@@ -116,13 +143,16 @@ export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps
         },
         legalDocumentsProps: {
             documents: documentsRaw.map((doc: any) => ({
-                icon: 'description',
+                id: doc.id,
+                icon: doc.icon || 'description',
                 name: doc.name || 'Document',
-                description: doc.description || 'Service related document',
+                description: doc.description || doc.status_text || 'Official service document',
                 createdAt: doc.created_at ? new Date(doc.created_at).toLocaleDateString('en-US') : 'N/A',
-                approvedAt: doc.verified_at ? new Date(doc.verified_at).toLocaleDateString('en-US') : 'Pending',
+                approvedAt: doc.signed_at ? new Date(doc.signed_at).toLocaleDateString('en-US') : (doc.generation_status === 'ready' ? 'Approved' : 'Pending'),
                 step: doc.step_name || 'General',
                 format: doc.file_type || 'PDF',
+                generationStatus: doc.generation_status || 'pending',
+                fileKey: doc.file_key || null,
             })),
         },
         showRequests: !!allRequestsRaw.length,
@@ -221,7 +251,7 @@ export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps
                     checkboxes: action.config?.checkboxes || [],
                     fields: action.config?.fields || [],
                     submitDate: reqData.submittedAt
-                        ? new Date(reqData.submittedAt).toLocaleDateString('es-CO', {
+                        ? new Date(reqData.submittedAt).toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'short',
                             day: 'numeric',
@@ -230,7 +260,7 @@ export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps
                         })
                         : undefined,
                     acceptDate: reqData.acceptedAt
-                        ? new Date(reqData.acceptedAt).toLocaleDateString('es-CO', {
+                        ? new Date(reqData.acceptedAt).toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'short',
                             day: 'numeric',

@@ -81,6 +81,14 @@
         &--approved {
             @apply text-emerald-600 dark:text-emerald-500 font-medium mt-0.5;
         }
+
+        &--generating {
+            @apply text-amber-600 dark:text-amber-400 font-medium mt-0.5;
+        }
+
+        &--failed {
+            @apply text-rose-600 dark:text-rose-400 font-medium mt-0.5;
+        }
     }
 
     &__action {

@@ -372,8 +372,8 @@ export const FALLBACK_SUBSCRIPTION_DETAIL_DATA: UnifiedProductViewProps = {
                 name: 'Contrato de Consultoría Estratégica',
                 description: 'Definición de alcances, entregables y cronograma de la implementación de IA.',
                 createdAt: 'Mar 12, 2026',
-                approvedAt: 'Pendiente',
-                step: 'Contratación',
+                approvedAt: 'Pending',
+                step: 'Contracting',
                 format: 'DOCX',
             }
         ]

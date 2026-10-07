@@ -90,6 +90,23 @@ export async function updateProviderSubscriptionStatus(id: string, status: strin
   });
 }
 
+export async function advanceProviderSubscriptionStep(
+  id: string,
+  token?: string,
+  orgId?: string
+): Promise<{ success: boolean; message: string; subscription?: any; nextStepId?: string; status?: string }> {
+  return apiFetch<{ success: boolean; message: string; subscription?: any; nextStepId?: string; status?: string }>(
+    `/dashboard/subscriptions/${id}/advance-step`,
+    {
+      method: 'POST',
+      microservice: 'provider',
+      token,
+      orgId,
+      headers: { 'Content-Type': 'application/json' },
+    }
+  );
+}
+
 export async function getFinanceKPIs(token: string, orgId: string): Promise<FinanceKpis> {
   const data = await apiFetch<FinanceKpiDTO>('/finance/kpis', {
     microservice: 'provider',

@@ -11,6 +11,8 @@ import {
   getNotifications,
   deleteNotification,
 } from '@/src/lib/api/dashboard';
+import { canSwitchBetweenRoles } from '@/src/lib/utils/email';
+import { getUserAvatarUrl } from '@/src/lib/utils/avatar';
 import styles from './index.module.scss';
 
 interface NavItem {
@@ -32,6 +34,7 @@ export default function ProviderTopNavigation({ onLogout, activeTab: activeTabPr
     const user = userProfile || contextUser;
     const profile = user || { avatar_url: "", organization: { client_type: "" as any } };
     const isNaturalPerson = profile.organization?.client_type === 'natural_person';
+    const showModeSwitcher = canSwitchBetweenRoles(user?.email);
 
     const [mode, setMode] = useState('provider');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -143,7 +146,7 @@ export default function ProviderTopNavigation({ onLogout, activeTab: activeTabPr
                     </nav>
 
                     <div className={styles['nav__controls']}>
-                        {!isNaturalPerson && (
+                        {showModeSwitcher && (
                             <div className={styles['nav__mode-selector']}>
                                 <span className={styles['nav__mode-label']}>Mode:</span>
                                 <select
@@ -176,7 +179,11 @@ export default function ProviderTopNavigation({ onLogout, activeTab: activeTabPr
                             )}
                         </button>
 
-                        <Avatar sizeClasses="size-8" src={profile.avatar_url || profile.firebasePhotoUrl || ''} />
+                        <Avatar
+                            sizeClasses="size-8"
+                            src={getUserAvatarUrl(profile)}
+                            alt={profile.full_name || profile.name || profile.email || 'Provider User'}
+                        />
 
                         <button onClick={handleLogout} className={styles['nav__logout-btn']} title="Logout">
                             <Icon name="logout" className={styles['nav__logout-icon']} />
@@ -206,7 +213,7 @@ export default function ProviderTopNavigation({ onLogout, activeTab: activeTabPr
                                 </a>
                             ))}
 
-                            {!isNaturalPerson && (
+                            {showModeSwitcher && (
                                 <div className={styles['nav__mobile-mode']}>
                                     <span className={styles['nav__mobile-mode-label']}>Mode</span>
                                     <div className={styles['nav__mobile-mode-wrapper']}>

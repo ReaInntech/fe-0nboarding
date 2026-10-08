@@ -171,7 +171,7 @@ export default function RequestVerificationContent({ payload }: RequestVerificat
                             </div>
                             {data.fileName && (
                                 <div className={styles['verification-row']}>
-                                    <span className={styles['verification-label']}>Archivo Comprobante</span>
+                                    <span className={styles['verification-label']}>Payment Receipt File</span>
                                     <span className={styles['verification-value']}>{data.fileName}</span>
                                 </div>
                             )}
@@ -185,8 +185,8 @@ export default function RequestVerificationContent({ payload }: RequestVerificat
                     </div>
                     {data.receiptUrl && (
                         <div className={styles['verification-section']}>
-                            <h4 className={styles['verification-subtitle']}>Comprobante de Pago Subido</h4>
-                            <SecureFilePreview fileKey={data.receiptUrl} altTitle={data.fileName || 'Comprobante de Pago'} />
+                            <h4 className={styles['verification-subtitle']}>Uploaded Payment Receipt</h4>
+                            <SecureFilePreview fileKey={data.receiptUrl} altTitle={data.fileName || 'Payment Receipt'} />
                         </div>
                     )}
                 </div>

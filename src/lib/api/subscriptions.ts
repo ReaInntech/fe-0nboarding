@@ -1,3 +1,4 @@
+import { humanizeBillingModel } from "../utils/product";
 import { apiFetch } from './config';
 import { UnifiedProductViewProps } from '@/src/components/features/UnifiedProductView/UnifiedProductView';
 
@@ -116,7 +117,7 @@ export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps
             meta: [
                 { icon: 'calendar_today', text: `Started ${sub.created_at ? new Date(sub.created_at).toLocaleDateString('en-US') : 'N/A'}` },
                 { icon: 'business', text: providerName },
-                { icon: 'category', text: sub.product?.billing_model || 'Subscription' },
+                { icon: 'category', text: humanizeBillingModel(sub.product?.billing_model) },
             ],
             actions: hasSupportPhone && whatsappUrl ? [
                 { label: 'WhatsApp Support', icon: 'support_agent', variant: 'secondary', href: whatsappUrl },
@@ -135,7 +136,7 @@ export function mapSubscriptionToUnifiedView(data: any): UnifiedProductViewProps
             paidAmount: paidAmount,
             fields: [
                 { icon: 'info', label: 'Service Type', value: sub.product?.name || 'N/A' },
-                { icon: 'payments', label: 'Billing Model', value: sub.product?.billing_model || 'N/A' },
+                { icon: 'payments', label: 'Billing Model', value: humanizeBillingModel(sub.product?.billing_model) },
                 { icon: 'event', label: 'Next Renewal', value: sub.next_renewal ? new Date(sub.next_renewal).toLocaleDateString('en-US') : 'N/A' },
                 // Map product metadata using the helper
                 ...mapProductMetadataToFields(sub.product_metadata_override, sub.product?.metadata),

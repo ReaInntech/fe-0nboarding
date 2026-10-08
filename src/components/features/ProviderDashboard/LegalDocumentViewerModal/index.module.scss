@@ -1,0 +1,93 @@
+@reference "tailwindcss";
+
+.viewer {
+    @apply flex flex-col gap-4 text-slate-200;
+
+    &__meta {
+        @apply flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl bg-slate-900/80 border border-slate-800;
+    }
+
+    &__meta-left {
+        @apply flex items-center gap-3 min-w-0;
+    }
+
+    &__meta-icon-box {
+        @apply size-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-[#1978e5] flex items-center justify-center shrink-0;
+    }
+
+    &__meta-title {
+        @apply font-semibold text-slate-100 text-base truncate;
+    }
+
+    &__meta-sub {
+        @apply text-xs text-slate-400 mt-0.5 flex items-center gap-2;
+    }
+
+    &__meta-right {
+        @apply flex items-center gap-2 ml-auto;
+    }
+
+    &__badge {
+        @apply text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap uppercase tracking-wider;
+
+        &--signed {
+            @apply bg-emerald-500/15 text-emerald-400 border border-emerald-500/20;
+        }
+
+        &--pending {
+            @apply bg-amber-500/15 text-amber-400 border border-amber-500/20;
+        }
+
+        &--generating {
+            @apply bg-blue-500/15 text-blue-400 border border-blue-500/20;
+        }
+
+        &--failed {
+            @apply bg-rose-500/15 text-rose-400 border border-rose-500/20;
+        }
+    }
+
+    &__content {
+        @apply relative w-full rounded-xl overflow-hidden border border-slate-800 bg-slate-950/60 min-h-[480px] flex items-center justify-center;
+    }
+
+    &__iframe {
+        @apply w-full h-[65vh] border-0 rounded-xl bg-white dark:bg-slate-950;
+    }
+
+    &__state-box {
+        @apply flex flex-col items-center justify-center text-center p-8 max-w-md mx-auto;
+    }
+
+    &__state-icon {
+        @apply size-14 rounded-2xl flex items-center justify-center mb-4 text-2xl;
+
+        &--loading {
+            @apply bg-blue-500/10 text-blue-400 border border-blue-500/20 animate-spin;
+        }
+
+        &--generating {
+            @apply bg-amber-500/10 text-amber-400 border border-amber-500/20 animate-pulse;
+        }
+
+        &--empty {
+            @apply bg-slate-800 text-slate-400 border border-slate-700;
+        }
+
+        &--error {
+            @apply bg-rose-500/10 text-rose-400 border border-rose-500/20;
+        }
+    }
+
+    &__state-title {
+        @apply text-base font-semibold text-slate-200 mb-1.5;
+    }
+
+    &__state-desc {
+        @apply text-xs text-slate-400 max-w-sm leading-relaxed mb-4;
+    }
+
+    &__actions {
+        @apply flex items-center gap-2;
+    }
+}

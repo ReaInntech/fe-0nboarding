@@ -70,12 +70,12 @@ export default function PaymentHistory({
                                             rel="noopener noreferrer"
                                             download
                                             className={styles['payment-history__download-btn']}
-                                            title="Descargar comprobante"
+                                            title="Download receipt"
                                         >
                                             <Icon name="download" className="text-[20px]" />
                                         </a>
                                     ) : (
-                                        <button className={styles['payment-history__download-btn']} title="Comprobante no disponible" disabled>
+                                        <button className={styles['payment-history__download-btn']} title="Receipt not available" disabled>
                                             <Icon name="download" className="text-[20px] opacity-40" />
                                         </button>
                                     )}

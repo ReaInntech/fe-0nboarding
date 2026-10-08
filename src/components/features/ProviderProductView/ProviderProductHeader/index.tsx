@@ -5,6 +5,7 @@ import Icon from '../../../shared/atoms/Icon';
 import Badge from '../../../shared/atoms/Badge';
 import ProviderProductForm from './ProviderProductForm';
 import CreateSubscriptionModal from '../../../shared/molecule/CreateSubscriptionModal';
+import { humanizeBillingModel, formatBillingPeriod } from '@/src/lib/utils/product';
 import styles from './index.module.scss';
 
 export interface ProviderProductHeaderProps {
@@ -131,15 +132,18 @@ export default function ProviderProductHeader({
                             <p className="flex items-center gap-1.5 text-slate-400 text-sm">
                                 <Icon name="payments" className="text-xs" />
                                 <span>${Number(saved.price || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
-                                <span className="text-xs opacity-70">/{saved.billing}</span>
+                                {formatBillingPeriod(saved.billing) ? (
+                                    <span className="text-xs opacity-70">{formatBillingPeriod(saved.billing)}</span>
+                                ) : null}
+                                <span className="text-xs opacity-70 font-medium">({humanizeBillingModel(saved.billing)})</span>
                             </p>
                             <p className="flex items-center gap-1.5 text-slate-400 text-sm">
                                 <Icon name="shopping_cart" className="text-xs" />
-                                <span>{sold} ventas</span>
+                                <span>{sold} {sold === 1 ? 'sale' : 'sales'}</span>
                             </p>
                             <p className="flex items-center gap-1.5 text-emerald-400 font-medium text-sm">
                                 <Icon name="account_balance_wallet" className="text-xs" />
-                                <span>${(sold * Number(saved.price || 0)).toLocaleString('en-US', { minimumFractionDigits: 2 })} recaudo</span>
+                                <span>${(sold * Number(saved.price || 0)).toLocaleString('en-US', { minimumFractionDigits: 2 })} revenue</span>
                             </p>
                         </div>
                     </div>
@@ -147,7 +151,7 @@ export default function ProviderProductHeader({
                 <div className={styles['provider-header__actions']}>
                     <div className="flex items-center gap-3 bg-slate-800/40 px-3 py-1.5 rounded-lg border border-slate-700/50">
                         <span className={`text-xs font-bold uppercase tracking-wider ${saved.status === 'active' ? 'text-emerald-400' : 'text-slate-400'}`}>
-                            {saved.status === 'active' ? 'Activo' : 'Inactivo'}
+                            {saved.status === 'active' ? 'Active' : 'Inactive'}
                         </span>
                         <button
                             onClick={handleToggleStatus}

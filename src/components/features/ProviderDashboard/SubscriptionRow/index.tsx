@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Icon from '../../../shared/atoms/Icon';
 import SubscriptionActionCenter from '../SubscriptionActionCenter';
+import LegalDocumentViewerModal from '../LegalDocumentViewerModal';
 import { Subscription } from '@/src/lib/api/types';
 export type SubscriptionData = Subscription;
 import styles from './index.module.scss';
@@ -25,6 +26,7 @@ export default function SubscriptionRow({
     onDisable
 }: SubscriptionRowProps) {
     const [isExpanded, setIsExpanded] = useState(initialExpanded);
+    const [selectedDocument, setSelectedDocument] = useState<any | null>(null);
 
     useEffect(() => {
         if (initialExpanded) {
@@ -213,14 +215,35 @@ export default function SubscriptionRow({
                             {sub.documents && sub.documents.length > 0 ? (
                                 <div className={styles['subscription-row__docs-container']}>
                                     {sub.documents.map((doc, idx) => (
-                                        <div key={idx} className={styles['subscription-row__doc-item']}>
+                                        <div
+                                            key={doc.id || idx}
+                                            className={`group ${styles['subscription-row__doc-item']}`}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setSelectedDocument(doc);
+                                            }}
+                                            role="button"
+                                            tabIndex={0}
+                                            title={`Click to preview ${doc.name}`}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' || e.key === ' ') {
+                                                    e.stopPropagation();
+                                                    setSelectedDocument(doc);
+                                                }
+                                            }}
+                                        >
                                             <div className={styles['subscription-row__doc-info']}>
-                                                <Icon name="description" className={styles['subscription-row__doc-icon']} />
+                                                <Icon name={doc.icon || "description"} className={styles['subscription-row__doc-icon']} />
                                                 <span className={styles['subscription-row__doc-name']}>{doc.name}</span>
                                             </div>
-                                            <span className={`${styles['subscription-row__doc-status']} ${styles[`subscription-row__doc-status--${doc.status === 'signed' ? 'signed' : 'pending'}`]}`}>
-                                                {doc.status.toUpperCase()}
-                                            </span>
+                                            <div className="flex items-center gap-1.5 shrink-0">
+                                                <span className={`${styles['subscription-row__doc-status']} ${styles[`subscription-row__doc-status--${doc.status === 'signed' ? 'signed' : 'pending'}`]}`}>
+                                                    {(doc.status || 'pending').toUpperCase()}
+                                                </span>
+                                                <span className={styles['subscription-row__doc-preview-icon']} title="View document">
+                                                    <Icon name="visibility" className="text-sm" />
+                                                </span>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
@@ -232,6 +255,17 @@ export default function SubscriptionRow({
                     <SubscriptionActionCenter subscriptionId={sub.id} steps={sub.steps} requests={sub.requests} />
                 </>
             )}
+
+            {/* Document Preview Modal */}
+            {selectedDocument && (
+                <LegalDocumentViewerModal
+                    isOpen={Boolean(selectedDocument)}
+                    onClose={() => setSelectedDocument(null)}
+                    document={selectedDocument}
+                    clientName={sub.client?.legalName}
+                />
+            )}
         </div>
     );
 }
+

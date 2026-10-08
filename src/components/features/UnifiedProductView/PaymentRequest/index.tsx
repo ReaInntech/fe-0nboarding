@@ -73,7 +73,7 @@ export default function PaymentRequest({
     // Initial receipt state from data
     const initialReceipt = data?.receiptFile || data?.receiptUrl ? {
         fileKey: data.receiptFile || data.receiptUrl,
-        fileName: data.fileName || (data.receiptFile ? data.receiptFile.split('/').pop() : 'Comprobante_Pago.pdf'),
+        fileName: data.fileName || (data.receiptFile ? data.receiptFile.split('/').pop() : 'Payment_Receipt.pdf'),
         uploadedAt: data.uploadedAt || uploadDate,
     } : null;
 
@@ -94,7 +94,7 @@ export default function PaymentRequest({
         if (data?.receiptFile || data?.receiptUrl) {
             setUploadedReceipt({
                 fileKey: data.receiptFile || data.receiptUrl,
-                fileName: data.fileName || (data.receiptFile ? data.receiptFile.split('/').pop() : 'Comprobante_Pago.pdf'),
+                fileName: data.fileName || (data.receiptFile ? data.receiptFile.split('/').pop() : 'Payment_Receipt.pdf'),
                 uploadedAt: data.uploadedAt || uploadDate,
             });
         }

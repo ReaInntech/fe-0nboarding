@@ -20,7 +20,7 @@ const STATUS_OPTIONS = [
 const BILLING_OPTIONS = [
     { value: 'monthly', label: 'Monthly', icon: 'calendar_month' },
     { value: 'annual', label: 'Annual', icon: 'event_available' },
-    { value: 'one_time', label: 'One-time Payment', icon: 'payments' },
+    { value: 'one_time', label: 'Single Payment', icon: 'payments' },
     { value: 'usage', label: 'By Usage', icon: 'show_chart' },
 ];
 
@@ -192,7 +192,7 @@ export default function ProviderProductForm({
                         disabled={isSubmitting || isSuccess}
                     >
                         {isSuccess ? (
-                            <><Icon name="check_circle" className="mr-2 text-sm" /> ¡Guardado!</>
+                            <><Icon name="check_circle" className="mr-2 text-sm" /> Saved!</>
                         ) : (
                             <><Icon name="save" className="mr-2 text-sm" /> {submitLabel}</>
                         )}

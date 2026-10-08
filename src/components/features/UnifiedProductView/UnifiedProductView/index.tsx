@@ -67,7 +67,9 @@ export default function UnifiedProductView({
                         <div className={styles['unified-product-view__left-col']}>
                             <ServiceDetails {...serviceDetailsProps} />
 
-                            <LegalDocuments {...legalDocumentsProps} />
+                            {legalDocumentsProps?.documents && legalDocumentsProps.documents.length > 0 && (
+                                <LegalDocuments {...legalDocumentsProps} />
+                            )}
                         </div>
                         <div className={styles['unified-product-view__right-col']}>
                             {

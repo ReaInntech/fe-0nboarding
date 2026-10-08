@@ -25,7 +25,7 @@ export function mapProduct(dto: ProductDTO): Product {
     description: dto.description || '',
     price: Number(dto.base_price ?? dto.price) || 0,
     period: mapBillingPeriod(dto.billing_model || dto.service_type || 'monthly'),
-    sold: dto.total_sold || 0,
+    sold: dto.total_sold ?? (dto as any)._count?.subscriptions ?? 0,
     productCode: dto.product_code || '',
     category: dto.category || 'General',
     status: (dto.status as any) || 'active',
@@ -188,7 +188,7 @@ export async function getProviderProductDetailData(id: string, token?: string, o
     base_price: data.base_price,
     billing_model: data.billing_model,
     price: data.price,
-    total_sold: data.total_sold,
+    total_sold: data.total_sold ?? data._count?.subscriptions ?? 0,
     status: data.status,
     category: data.category
   };

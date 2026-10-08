@@ -85,7 +85,7 @@ export default function FormRequest({
     }, [status, data, submitDate]);
 
     const displayTitle = formTitle || title || 'Form Request';
-    const displayInstructions = instructions || content || 'Por favor completa la información solicitada a continuación.';
+    const displayInstructions = instructions || content || 'Please complete the requested information below.';
     const displayFields: FormField[] = (fields && fields.length > 0)
         ? fields
         : (data?.fields && Array.isArray(data.fields) ? data.fields : []);
@@ -107,7 +107,7 @@ export default function FormRequest({
             const nowIso = new Date().toISOString();
             if (subscriptionId && id) {
                 const freshToken = await (auth.currentUser?.getIdToken() || Promise.resolve(user?.accessToken));
-                if (!freshToken) throw new Error('No se encontró sesión activa');
+                if (!freshToken) throw new Error('No active session found');
                 const orgId = user?.org_id || user?.organization?.id;
                 const baseUrl = process.env.NEXT_PUBLIC_CORE_API_URL || 'http://localhost:3001/api/v1/core';
 
@@ -131,7 +131,7 @@ export default function FormRequest({
 
                 if (!res.ok) {
                     const err = await res.json().catch(() => ({}));
-                    throw new Error(err.message || 'Error al enviar el formulario');
+                    throw new Error(err.message || 'Failed to submit form');
                 }
             }
 
@@ -152,7 +152,7 @@ export default function FormRequest({
             }
         } catch (err: any) {
             console.error('Failed to submit form responses:', err);
-            setSubmitError(err.message || 'Error al enviar las respuestas. Por favor intenta de nuevo.');
+            setSubmitError(err.message || 'Failed to submit responses. Please try again.');
         } finally {
             setIsSubmitting(false);
         }

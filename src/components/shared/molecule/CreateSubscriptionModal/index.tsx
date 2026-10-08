@@ -4,6 +4,7 @@ import Input from '../../atoms/Input';
 import Icon from '../../atoms/Icon';
 import * as api from '@/src/lib/api/provider';
 import { useApp } from '@/src/context/AppContext';
+import { humanizeBillingModel } from '@/src/lib/utils/product';
 
 export interface CreateSubscriptionModalProps {
     isOpen: boolean;
@@ -240,7 +241,7 @@ export default function CreateSubscriptionModal({
 
                         <div className="flex flex-col gap-4">
                             <div className="flex items-center justify-between border border-slate-700/50 rounded-lg p-3 bg-slate-800/20">
-                                <span className="text-sm text-slate-300">Precio Base del Producto</span>
+                                <span className="text-sm text-slate-300">Base Product Price</span>
                                 <span className="text-sm font-medium text-slate-200">${productPrice}</span>
                             </div>
 
@@ -254,11 +255,11 @@ export default function CreateSubscriptionModal({
                                         if (!e.target.checked) setPrice(String(productPrice));
                                     }}
                                 />
-                                <span className="text-sm text-slate-300 select-none">Habilitar edición de precio (Precio Promocional)</span>
+                                <span className="text-sm text-slate-300 select-none">Enable custom pricing (Promotional / Overridden Price)</span>
                             </label>
 
                             <Input
-                                label="Precio Final"
+                                label="Final Price"
                                 type="currency"
                                 prefix="$"
                                 value={price}
@@ -267,10 +268,10 @@ export default function CreateSubscriptionModal({
                             />
 
                             <div className="flex items-center justify-between border border-slate-700/50 rounded-lg p-3 bg-slate-800/20">
-                                <span className="text-sm text-slate-300">Periodo de Cobro</span>
+                                <span className="text-sm text-slate-300">Billing Period</span>
                                 <span className="text-sm font-medium text-slate-200 capitalize">
-                                    {productBillingPeriod === 'monthly' ? 'Mensual' : productBillingPeriod === 'annual' ? 'Anual' : productBillingPeriod}
-                                    <span className="text-xs text-slate-500 ml-1">(definido por el producto)</span>
+                                    {humanizeBillingModel(productBillingPeriod)}
+                                    <span className="text-xs text-slate-500 ml-1">(set by product)</span>
                                 </span>
                             </div>
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Icon from '../../../shared/atoms/Icon';
+import { formatBillingPeriod, humanizeBillingModel } from '@/src/lib/utils/product';
 import styles from './index.module.scss';
 
 export interface Product {
@@ -24,7 +25,7 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     const statusClass = styles[`product-card__status--${product?.status}`] || styles['product-card__status--active'];
     const price = typeof product?.price === 'number' ? product.price : Number(product?.price) || 0;
-    const period = product?.period === 'month' ? 'mo' : (product?.period || 'mo');
+    const periodSuffix = formatBillingPeriod(product?.period);
     const color = product?.iconColor?.startsWith('#') || product?.iconColor?.startsWith('rgb') ? product.iconColor : '#1978e5';
 
     return (
@@ -59,7 +60,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                     <span className={styles['product-card__label']}>Price</span>
                     <span className={styles['product-card__value']}>
                         ${price.toLocaleString()} 
-                        <span className={styles['product-card__period']}>/{period}</span>
+                        {periodSuffix ? (
+                            <span className={styles['product-card__period']}>{periodSuffix}</span>
+                        ) : (
+                            <span className={styles['product-card__period']}> ({humanizeBillingModel(product?.period)})</span>
+                        )}
                     </span>
                 </div>
                 <div className={styles['product-card__stat-item']}>

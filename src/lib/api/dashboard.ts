@@ -1,3 +1,4 @@
+import { humanizeBillingModel, formatBillingPeriod } from "../utils/product";
 import { apiFetch } from './config';
 import { Notification, NotificationDTO, Subscription, SubscriptionDTO } from './types';
 
@@ -41,14 +42,14 @@ export function mapSubscription(dto: any): Subscription {
   return {
     id: dto.id,
     name: dto.product?.name || 'Service',
-    tier: dto.product?.billing_model ? `${dto.product.billing_model} Plan` : 'Standard Plan',
+    tier: dto.product?.billing_model ? `${humanizeBillingModel(dto.product.billing_model)} Plan` : 'Standard Plan',
     icon: dto.product?.icon || 'hub',
     status: dto.status as Subscription['status'],
     progressLabel: dto.current_step?.label || dto.progress_label || '',
     progressPct: dto.progress_pct || 0,
     hasActionRequest: dto.has_action_request || false,
     price: dto.price ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(dto.price) : undefined,
-    pricePeriod: dto.product?.billing_model === 'one_time' ? "" : (dto.product?.billing_model ? `/${dto.product.billing_model.toLowerCase()}` : "/mo"),
+    pricePeriod: formatBillingPeriod(dto.product?.billing_model),
     product: {
       name: dto.product?.name || '',
       icon: dto.product?.icon || '',
@@ -81,7 +82,7 @@ export function mapSubscription(dto: any): Subscription {
       country: dto.client.country || '',
       users: dto.client.users || [],
     } : undefined,
-    tierName: dto.tierName || dto.tier || (dto.product?.billing_model ? `${dto.product.billing_model} Plan` : 'Standard Plan'),
+    tierName: dto.tierName || dto.tier || (dto.product?.billing_model ? `${humanizeBillingModel(dto.product.billing_model)} Plan` : 'Standard Plan'),
     monthlyPrice: dto.monthlyPrice || Number(dto.price) || 0,
     payments: dto.payments || [],
     documents: dto.documents || [],

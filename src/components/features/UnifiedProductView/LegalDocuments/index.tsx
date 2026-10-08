@@ -29,6 +29,10 @@ export default function LegalDocuments({
     documents = [],
     className = ''
 }: LegalDocumentsProps) {
+    if (!documents || documents.length === 0) {
+        return null;
+    }
+
     const [openingDocId, setOpeningDocId] = React.useState<string | number | null>(null);
 
     const handleOpenDocument = async (doc: Document) => {

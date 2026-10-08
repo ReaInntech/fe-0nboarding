@@ -1,0 +1,94 @@
+@reference "tailwindcss";
+
+.wysiwyg {
+  @apply w-full rounded-xl border border-slate-800 bg-[#0b101d] overflow-hidden flex flex-col transition-all duration-200;
+
+  &:focus-within {
+    @apply border-blue-500/60 ring-2 ring-blue-500/20 shadow-lg shadow-blue-500/5;
+  }
+
+  &__loading {
+    @apply flex items-center justify-center gap-2.5 p-12 bg-[#0b101d] border border-slate-800 rounded-xl text-slate-400;
+  }
+
+  &__toolbar {
+    @apply flex flex-wrap items-center gap-1.5 px-3 py-2 bg-[#0e1626] border-b border-slate-800/80;
+  }
+
+  &__toolbar-group {
+    @apply flex items-center gap-1;
+  }
+
+  &__divider {
+    @apply w-px h-5 bg-slate-800 mx-1;
+  }
+
+  &__toolbar-btn {
+    @apply flex items-center justify-center h-8 w-8 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800/80 transition-all duration-150 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed;
+
+    &--active {
+      @apply bg-blue-600/20 text-blue-400 border border-blue-500/30;
+    }
+  }
+
+  &__editor-area {
+    @apply p-4 min-h-[160px] max-h-[360px] overflow-y-auto cursor-text text-slate-200 text-sm leading-relaxed outline-none;
+  }
+
+  &__content {
+    @apply outline-none min-h-[130px];
+
+    p {
+      @apply mb-3 text-slate-300 leading-relaxed;
+      &:last-child {
+        @apply mb-0;
+      }
+    }
+
+    h2 {
+      @apply text-lg font-bold text-white mb-2 mt-4 tracking-tight;
+      &:first-child {
+        @apply mt-0;
+      }
+    }
+
+    h3 {
+      @apply text-base font-semibold text-slate-100 mb-2 mt-3;
+      &:first-child {
+        @apply mt-0;
+      }
+    }
+
+    strong, b {
+      @apply font-bold text-white;
+    }
+
+    em, i {
+      @apply italic text-slate-200;
+    }
+
+    ul {
+      @apply list-disc list-inside mb-3 space-y-1 text-slate-300 pl-2;
+    }
+
+    ol {
+      @apply list-decimal list-inside mb-3 space-y-1 text-slate-300 pl-2;
+    }
+
+    li {
+      @apply leading-relaxed;
+    }
+
+    a {
+      @apply text-blue-400 underline font-medium hover:text-blue-300;
+    }
+  }
+
+  &__help-bar {
+    @apply flex items-center justify-between gap-3 px-4 py-2.5 bg-[#090d18] border-t border-slate-800/80 flex-wrap;
+  }
+
+  &__var-badge {
+    @apply px-2 py-0.5 rounded bg-slate-800/80 border border-slate-700/60 text-[11px] font-mono text-cyan-300 hover:bg-slate-700 transition cursor-help;
+  }
+}

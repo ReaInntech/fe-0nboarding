@@ -799,3 +799,68 @@ export async function getProviderBrandingByIdentifier(
   }
 }
 
+export interface ProductNotificationConfigData {
+  id?: string;
+  product_id?: string;
+  welcome_email_subject: string;
+  welcome_email_body: string;
+  notify_on_step_change: boolean;
+  notify_on_rejection: boolean;
+  notify_on_completion: boolean;
+}
+
+/**
+ * Get notification configuration for a product (Core API)
+ */
+export async function getProductNotificationConfig(
+  productId: string,
+  token: string,
+  orgId: string
+): Promise<ProductNotificationConfigData> {
+  return apiFetch<ProductNotificationConfigData>(`/products/${productId}/notification-config`, {
+    microservice: 'core',
+    token,
+    orgId,
+  });
+}
+
+/**
+ * Update notification configuration for a product (Core API)
+ */
+export async function updateProductNotificationConfig(
+  productId: string,
+  token: string,
+  orgId: string,
+  data: Partial<ProductNotificationConfigData>
+): Promise<ProductNotificationConfigData> {
+  return apiFetch<ProductNotificationConfigData>(`/products/${productId}/notification-config`, {
+    method: 'PUT',
+    microservice: 'core',
+    token,
+    orgId,
+    body: JSON.stringify(data),
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+/**
+ * Tracks invite access upon client login and notifies provider (Core API)
+ */
+export async function trackInviteAccess(
+  subscriptionId: string,
+  token: string,
+  orgId?: string
+): Promise<{ success: boolean }> {
+  try {
+    return await apiFetch<{ success: boolean }>(`/subscriptions/${subscriptionId}/track-invite-access`, {
+      method: 'POST',
+      microservice: 'core',
+      token,
+      orgId,
+    });
+  } catch (err) {
+    console.warn(`[ProviderAPI] trackInviteAccess error for ${subscriptionId}:`, err);
+    return { success: false };
+  }
+}
+

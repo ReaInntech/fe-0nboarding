@@ -1,13 +1,15 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useApp } from '@/src/context/AppContext';
 import ProviderTopNavigation from '../../../shared/molecule/ProviderTopNavigation';
 import Footer from '../../../shared/molecule/Footer';
+import Icon from '../../../shared/atoms/Icon';
 import ProviderProductHeader from '../ProviderProductHeader';
 import ProviderOnboardingManager from '../ProviderOnboardingManager';
 import ProviderRequestsManager from '../ProviderRequestsManager';
 import ProviderDetailsProduct from '../ProviderDetailsProduct';
+import ProductNotificationConfigTab from '../ProductNotificationConfigTab';
 import { OnboardingStep, ClientRequest, OnboardingRequest, UserProfile, Product } from '@/src/lib/api/types';
 import * as api from '@/src/lib/api/provider';
 import { auth } from '@/src/lib/firebase/config';
@@ -30,6 +32,7 @@ export default function ProviderProductView({
 }: ProviderProductViewProps) {
     const { user } = useApp();
     const orgId = user?.organization?.id || '';
+    const [activeTab, setActiveTab] = useState<'onboarding' | 'notifications'>('onboarding');
 
     const getFreshToken = async () => {
         const currentUser = auth.currentUser;
@@ -145,35 +148,64 @@ export default function ProviderProductView({
                     />
                 </div>
 
-                {/* Requirements - full width */}
-                <ProviderDetailsProduct 
-                    initialMetadata={metadata} 
-                    onSave={handleSaveMetadata}
-                />
-
-
-                {/* Onboarding - full width */}
-                <ProviderOnboardingManager
-                    initialSteps={onboardingSteps}
-                    productPrice={product?.price || 0}
-                    onSaveStepMetadata={handleSaveStepMetadata}
-                    onSaveRequest={handleSaveRequest}
-                    onDeleteRequest={handleDeleteRequest}
-                    onDeleteStep={handleDeleteStep}
-                    onCancel={() => {
-                        console.log('[ProviderProductView] Cancelled onboarding changes');
-                    }}
-                />
-
-
-                {/* Requests - full width */}
-                <ProviderRequestsManager requests={requests} />
-
-                {/* Activity Log Placeholder */}
-                <div className={styles['provider-view__activity-log']}>
-                    <h4>Usage Activity Log</h4>
-                    <p>Detailed logs of client interactions and service consumption will appear here.</p>
+                {/* Tabs Navigation */}
+                <div className={styles['provider-view__tabs-nav']}>
+                    <button
+                        type="button"
+                        onClick={() => setActiveTab('onboarding')}
+                        className={`${styles['provider-view__tab-btn']} ${activeTab === 'onboarding' ? styles['provider-view__tab-btn--active'] : ''}`}
+                    >
+                        <Icon name="account_tree" className="text-sm" />
+                        <span>Flujo de Onboarding & Requisitos</span>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setActiveTab('notifications')}
+                        className={`${styles['provider-view__tab-btn']} ${activeTab === 'notifications' ? styles['provider-view__tab-btn--active'] : ''}`}
+                    >
+                        <Icon name="notifications_active" className="text-sm" />
+                        <span>Configure notifications</span>
+                    </button>
                 </div>
+
+                {activeTab === 'notifications' ? (
+                    <ProductNotificationConfigTab
+                        productId={product?.id || product?.productCode}
+                        productName={product?.name || 'Producto'}
+                        providerLogo={user?.organization?.logo_url}
+                        providerName={user?.organization?.legal_name || 'Proveedor'}
+                    />
+                ) : (
+                    <>
+                        {/* Requirements - full width */}
+                        <ProviderDetailsProduct 
+                            initialMetadata={metadata} 
+                            onSave={handleSaveMetadata}
+                        />
+
+                        {/* Onboarding - full width */}
+                        <ProviderOnboardingManager
+                            initialSteps={onboardingSteps}
+                            productPrice={product?.price || 0}
+                            onSaveStepMetadata={handleSaveStepMetadata}
+                            onSaveRequest={handleSaveRequest}
+                            onDeleteRequest={handleDeleteRequest}
+                            onDeleteStep={handleDeleteStep}
+                            onCancel={() => {
+                                console.log('[ProviderProductView] Cancelled onboarding changes');
+                            }}
+                        />
+
+                        {/* Requests - full width */}
+                        <ProviderRequestsManager requests={requests} />
+
+                        {/* Activity Log Placeholder */}
+                        <div className={styles['provider-view__activity-log']}>
+                            <h4>Usage Activity Log</h4>
+                            <p>Detailed logs of client interactions and service consumption will appear here.</p>
+                        </div>
+                    </>
+                )}
             </main>
             <Footer />
         </div>

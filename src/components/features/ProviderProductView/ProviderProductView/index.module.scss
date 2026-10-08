@@ -16,7 +16,19 @@
     }
 
     &__header-section {
-        @apply pb-10 border-b border-white/[0.03];
+        @apply pb-6 border-b border-white/[0.03];
+    }
+
+    &__tabs-nav {
+        @apply flex items-center gap-2 border-b border-slate-800 pb-2;
+    }
+
+    &__tab-btn {
+        @apply flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all cursor-pointer;
+
+        &--active {
+            @apply text-blue-400 bg-blue-600/15 border border-blue-500/30 shadow-sm shadow-blue-500/10;
+        }
     }
 
     &__activity-log {

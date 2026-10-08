@@ -1,26 +1,44 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useEffect, useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
   signInWithPopup,
-  getIdToken
 } from 'firebase/auth';
 import { auth, googleProvider } from '@/src/lib/firebase/config';
 import LoginForm from '@/src/components/shared/molecule/LoginForm';
 import { useApp } from '@/src/context/AppContext';
+import { trackInviteAccess } from '@/src/lib/api/provider';
 
-export default function LoginPage() {
+function LoginContent() {
     const { user, isLoading } = useApp();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [authError, setAuthError] = useState<string | null>(null);
 
-    // If already logged in, redirect to dashboard
+    const redirectParam = searchParams.get('redirect');
+    const subIdParam = searchParams.get('sub_id');
+    const fromInvite = searchParams.get('from_invite') === 'true';
+
+    const handlePostLoginRedirect = async (token?: string) => {
+        const target = redirectParam || '/dashboard';
+        if (subIdParam && fromInvite) {
+            try {
+                const freshToken = token || (await auth.currentUser?.getIdToken()) || '';
+                await trackInviteAccess(subIdParam, freshToken);
+            } catch (err) {
+                console.warn('[LoginPage] trackInviteAccess notification error:', err);
+            }
+        }
+        router.push(target);
+    };
+
+    // If already logged in, redirect to destination
     useEffect(() => {
         if (!isLoading && user) {
-            router.push('/dashboard');
+            handlePostLoginRedirect(user.accessToken);
         }
     }, [user, isLoading, router]);
 
@@ -41,6 +59,7 @@ export default function LoginPage() {
                 const token = await userCredential.user.getIdToken();
                 const { createSession } = await import('@/src/lib/firebase/auth-actions');
                 await createSession(token);
+                await handlePostLoginRedirect(token);
             } catch (err) {
                 console.warn('[LoginPage] Immediate session sync failed, fallback to AppContext listener', err);
             }
@@ -68,10 +87,11 @@ export default function LoginPage() {
                 const token = await userCredential.user.getIdToken();
                 const { createSession } = await import('@/src/lib/firebase/auth-actions');
                 await createSession(token);
+                await handlePostLoginRedirect(token);
             } catch (err) {
                 console.warn('[LoginPage] Google immediate session sync failed', err);
+                await handlePostLoginRedirect();
             }
-            router.push('/dashboard');
         } catch (err: any) {
             console.error('[LoginPage] Google login error:', err);
             setAuthError('Failed to login with Google.');
@@ -87,7 +107,7 @@ export default function LoginPage() {
         );
     }
 
-    // If user is already resolved and present, the useEffect will handle redirect.
+    // If user is already resolved and present, useEffect handles redirection
     if (user) return null;
 
     return (
@@ -102,5 +122,17 @@ export default function LoginPage() {
                 )}
             </div>
         </div>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center min-h-screen bg-[#0f1523]">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+        }>
+            <LoginContent />
+        </Suspense>
     );
 }
